@@ -1,0 +1,686 @@
+/* src/styles/hobbies.css */
+.hobbies-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hobbies-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #00f5ff, #ff007a);
+  z-index: 2;
+}
+
+.hobbies-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #00f5ff, #ff007a);
+  border-radius: 3px;
+}
+
+.intro-wide {
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  padding: 0 1rem;
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .hobbies-section {
+    padding: 3rem 0;
+  }
+  
+  .hobbies-title {
+    font-size: 2rem;
+  }
+  
+  .hobbies-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hobbies-section {
+    padding: 2rem 0;
+  }
+  
+  .hobbies-title {
+    font-size: 1.8rem;
+  }
+  
+  .intro-wide {
+    font-size: 1rem;
+  }
+}
+
+.skeleton-title {
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin: 0 auto 2rem;
+  width: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-title::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-text {
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin: 0 auto 3rem;
+  width: 80%;
+  max-width: 800px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-text::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-card {
+  height: 500px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.loading-placeholder {
+  padding: 1rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.hobbies-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+.hobbies-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hobbies-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #00f5ff, #ff007a);
+  z-index: 2;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.hobbies-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #00f5ff, #ff007a);
+  border-radius: 3px;
+}
+
+.intro-wide {
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  padding: 0 1rem;
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+}
+
+.loading-trigger {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 50px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #00f5ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-placeholder {
+  padding: 1rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.skeleton-title {
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin: 0 auto 2rem;
+  width: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-title::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-text {
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin: 0 auto 3rem;
+  width: 80%;
+  max-width: 800px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-text::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-card {
+  height: 500px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: 768px) {
+  .hobbies-section {
+    padding: 3rem 0;
+  }
+  
+  .hobbies-title {
+    font-size: 2rem;
+  }
+  
+  .hobbies-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hobbies-section {
+    padding: 2rem 0;
+  }
+  
+  .hobbies-title {
+    font-size: 1.8rem;
+  }
+  
+  .intro-wide {
+    font-size: 1rem;
+  }
+}
+
+.hobbies-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.hobbies-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #FF6B6B, #4D96FF, #6BCB77, #9C51E0, #FFD93D);
+  z-index: 2;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.intro-wide {
+  max-width: 800px;
+  margin: 0 auto 4rem;
+  padding: 0 1rem;
+  font-size: 1.2rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  font-weight: 300;
+}
+
+.loading-trigger {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+  min-height: 60px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #FF6B6B;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cardAppear {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hobbies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 0.9rem;
+  margin: 0 auto;
+  max-width: auto;
+  padding: 0 1rem;
+}
+.hobbies-grid > *:nth-child(1) { animation-delay: 0.1s; }
+.hobbies-grid > *:nth-child(2) { animation-delay: 0.2s; }
+.hobbies-grid > *:nth-child(3) { animation-delay: 0.3s; }
+.hobbies-grid > *:nth-child(4) { animation-delay: 0.4s; }
+.hobbies-grid > *:nth-child(5) { animation-delay: 0.5s; }
+.hobbies-grid > *:nth-child(6) { animation-delay: 0.6s; }
+
+@media (max-width: 968px) {
+  .hobbies-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hobbies-section {
+    padding: 3rem 0;
+  }
+  
+  .hobbies-title {
+    font-size: 2.5rem;
+  }
+  
+  .hobbies-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .intro-wide {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hobbies-section {
+    padding: 2rem 0;
+  }
+  
+  .hobbies-title {
+    font-size: 2rem;
+  }
+  
+  .intro-wide {
+    font-size: 1rem;
+    margin-bottom: 3rem;
+  }
+  
+  .hobbies-grid {
+    gap: 1.5rem;
+  }
+}
+
+.hobbies-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.hobbies-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #007bff, #00b4ff);
+  z-index: 2;
+}
+
+.hobbies-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #343a40;
+  position: relative;
+}
+
+.hobbies-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #007bff, #00b4ff);
+  border-radius: 3px;
+}
+
+.intro-wide {
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  padding: 0 1rem;
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: #495057;
+  text-align: center;
+}
+
+.hobbies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 0 1rem;
+}
+
+.loading-trigger {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 50px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 123, 255, 0.1);
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.skeleton-title {
+  height: 40px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin: 0 auto 2rem;
+  width: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-title::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-text {
+  height: 20px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  margin: 0 auto 3rem;
+  width: 80%;
+  max-width: 800px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-text::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-card {
+  height: 500px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: 768px) {
+  .hobbies-section {
+    padding: 3rem 0;
+  }
+  
+  .hobbies-title {
+    font-size: 2rem;
+  }
+  
+  .hobbies-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hobbies-section {
+    padding: 2rem 0;
+  }
+  
+  .hobbies-title {
+    font-size: 1.8rem;
+  }
+  
+  .intro-wide {
+    font-size: 1rem;
+  }
+}
