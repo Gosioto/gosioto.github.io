@@ -120,7 +120,7 @@ export const projectsData: Project[] = [
       { src: '/img/Case_screenshot_2.png', alt: 'Real-time log' }
     ],
     demoUrl: '/case/remote-admin.html',
-    thumbnail: '/img/case.png'
+    thumbnail: '/img/Case.png'
   },
   {
     id: 'python-scripts',
