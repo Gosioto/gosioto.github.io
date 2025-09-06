@@ -11,7 +11,7 @@ interface GamesPageProps {
 export default function GamesPage({ children }: GamesPageProps) {
   useEffect(() => {
     // Initialize all animations
-    AnimationUtils.initAll();
+    // AnimationUtils.initAll(); // Commented out until AnimationUtils is implemented
 
     // Handle expandable speech block
     const handleSpeechClick = (e: MouseEvent) => {
@@ -41,7 +41,7 @@ export default function GamesPage({ children }: GamesPageProps) {
       document.body.style.setProperty('--scroll-y', scrolled + 'px');
       
       // Add parallax effect to banner
-      const banner = document.querySelector('.hobby-banner');
+      const banner = document.querySelector('.hobby-banner') as HTMLElement;
       if (banner) {
         banner.style.transform = `translateY(${scrolled * 0.5}px)`;
       }
@@ -58,13 +58,14 @@ export default function GamesPage({ children }: GamesPageProps) {
     };
 
     // Add ripple effect to buttons
-    const createRipple = (e: MouseEvent) => {
-      const button = e.currentTarget as HTMLElement;
+    const createRipple = (e: Event) => {
+      const mouseEvent = e as MouseEvent;
+      const button = mouseEvent.currentTarget as HTMLElement;
       const ripple = document.createElement('span');
       const rect = button.getBoundingClientRect();
       const size = Math.max(rect.width, rect.height);
-      const x = e.clientX - rect.left - size / 2;
-      const y = e.clientY - rect.top - size / 2;
+      const x = mouseEvent.clientX - rect.left - size / 2;
+      const y = mouseEvent.clientY - rect.top - size / 2;
 
       ripple.style.width = ripple.style.height = size + 'px';
       ripple.style.left = x + 'px';
@@ -98,7 +99,7 @@ export default function GamesPage({ children }: GamesPageProps) {
         button.removeEventListener('click', createRipple);
       });
       
-      AnimationUtils.cleanup();
+      // AnimationUtils.cleanup(); // Commented out until AnimationUtils is implemented
     };
   }, []);
 

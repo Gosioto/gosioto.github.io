@@ -60,7 +60,7 @@ export function getGameIconColor(gameName: string): string {
     '#ff6b6b', '#f9844a', '#ee6c4d', '#c9184a', '#560bad', '#7209b7',
     '#3a0ca3', '#4361ee', '#4895ef', '#4cc9f0', '#06ffa5', '#52b788'
   ];
-  const idx = [...gameName].reduce((a, c) => a + c.charCodeAt(0), 0) % colors.length;
+  const idx = gameName.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % colors.length;
   return colors[idx];
 }
 

@@ -3,7 +3,7 @@
 
 import { hobbiesData } from '@/data/hobbiesData';
 import HobbyCard from './HobbyCard';
-import HobbiesGamesSection from './HobbiesPageSection';
+import HobbiesGamesSection from './HobbiesGamesSection';
 import { useState, useEffect, useRef } from 'react';
 
 const EnhancedHobbiesPageSection = () => {
