@@ -1,0 +1,149 @@
+/* Modal Buttons Styles */
+
+/* Fixed position buttons */
+.game-modal-buttons {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.game-modal-button {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.game-modal-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.game-modal-button:active {
+  transform: translateY(0) scale(1);
+}
+
+.game-modal-button.screenshots {
+  background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+}
+
+.game-modal-button.achievements {
+  background: linear-gradient(135deg, var(--accent-orange), #ff6b6b);
+}
+
+.game-modal-button i {
+  font-size: 1.125rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .game-modal-buttons {
+    bottom: 1rem;
+    right: 1rem;
+  }
+  
+  .game-modal-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .game-modal-button span {
+    display: none;
+  }
+  
+  .game-modal-button i {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-modal-buttons {
+    bottom: 0.75rem;
+    right: 0.75rem;
+    gap: 0.5rem;
+  }
+  
+  .game-modal-button {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Animation for button appearance */
+.game-modal-button {
+  animation: buttonSlideIn 0.5s ease-out;
+}
+
+.game-modal-button:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.game-modal-button:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.game-modal-button:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes buttonSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Hover effects */
+.game-modal-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.game-modal-button:hover::before {
+  left: 100%;
+}
+
+/* Focus styles */
+.game-modal-button:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+  .game-modal-button {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  }
+  
+  .game-modal-button:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  }
+}

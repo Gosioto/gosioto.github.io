@@ -81,7 +81,10 @@ export default function GamesSidebar() {
               <span className="text-sm">Стратег Dawn of War</span>
             </li>
           </ul>
-          <button className="w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition">
+          <button 
+            className="btn-achievements w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition"
+            data-game="Общие достижения"
+          >
             <i className="fas fa-list mr-2"></i> Все достижения
           </button>
         </div>

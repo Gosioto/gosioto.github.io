@@ -1,0 +1,192 @@
+/* Games Dropdown Menu Styles */
+
+/* Main dropdown container */
+.games-dropdown-menu {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+/* Dropdown content - always visible on hover */
+.games-dropdown-content {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.75rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px) scale(0.9);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.games-dropdown-menu:hover .games-dropdown-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+
+/* Individual menu buttons */
+.games-dropdown-button {
+  background: linear-gradient(135deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 20, 0.95));
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 200px;
+  justify-content: flex-start;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.games-dropdown-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.games-dropdown-button:hover::before {
+  left: 100%;
+}
+
+.games-dropdown-button:hover {
+  transform: translateX(-10px);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+.games-dropdown-button:active {
+  transform: translateX(-5px) scale(0.98);
+}
+
+.games-dropdown-button i {
+  font-size: 1.1rem;
+  width: 1.5rem;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.games-dropdown-button:hover i {
+  transform: scale(1.1);
+}
+
+.games-dropdown-button span {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Button variants */
+.games-dropdown-button.info {
+  border-color: rgba(0, 212, 255, 0.3);
+}
+
+.games-dropdown-button.info:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 6px 25px rgba(0, 212, 255, 0.2);
+}
+
+.games-dropdown-button.screenshots {
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.games-dropdown-button.screenshots:hover {
+  border-color: var(--accent-purple);
+  box-shadow: 0 6px 25px rgba(139, 92, 246, 0.2);
+}
+
+.games-dropdown-button.achievements {
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.games-dropdown-button.achievements:hover {
+  border-color: var(--accent-orange);
+  box-shadow: 0 6px 25px rgba(245, 158, 11, 0.2);
+}
+
+/* Staggered animation delays */
+.games-dropdown-button:nth-child(1) {
+  transition-delay: 0.05s;
+}
+
+.games-dropdown-button:nth-child(2) {
+  transition-delay: 0.1s;
+}
+
+.games-dropdown-button:nth-child(3) {
+  transition-delay: 0.15s;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .games-dropdown-menu {
+    bottom: 0.75rem;
+    right: 0.75rem;
+  }
+  
+  .games-dropdown-button {
+    min-width: 180px;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.85rem;
+  }
+  
+  .games-dropdown-button i {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .games-dropdown-menu {
+    bottom: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  .games-dropdown-button {
+    min-width: 160px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .games-dropdown-button span {
+    display: none;
+  }
+  
+  .games-dropdown-button i {
+    font-size: 1.25rem;
+    width: auto;
+  }
+}
+
+/* Animation for initial appearance */
+.games-dropdown-menu {
+  animation: menuSlideUp 0.6s ease-out;
+}
+
+@keyframes menuSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

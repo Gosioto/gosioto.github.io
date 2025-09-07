@@ -1,0 +1,423 @@
+/* Enhanced Midjourney Style Animations and Effects */
+
+/* Additional CSS Variables */
+:root {
+  --glow-blue: 0 0 20px rgba(0, 212, 255, 0.3);
+  --glow-purple: 0 0 20px rgba(139, 92, 246, 0.3);
+  --glow-green: 0 0 20px rgba(16, 185, 129, 0.3);
+  
+  --particle-size: 2px;
+  --particle-count: 50;
+}
+
+/* Enhanced Hero Section */
+.games-hero-bg {
+  position: relative;
+}
+
+.games-hero-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+  animation: backgroundShift 20s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes backgroundShift {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* Floating Particles */
+.games-hero-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.particle {
+  position: absolute;
+  width: var(--particle-size);
+  height: var(--particle-size);
+  background: var(--accent-blue);
+  border-radius: 50%;
+  animation: float 15s infinite linear;
+  opacity: 0.6;
+}
+
+.particle:nth-child(odd) {
+  background: var(--accent-purple);
+  animation-duration: 20s;
+}
+
+.particle:nth-child(3n) {
+  background: var(--accent-green);
+  animation-duration: 25s;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100px) translateX(100px);
+    opacity: 0;
+  }
+}
+
+/* Enhanced Cards with Glow Effects */
+.games-stat-card:hover {
+  box-shadow: 
+    var(--shadow-large),
+    var(--glow-blue);
+}
+
+.games-card:hover {
+  box-shadow: 
+    var(--shadow-large),
+    var(--glow-purple);
+}
+
+.games-top-card:hover {
+  box-shadow: 
+    var(--shadow-medium),
+    var(--glow-green);
+}
+
+/* Enhanced Buttons */
+.games-card-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.games-card-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.games-card-btn:hover::before {
+  left: 100%;
+}
+
+.games-card-btn.primary {
+  background: var(--gradient-primary);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.games-card-btn.primary:hover {
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Enhanced Progress Bars */
+.games-current-progress-fill {
+  position: relative;
+  overflow: hidden;
+}
+
+.games-current-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: progressShimmer 2s infinite;
+}
+
+@keyframes progressShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Enhanced Modal Animations */
+.games-modal {
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.games-modal-content {
+  animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(10px);
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Enhanced Scroll Reveal */
+.games-scroll-reveal {
+  opacity: 0;
+  transform: translateY(50px) scale(0.95);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.games-scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Staggered Animation */
+.games-scroll-reveal:nth-child(1) { transition-delay: 0.1s; }
+.games-scroll-reveal:nth-child(2) { transition-delay: 0.2s; }
+.games-scroll-reveal:nth-child(3) { transition-delay: 0.3s; }
+.games-scroll-reveal:nth-child(4) { transition-delay: 0.4s; }
+.games-scroll-reveal:nth-child(5) { transition-delay: 0.5s; }
+
+/* Enhanced Navigation */
+.games-nav {
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.games-nav.scrolled {
+  backdrop-filter: blur(30px);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced Sidebar */
+.games-sidebar {
+  background: rgba(17, 17, 17, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.games-sidebar-item:hover {
+  background: rgba(0, 212, 255, 0.1);
+  border-radius: var(--border-radius);
+  margin: 0 -0.5rem;
+  padding-left: 1rem;
+  padding-right: 0.5rem;
+}
+
+/* Enhanced Images */
+.games-card-image,
+.games-top-card-image,
+.games-current-image {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.games-card:hover .games-card-image,
+.games-top-card:hover .games-top-card-image {
+  transform: scale(1.1) rotate(1deg);
+}
+
+/* Loading States */
+.games-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.games-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: loadingShimmer 1.5s infinite;
+}
+
+@keyframes loadingShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Enhanced Typography */
+.games-hero-title {
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  from {
+    text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+  }
+  to {
+    text-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
+  }
+}
+
+/* Enhanced Stats Numbers */
+.games-stat-number {
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  animation: numberPulse 2s ease-in-out infinite;
+}
+
+@keyframes numberPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Enhanced Icons */
+.games-stat-icon {
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .games-hero-title {
+    font-size: 3rem;
+  }
+  
+  .games-hero-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .games-hero-stats {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .games-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .games-hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .games-hero-subtitle {
+    font-size: 1rem;
+  }
+  
+  .games-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .games-top-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Performance Optimizations */
+.games-page-midjourney * {
+  will-change: transform;
+}
+
+.games-card,
+.games-stat-card,
+.games-current-item {
+  contain: layout style paint;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .games-hero-title {
+    animation: none;
+  }
+  
+  .games-stat-number {
+    animation: none;
+  }
+  
+  .games-stat-icon {
+    animation: none;
+  }
+}
+
+/* Focus Styles */
+.games-card-btn:focus,
+.games-modal-close:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
+}
+
+/* Print Styles */
+@media print {
+  .games-hero-bg,
+  .games-nav,
+  .games-modal {
+    display: none;
+  }
+  
+  .games-page-midjourney {
+    background: white;
+    color: black;
+  }
+}

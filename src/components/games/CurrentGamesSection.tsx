@@ -61,13 +61,22 @@ export default function CurrentGamesSection() {
                   <h4 className="font-semibold mb-2">Достижения:</h4>
                   <p className="text-sm text-gray-600">{game.achievements}</p>
                 </div>
-                <button 
-                  className="btn-screens bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
-                  data-game={game.name}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <i className="fas fa-images mr-2"></i> Скриншоты
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    className="btn-screens bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
+                    data-game={game.name}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <i className="fas fa-images mr-2"></i> Скриншоты
+                  </button>
+                  <button 
+                    className="btn-achievements bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition"
+                    data-game={game.name}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <i className="fas fa-trophy mr-2"></i> Достижения
+                  </button>
+                </div>
               </div>
             )}
           </div>

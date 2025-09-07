@@ -1,17 +1,39 @@
 // src/components/games/GamesPage.tsx
 'use client';
 
-import { useEffect, ReactNode } from 'react';
-//import AnimationUtils from '@/utils/animations';
+import { useEffect, ReactNode, useState } from 'react';
+import ScreenshotsModal from './ScreenshotsModal';
+import AchievementsModal from './AchievementsModal';
+import { AnimationUtils } from '@/utils/animations';
 
 interface GamesPageProps {
   children: ReactNode;
 }
 
 export default function GamesPage({ children }: GamesPageProps) {
+  const [screenshotsModal, setScreenshotsModal] = useState<{
+    isOpen: boolean;
+    gameName: string;
+    screenshots: string[];
+  }>({
+    isOpen: false,
+    gameName: '',
+    screenshots: []
+  });
+
+  const [achievementsModal, setAchievementsModal] = useState<{
+    isOpen: boolean;
+    gameName: string;
+    achievements: any[];
+  }>({
+    isOpen: false,
+    gameName: '',
+    achievements: []
+  });
+
   useEffect(() => {
     // Initialize all animations
-    // AnimationUtils.initAll(); // Commented out until AnimationUtils is implemented
+    AnimationUtils.initAll();
 
     // Handle expandable speech block
     const handleSpeechClick = (e: MouseEvent) => {
@@ -89,9 +111,83 @@ export default function GamesPage({ children }: GamesPageProps) {
       button.addEventListener('click', createRipple);
     });
 
+    // Handle screenshots button clicks
+    const handleScreenshotsClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      const button = target.closest('.btn-screens');
+      if (button) {
+        const gameName = button.getAttribute('data-game');
+        if (gameName) {
+          // Mock screenshots data - in real app, this would come from API
+          const mockScreenshots = [
+            `/img/screenshot/screenshot1.jpg`,
+            `/img/screenshot/screenshot2.jpg`,
+            `/img/screenshot/screenshot3.jpg`,
+            `/img/screenshot/screenshot1.jpg`,
+            `/img/screenshot/screenshot2.jpg`
+          ];
+          setScreenshotsModal({
+            isOpen: true,
+            gameName,
+            screenshots: mockScreenshots
+          });
+        }
+      }
+    };
+
+    // Handle achievements button clicks
+    const handleAchievementsClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      const button = target.closest('.btn-achievements');
+      if (button) {
+        const gameName = button.getAttribute('data-game');
+        if (gameName) {
+          // Mock achievements data - in real app, this would come from API
+          const mockAchievements = [
+            {
+              id: '1',
+              name: 'Первые шаги',
+              description: 'Завершите обучение',
+              icon: 'fas fa-graduation-cap',
+              unlocked: true,
+              unlockedAt: '2024-01-15',
+              rarity: 'common' as const
+            },
+            {
+              id: '2',
+              name: 'Мастер боя',
+              description: 'Победите 100 врагов',
+              icon: 'fas fa-sword',
+              unlocked: true,
+              unlockedAt: '2024-02-20',
+              rarity: 'rare' as const
+            },
+            {
+              id: '3',
+              name: 'Легенда',
+              description: 'Завершите игру на максимальной сложности',
+              icon: 'fas fa-crown',
+              unlocked: false,
+              rarity: 'legendary' as const
+            }
+          ];
+          setAchievementsModal({
+            isOpen: true,
+            gameName,
+            achievements: mockAchievements
+          });
+        }
+      }
+    };
+
+    document.addEventListener('click', handleScreenshotsClick);
+    document.addEventListener('click', handleAchievementsClick);
+
     // Cleanup
     return () => {
       document.removeEventListener('click', handleSpeechClick);
+      document.removeEventListener('click', handleScreenshotsClick);
+      document.removeEventListener('click', handleAchievementsClick);
       document.querySelector('.menu-toggle')?.removeEventListener('click', handleMenuToggle);
       window.removeEventListener('scroll', handleScroll);
       
@@ -99,7 +195,7 @@ export default function GamesPage({ children }: GamesPageProps) {
         button.removeEventListener('click', createRipple);
       });
       
-      // AnimationUtils.cleanup(); // Commented out until AnimationUtils is implemented
+      AnimationUtils.cleanup();
     };
   }, []);
 
@@ -196,6 +292,21 @@ export default function GamesPage({ children }: GamesPageProps) {
           </p>
         </div>
       </footer>
+
+      {/* Modals */}
+      <ScreenshotsModal
+        gameName={screenshotsModal.gameName}
+        isOpen={screenshotsModal.isOpen}
+        onClose={() => setScreenshotsModal(prev => ({ ...prev, isOpen: false }))}
+        screenshots={screenshotsModal.screenshots}
+      />
+
+      <AchievementsModal
+        gameName={achievementsModal.gameName}
+        isOpen={achievementsModal.isOpen}
+        onClose={() => setAchievementsModal(prev => ({ ...prev, isOpen: false }))}
+        achievements={achievementsModal.achievements}
+      />
     </div>
   );
 }

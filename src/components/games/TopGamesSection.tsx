@@ -39,12 +39,20 @@ export default function TopGamesSection() {
                 <p className="mb-2"><strong>Часы в Steam:</strong> {game.hours} ч</p>
                 <p className="mb-2"><strong>Последний запуск:</strong> {game.lastLaunch}</p>
                 <p className="mb-4"><strong>Достижения:</strong> {game.achievements}</p>
-                <button 
-                  className="btn-screens bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
-                  data-game={game.name}
-                >
-                  <i className="fas fa-images mr-2"></i> Посмотреть скриншоты
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    className="btn-screens bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
+                    data-game={game.name}
+                  >
+                    <i className="fas fa-images mr-2"></i> Скриншоты
+                  </button>
+                  <button 
+                    className="btn-achievements bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition"
+                    data-game={game.name}
+                  >
+                    <i className="fas fa-trophy mr-2"></i> Достижения
+                  </button>
+                </div>
               </div>
             )}
           </div>

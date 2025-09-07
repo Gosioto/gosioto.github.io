@@ -70,16 +70,16 @@ export const gamesData: Game[] = [
 ];
 
 export const topGames: TopGame[] = [
-  { name: 'The Witcher 3: Wild Hunt', hours: 6945, lastLaunch: '22 июн.', achievements: '78/78', image: 'https://cdn.cloudflare.steamstatic.com/steam/apps/292030/header.jpg', rank: 1 },
-  { name: 'GTFO', hours: 989, lastLaunch: 'Активная игра', achievements: '56/57', image: 'https://cdn.cloudflare.steamstatic.com/steam/apps/493520/header.jpg', rank: 2 },
-  { name: 'Warhammer 40,000: Dawn of War - Soulstorm', hours: 794, lastLaunch: '29 нояб. 2024', achievements: '', image: 'https://cdn.cloudflare.steamstatic.com/steam/apps/9450/header.jpg', rank: 3 },
-  { name: 'TRADESMAN: Deal to Dealer', hours: 445, lastLaunch: 'Активная игра', achievements: 'Скоро будут ;)', image: 'https://cdn.cloudflare.steamstatic.com/steam/apps/2555430/header.jpg', rank: 4 },
-  { name: 'EVE Frontier', hours: 52, lastLaunch: 'Активная игра', achievements: '-', image: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1827680/header.jpg', rank: 5 }
+  { name: 'Wild Hunt: The Witcher 3', hours: 6945, lastLaunch: '22 июн.', achievements: '78/78', image: '/img/The-Witcher-3.jpg', rank: 1 },
+  { name: 'GTFO', hours: 989, lastLaunch: 'Активная игра', achievements: '56/57', image: '/img/gtfo.png', rank: 2 },
+  { name: 'Dawn of War Soulstorm', hours: 794, lastLaunch: '29 нояб. 2024', achievements: '', image: '/img/soulstorm.png', rank: 3 },
+  { name: 'Tradesman Deal to Dealer', hours: 445, lastLaunch: 'Активная игра', achievements: 'Скоро будут ;)', image: '/img/tradesman-deal-to-dealer.jpg', rank: 4 },
+  { name: 'EVE Frontier', hours: 52, lastLaunch: 'Активная игра', achievements: '-', image: '/img/eve-frontier.jpg', rank: 5 }
 ];
 
 export const currentGames: CurrentGame[] = [
-  { name: 'Expeditions: A MudRunner Game', hours: 72, lastLaunch: 'Активная игра', achievements: '13/20', image: 'https://cdn.cloudflare.steamstatic.com/steam/apps/2477340/header.jpg', progress: 47 },
-  { name: 'EVE Frontier', hours: 52, lastLaunch: 'Активная игра', achievements: '-', image: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1827680/header.jpg', progress: 32 }
+  { name: 'Expeditions: A MudRunner Game', hours: 72, lastLaunch: 'Активная игра', achievements: '13/20', image: '/img/expeditions.jpg', progress: 47 },
+  { name: 'EVE Frontier', hours: 52, lastLaunch: 'Активная игра', achievements: '-', image: '/img/eve-frontier.jpg', progress: 32 }
 ];
 
 export const gameStats = {

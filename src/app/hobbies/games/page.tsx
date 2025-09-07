@@ -2,20 +2,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import GamesPage from '@/components/games/GamesPage';
-import GameStatsSection from '@/components/games/GameStatsSection';
-import TopGamesSection from '@/components/games/TopGamesSection';
-import CurrentGamesSection from '@/components/games/CurrentGamesSection';
-import SteamGamesSection from '@/components/games/SteamGamesSection';
-import GamesSidebar from '@/components/games/GamesSidebar';
+import GamesPageMidjourney from '@/components/games/GamesPageMidjourney';
+import TopGamesMidjourney from '@/components/games/TopGamesMidjourney';
+import CurrentGamesMidjourney from '@/components/games/CurrentGamesMidjourney';
+import SteamGamesMidjourney from '@/components/games/SteamGamesMidjourney';
+import GamesSidebarMidjourney from '@/components/games/GamesSidebarMidjourney';
+import GameModalButtons from '@/components/games/GameModalButtons';
 import Footer from '@/components/Footer';
 import NewsTab from '@/components/NewsTab';
 import StubbornButton from '@/components/StubbornButton';
-import '@/styles/hobbies.css';
-import '@/styles/games.css';
-import '@/styles/hobbies-games.css';
-import '@/styles/hobby-game-card.css';
-import '@/styles/enhanced-hobbies.css';
+import '@/styles/games-midjourney.css';
+import '@/styles/games-midjourney-enhanced.css';
+import '@/styles/games-dropdown-menu.css';
+import '@/styles/games-modals.css';
 export default function HobbiesGamesPage() {
   const [mounted, setMounted] = useState(false);
 
@@ -33,13 +32,14 @@ export default function HobbiesGamesPage() {
 
   return (
     <div>
-      <GamesPage>
-        <GameStatsSection />
-        <TopGamesSection />
-        <CurrentGamesSection />
-        <SteamGamesSection />
-        <GamesSidebar />
-      </GamesPage>
+      <GamesPageMidjourney>
+        <div></div>
+        <TopGamesMidjourney />
+        <CurrentGamesMidjourney />
+        <SteamGamesMidjourney />
+        <GamesSidebarMidjourney />
+      </GamesPageMidjourney>
+      <GameModalButtons />
       <Footer />
       <NewsTab />
       <StubbornButton />
