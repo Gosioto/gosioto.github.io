@@ -8,6 +8,120 @@
   
   --particle-size: 2px;
   --particle-count: 50;
+  
+  /* VA-style accents */
+  --va-gradient: linear-gradient(135deg, #00d4ff, #8b5cf6);
+  --va-gradient-2: linear-gradient(135deg, #10b981, #00d4ff);
+}
+
+/* Subtle 3D tilt on hover/focus */
+.games-card,
+.games-top-card,
+.games-current-item {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transform-style: preserve-3d;
+}
+
+.games-card:hover,
+.games-card:focus-within,
+.games-top-card:hover,
+.games-top-card:focus-within,
+.games-current-item:hover,
+.games-current-item:focus-within {
+  transform: translateY(-6px) rotate3d(1, 0.5, 0, 2deg);
+}
+
+/* VA-style gradient frame using an inset border layer */
+.games-card,
+.games-top-card,
+.games-current-item {
+  position: relative;
+}
+
+.games-card::before,
+.games-top-card::before,
+.games-current-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px; /* border thickness */
+  border-radius: inherit;
+  background: var(--va-gradient);
+  -webkit-mask: 
+    linear-gradient(#000 0 0) content-box, 
+    linear-gradient(#000 0 0);
+  mask: 
+    linear-gradient(#000 0 0) content-box, 
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* Disable repeated hover shine sweep to keep animations one-time */
+.games-card::after,
+.games-top-card::after,
+.games-current-item::after {
+  content: none;
+}
+
+/* Remove wobble/rotate hover animation to avoid repeated motion */
+@keyframes wobbleSpin { }
+
+/* Glass overlays for content blocks */
+.games-card-content,
+.games-top-card-content,
+.games-current-content {
+  background: linear-gradient(180deg, rgba(17,17,17,0.35), rgba(17,17,17,0.15));
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+}
+
+/* Highlight primary buttons with VA gradient */
+.games-card-btn.primary {
+  background: var(--va-gradient);
+  box-shadow: 0 8px 26px rgba(0, 212, 255, 0.28);
+}
+
+.games-card-btn.primary:hover {
+  box-shadow: 0 12px 36px rgba(0, 212, 255, 0.42);
+}
+
+/* Focus ring for keyboard users */
+.games-card[tabindex="0"],
+.games-top-card[tabindex="0"],
+.games-current-item[tabindex="0"] {
+  outline: none;
+}
+
+.games-card[tabindex="0"]:focus,
+.games-top-card[tabindex="0"]:focus,
+.games-current-item[tabindex="0"]:focus {
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.35), var(--shadow-medium);
+}
+
+/* Action buttons reveal on hover for steam cards */
+.games-card .games-card-actions {
+  opacity: 0.9;
+  transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Top/Current details smooth expand already handled via React; ensure smoother image motion */
+.games-top-card-image,
+.games-current-image {
+  transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+.games-top-card:hover .games-top-card-image,
+.games-top-card:focus-within .games-top-card-image,
+.games-current-item:hover .games-current-image,
+.games-current-item:focus-within .games-current-image {
+  transform: scale(1.03);
+  filter: saturate(1.05) contrast(1.05);
 }
 
 /* Enhanced Hero Section */
@@ -348,6 +462,79 @@
   .games-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
+}
+
+/* Top-5 Cards Redesign */
+.top5-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.35);
+}
+
+.top5-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.65) 100%);
+  z-index: 0;
+  transition: opacity 0.35s ease;
+}
+
+.top5-card:hover::before,
+.top5-card:focus-within::before {
+  opacity: 0.9;
+}
+
+.top5-rank-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  padding: 0.35rem 0.6rem;
+  border-radius: 9999px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: var(--va-gradient);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.24);
+}
+
+.top5-corner-shine {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 60%);
+  filter: blur(8px);
+  opacity: 0.6;
+  z-index: 1;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.top5-card:hover .top5-corner-shine,
+.top5-card:focus-within .top5-corner-shine {
+  transform: translate(-10px, 10px) scale(1.05);
+  opacity: 0.9;
+}
+
+.top5-card .games-card-content {
+  position: relative;
+  z-index: 2;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(17,17,17,0.55), rgba(17,17,17,0.25));
+}
+
+.top5-toggle {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+.top5-toggle[aria-expanded="true"] {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.28);
 }
 
 @media (max-width: 480px) {

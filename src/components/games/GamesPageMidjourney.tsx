@@ -233,7 +233,7 @@ export default function GamesPageMidjourney({ children }: GamesPageMidjourneyPro
           </div>
           
           <div className="games-top-section">
-            <div className="games-top-grid">
+            <div className="steam-games">
               {Array.isArray(children) && children[1] && (
                 <div className="games-scroll-reveal">
                   {children[1]}

@@ -44,6 +44,21 @@ body {
   overflow-x: hidden;
 }
 
+/* Aspect-ratio utilities for game avatars */
+.aspect-3-4 {
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.aspect-16-9 {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
 /* Main Games Page Layout */
 .games-page-midjourney {
   min-height: 100vh;
@@ -411,56 +426,94 @@ body {
   height: 100%;
 }
 
+/* Title and hours as badges */
 .games-card-title {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
   color: var(--text-primary);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  display: inline-block;
+  background: rgba(0,0,0,0.35);
+  padding: 0.35rem 0.6rem;
+  border-radius: 9999px;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.12);
 }
 
 .games-card-hours {
-  font-size: 1rem;
-  color: var(--accent-blue);
+  font-size: 0.9rem;
+  color: #111827;
   margin-bottom: 1rem;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  font-weight: 700;
+  display: inline-block;
+  background: #a7f3d0;
+  background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(16,185,129,0.15));
+  color: #d1fae5;
+  border: 1px solid rgba(16,185,129,0.35);
+  border-radius: 9999px;
+  padding: 0.25rem 0.6rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
 }
 
+/* Glass action bar */
 .games-card-actions {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 0.4rem;
 }
 
+/* Button variants */
 .games-card-btn {
   flex: 1;
-  padding: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(0, 0, 0, 0.6);
+  padding: 0.6rem 0.9rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
   color: var(--text-primary);
-  border-radius: var(--border-radius);
+  border-radius: 9999px;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   transition: var(--transition);
   cursor: pointer;
-  backdrop-filter: blur(10px);
+  line-height: 1;
 }
 
 .games-card-btn:hover {
-  background: var(--accent-blue);
-  color: white;
-  border-color: var(--accent-blue);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.games-card-btn i { pointer-events: none; }
+
+/* Icon-only buttons inside action bar (Steam cards) */
+.games-card-actions .games-card-btn:not(.primary) {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0;
+  font-size: 1rem;
 }
 
 .games-card-btn.primary {
   background: var(--gradient-primary);
   color: white;
   border: none;
+  box-shadow: 0 6px 18px rgba(0, 212, 255, 0.25);
 }
 
 .games-card-btn.primary:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-medium);
+  box-shadow: 0 10px 28px rgba(0, 212, 255, 0.4);
 }
 
 /* Top Games Section */
@@ -497,31 +550,43 @@ body {
   object-fit: cover;
 }
 
+/* When aspect class is applied, allow aspect-ratio to control height */
+.games-top-card-image.aspect-3-4,
+.games-top-card-image.aspect-16-9 {
+  height: auto;
+  border-bottom: 1px solid var(--border-color);
+}
+
 .games-top-card-content {
   padding: 1.5rem;
 }
 
 .games-top-card-title {
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
   margin-bottom: 0.5rem;
-  color: var(--text-primary);
 }
 
 .games-top-card-hours {
-  font-size: 1rem;
-  color: var(--accent-blue);
-  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(59,130,246,0.15);
+  color: #c7d2fe;
+  border: 1px solid rgba(59,130,246,0.35);
+  margin-bottom: 0.75rem;
 }
 
 .games-top-card-rank {
   display: inline-block;
   background: var(--gradient-accent);
   color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--border-radius);
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
 }
 
 /* Current Games Section */
@@ -561,19 +626,26 @@ body {
   border-radius: var(--border-radius);
 }
 
+/* When aspect class is applied, prefer responsive width and auto height */
+.games-current-image.aspect-3-4,
+.games-current-image.aspect-16-9 {
+  width: 220px;
+  max-width: 40vw;
+  height: auto;
+}
+
 .games-current-content {
   flex: 1;
 }
 
 .games-current-title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.4rem;
+  font-weight: 700;
   margin-bottom: 0.5rem;
-  color: var(--text-primary);
 }
 
 .games-current-hours {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
   margin-bottom: 1rem;
 }
@@ -605,7 +677,7 @@ body {
 
 .games-current-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 /* Sidebar */
@@ -930,4 +1002,395 @@ body {
 .games-modal-close:focus {
   outline: 2px solid var(--accent-blue);
   outline-offset: 2px;
+}
+
+/* Steam Games Gallery (VA-style mosaic) */
+.steam-games {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: 160px;
+  gap: 1rem;
+  grid-auto-flow: dense;
+}
+
+.steam-games .games-card {
+  height: auto;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+}
+
+/* Mosaic spans for variety */
+@media (min-width: 1024px) {
+  .steam-games .games-card:nth-child(7n) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  .steam-games .games-card:nth-child(11n) {
+    grid-column: span 2;
+  }
+  .steam-games .games-card:nth-child(13n) {
+    grid-row: span 2;
+  }
+}
+
+/* Centered overlay content on hover like a gallery tile */
+.steam-games .games-card .games-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(180deg, rgba(17,17,17,0.35), rgba(17,17,17,0.15));
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  inset: auto 0 0 0;
+  position: absolute;
+  margin: 0.75rem;
+  min-height: 56px;
+  transition: var(--transition);
+}
+
+.steam-games .games-card:hover .games-card-content {
+  inset: 0;
+  margin: 1rem;
+}
+
+.steam-games .games-card-title {
+  margin: 0;
+}
+
+.steam-games .games-card-actions {
+  margin-top: 0.5rem;
+  justify-content: center;
+}
+
+/* Shine sweep already handled in enhanced file; ensure visibility here */
+.steam-games .games-card::after { opacity: 0; }
+.steam-games .games-card:hover::after { opacity: 1; }
+
+/* Unified Button System for Game Cards */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.1rem;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: var(--text-primary);
+  transition: var(--transition-slow);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.btn:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.28);
+  transition: var(--transition-slow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(0, 212, 255, 0.42);
+}
+
+.btn-ghost {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: rgba(255,255,255,0.28);
+}
+
+.btn-icon {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.16);
+  transition: var(--transition-slow);
+}
+
+.btn-icon:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* Tooltip via data-tooltip attr */
+.btn-icon[data-tooltip] {
+  position: relative;
+}
+
+.btn-icon[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  color: white;
+  background: rgba(17,17,17,0.9);
+  border: 1px solid rgba(255,255,255,0.12);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.btn-icon:hover[data-tooltip]::after,
+.btn-icon:focus[data-tooltip]::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* Integrate into card action bars */
+.games-card-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 0.6rem;
+}
+
+/* Smooth expand for details sections */
+.games-details {
+  animation: detailsExpand 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: top;
+}
+
+@keyframes detailsExpand {
+  0% { opacity: 0; transform: translateY(-8px) scaleY(0.96); }
+  100% { opacity: 1; transform: translateY(0) scaleY(1); }
+}
+
+/* Replace legacy classes with graceful fallback */
+.games-card-btn { all: unset; }
+.games-card-btn { display: inline-flex; }
+
+/* Toggle Button (Show/Hide details) */
+.btn-toggle {
+  justify-content: center;
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  border-radius: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.18);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-toggle .chevron {
+  transition: transform 0.35s ease;
+}
+
+/* rotate chevron when expanded */
+.btn-toggle[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+/* stronger visual when expanded */
+.btn-toggle[aria-expanded="true"] {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.28);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.28);
+}
+
+/* ripple on press */
+.btn-toggle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.25) 10%, rgba(255,255,255,0) 60%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: width 0.45s ease, height 0.45s ease, opacity 0.45s ease;
+  pointer-events: none;
+}
+
+.btn-toggle:active::after {
+  width: 240px;
+  height: 240px;
+  opacity: 1;
+}
+
+/* size variants if needed */
+.btn-toggle.btn-sm { padding: 0.65rem 0.9rem; border-radius: 12px; font-size: 0.9rem; }
+.btn-toggle.btn-lg { padding: 1rem 1.25rem; border-radius: 16px; font-size: 1rem; }
+
+/* Fixed Card Sizes */
+/* Steam gallery: uniform tiles */
+.steam-games {
+  grid-auto-rows: 240px;
+}
+
+.steam-games .games-card {
+  height: 100%;
+  grid-column: span 1 !important;
+  grid-row: span 1 !important;
+  /* show full image without cropping */
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-color: var(--secondary-bg);
+}
+
+/* Standard games cards (grid) */
+.games-grid .games-card {
+  height: 320px;
+}
+
+/* Top games cards */
+.games-top-card {
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+}
+
+.games-top-card-image {
+  height: 200px; /* fixed image zone within fixed card */
+  object-fit: contain; /* avoid cropping */
+  background: var(--accent-bg);
+  padding: 6px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.games-top-card-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Current games row cards */
+.games-current-item {
+  min-height: 220px;
+}
+
+.games-current-image {
+  width: 220px;
+  max-width: 40vw;
+  height: 160px;
+  object-fit: contain; /* avoid cropping */
+  background: var(--accent-bg);
+  border-radius: var(--border-radius);
+  padding: 6px;
+  border: 1px solid var(--border-color);
+}
+
+/* Ensure images fill fixed zones nicely */
+/* (cover removed to prevent cropping) */
+
+/* 16:9 Standardized Layouts (New Sizes) */
+
+/* Steam gallery tiles: true 16:9 cards */
+.steam-games {
+  grid-auto-rows: unset;
+}
+
+.steam-games .games-card {
+  aspect-ratio: 16 / 9;
+  height: auto;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-color: var(--secondary-bg);
+  grid-column: span 1 !important;
+  grid-row: span 1 !important;
+}
+
+/* General games grid cards: 16:9 poster tiles */
+.games-grid .games-card {
+  aspect-ratio: 16 / 9;
+  height: auto;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: var(--secondary-bg);
+}
+
+/* Top games: wider card with 16:9 media */
+.games-top-card {
+  height: auto;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+}
+
+.games-top-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  object-fit: contain;
+  background: var(--accent-bg);
+  padding: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.games-top-card-content {
+  padding: 1.25rem;
+  gap: 0.5rem;
+}
+
+/* Current games: image area 16:9 with flexible width */
+.games-current-image {
+  width: 360px;
+  max-width: 48vw;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  object-fit: contain;
+  background: var(--accent-bg);
+  border-radius: var(--border-radius);
+  padding: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.games-current-item {
+  min-height: 200px;
+}
+
+/* Ensure classic .games-card (non-grid overrides) keeps 16:9 if used */
+.games-card:not(.games-card-show-all) {
+  aspect-ratio: 16 / 9;
 }
