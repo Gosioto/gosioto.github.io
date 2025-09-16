@@ -6,6 +6,7 @@ import { currentGames } from '@/data/gamesData';
 
 export default function CurrentGamesMidjourney() {
   const [openGame, setOpenGame] = useState<string | null>(null);
+  const [hoveredGame, setHoveredGame] = useState<string | null>(null);
 
   const toggleGame = (gameName: string) => {
     setOpenGame(openGame === gameName ? null : gameName);
@@ -34,7 +35,14 @@ export default function CurrentGamesMidjourney() {
       {currentGames.map((game) => (
         <div 
           key={game.name} 
-          className={`games-current-item games-animate-scale ${openGame === game.name ? 'border-blue-500' : ''}`}
+          className={`current-game-card ${openGame === game.name ? 'expanded' : ''} ${hoveredGame === game.name ? 'hovered' : ''}`}
+          style={{
+            backgroundImage: `url(${game.image})`,
+            '--animation-delay': `${currentGames.indexOf(game) * 0.1}s`
+          } as React.CSSProperties}
+          onMouseEnter={() => setHoveredGame(game.name)}
+          onMouseLeave={() => setHoveredGame(null)}
+          onClick={() => toggleGame(game.name)}
           role="button"
           tabIndex={0}
           aria-expanded={openGame === game.name}
@@ -42,71 +50,102 @@ export default function CurrentGamesMidjourney() {
           onKeyDown={(e) => handleKeyDown(e, game.name)}
           title={`${game.name} — показать детали`}
         >
-          <img 
-            src={game.image} 
-            alt={game.name}
-            className="games-current-image"
-            onLoad={handleImageLoad}
-          />
-          <div className="games-current-content">
-            <h3 className="games-current-title">{game.name}</h3>
-            <div className="games-current-hours">{game.hours} часов</div>
-            
-            <div className="games-current-progress">
-              <div className="games-current-progress-label">
-                Прогресс: {game.progress}%
+          {/* Corner Decoration */}
+          <div className="corner-decoration"></div>
+
+          {/* Game Content */}
+          <div className="game-content">
+            {/* Header */}
+            <div className="game-header">
+              <h3 className="game-title">{game.name}</h3>
+              <div className="game-status-badge">
+                Сейчас играю
               </div>
-              <div className="games-current-progress-bar">
+            </div>
+
+            {/* Stats */}
+            <div className="game-stats">
+              <div className="stat-item">
+                <i className="fas fa-clock text-blue-400"></i>
+                <span>{game.hours} ч</span>
+              </div>
+              <div className="stat-item">
+                <i className="fas fa-percentage text-green-400"></i>
+                <span>{game.progress}%</span>
+              </div>
+              <div className="stat-item">
+                <i className="fas fa-calendar text-purple-400"></i>
+                <span>{game.lastLaunch}</span>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="progress-section">
+              <div className="progress-label">Прогресс прохождения</div>
+              <div className="progress-bar">
                 <div 
-                  className="games-current-progress-fill"
+                  className="progress-fill"
                   style={{ width: `${game.progress}%` }}
                 ></div>
               </div>
             </div>
             
-            <div className="text-sm text-gray-400 mb-4">
-              Последний запуск: {game.lastLaunch}
-            </div>
-            
+            {/* Expandable Details */}
             {openGame === game.name && (
-              <div id={`current-game-details-${game.name}`} className="games-details border-t border-gray-600 pt-4">
-                <div className="mb-4">
-                  <h4 className="font-semibold mb-2 text-white">Достижения:</h4>
-                  <p className="text-sm text-gray-400">{game.achievements}</p>
-                </div>
-                <div className="games-current-actions">
-                  <button 
-                    className="btn btn-primary"
-                    data-action="screenshots"
-                    data-game={game.name}
-                    aria-label={`Скриншоты: ${game.name}`}
-                  >
-                    <i className="fas fa-images mr-2" aria-hidden="true"></i>
-                    Скриншоты
-                  </button>
-                  <button 
-                    className="btn btn-outline"
-                    data-action="achievements"
-                    data-game={game.name}
-                    aria-label={`Достижения: ${game.name}`}
-                  >
-                    <i className="fas fa-trophy mr-2" aria-hidden="true"></i>
-                    Достижения
-                  </button>
+              <div
+                id={`current-game-details-${game.name}`}
+                className="game-details"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="details-content">
+                  <div className="achievement-info">
+                    <i className="fas fa-trophy text-yellow-400"></i>
+                    <span>Достижения: {game.achievements}</span>
+                  </div>
+
+                  <div className="action-buttons">
+                    <button
+                      className="action-btn primary"
+                      data-action="screenshots"
+                      data-game={game.name}
+                      aria-label={`Скриншоты: ${game.name}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <i className="fas fa-images"></i>
+                      <span>Скриншоты</span>
+                    </button>
+                    <button
+                      className="action-btn secondary"
+                      data-action="achievements"
+                      data-game={game.name}
+                      aria-label={`Достижения: ${game.name}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <i className="fas fa-trophy"></i>
+                      <span>Достижения</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
             
+            {/* Toggle Button */}
             <button
-              onClick={() => toggleGame(game.name)}
-              className="btn btn-toggle mt-4"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleGame(game.name);
+              }}
+              className={`toggle-btn ${openGame === game.name ? 'expanded' : ''}`}
               aria-expanded={openGame === game.name}
               aria-controls={`current-game-details-${game.name}`}
             >
-              <span className="mr-2">{openGame === game.name ? 'Скрыть детали' : 'Показать детали'}</span>
-              <i className="chevron fas fa-chevron-down" aria-hidden="true"></i>
+              <span>{openGame === game.name ? 'Скрыть детали' : 'Показать детали'}</span>
+              <i className={`fas fa-chevron-down ${openGame === game.name ? 'rotated' : ''}`}></i>
             </button>
           </div>
+
+          {/* Hover Overlay */}
+          <div className="hover-overlay"></div>
         </div>
       ))}
     </>

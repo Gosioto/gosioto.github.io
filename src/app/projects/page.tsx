@@ -6,7 +6,6 @@ import '@/styles/projects.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import NewsTab from '@/components/NewsTab';
-import StubbornButton from '@/components/StubbornButton';
 import ScrollToTop from '@/components/ScrollToTop';
 
 export default function ProjectsPage() {
@@ -18,7 +17,6 @@ export default function ProjectsPage() {
       </main>
       <Footer />
       <NewsTab />
-      <StubbornButton />
       <ScrollToTop />
     </div>
   );

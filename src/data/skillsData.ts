@@ -38,21 +38,21 @@ export const skillsData: SkillCategory[] = [
         id: 'angular',
         name: 'Angular',
         icon: 'fab fa-angular',
-        percentage: 70,
+        percentage: 55,
         tooltip: 'Components, Services, RxJS'
       },
       {
         id: 'vue',
         name: 'Vue.js',
         icon: 'fab fa-vuejs',
-        percentage: 70,
+        percentage: 55,
         tooltip: 'Vuex, Vue Router, Composition API'
       },
       {
         id: 'react',
         name: 'React',
         icon: 'fab fa-react',
-        percentage: 65,
+        percentage: 75,
         tooltip: 'Hooks, Context API, Redux, Next.js'
       },
       {

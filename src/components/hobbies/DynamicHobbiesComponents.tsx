@@ -8,10 +8,6 @@ const NewsTab = dynamic(() => import('@/components/NewsTab'), {
   ssr: false
 });
 
-const StubbornButton = dynamic(() => import('@/components/StubbornButton'), {
-  loading: () => null,
-  ssr: false
-});
 
 const ScrollToTop = dynamic(() => import('@/components/ScrollToTop'), {
   loading: () => null,
@@ -22,7 +18,6 @@ export default function DynamicHobbiesComponents() {
   return (
     <>
       <NewsTab />
-      <StubbornButton />
       <ScrollToTop />
     </>
   );

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import NewsTab from '@/components/NewsTab';
-import StubbornButton from '@/components/StubbornButton';
 import '@/app/globals.css';
 import '@/styles/contact.css';
 import '@/styles/news-tab.css';
@@ -282,7 +281,6 @@ const ContactPage = () => {
       </main>
       <Footer />
       <NewsTab showModal={showNewsModal} setShowModal={setShowNewsModal} />
-      <StubbornButton />
       <ScrollToTop />
 
     </div>

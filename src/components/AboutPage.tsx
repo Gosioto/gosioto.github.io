@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import { useEffect } from 'react';
 import NewsTab from '@/components/NewsTab';
-import StubbornButton from '@/components/StubbornButton';
 
 export default function AboutPage() {
   useEffect(() => {
@@ -301,7 +300,6 @@ export default function AboutPage() {
       </footer>
 
       <NewsTab />
-      <StubbornButton />
     </div>
   );
 }

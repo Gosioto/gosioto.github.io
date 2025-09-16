@@ -9,7 +9,6 @@ import LatestProjectSection from '@/components/LatestProjectSection';
 import CasesSection from '@/components/CasesSection';
 import Footer from '@/components/Footer';
 import NewsTab from '@/components/NewsTab';
-import StubbornButton from '@/components/StubbornButton';
 import PixelEcosystemWrapper from '@/components/PixelEcosystemWrapper';
 import ScrollToTop from '@/components/ScrollToTop';
 
@@ -28,7 +27,6 @@ export default function Home() {
       </main>
       <Footer />
       <NewsTab />
-      <StubbornButton />
       <ScrollToTop />
     </div>
   );

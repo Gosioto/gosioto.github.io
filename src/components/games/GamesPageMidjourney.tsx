@@ -5,6 +5,7 @@ import { useEffect, ReactNode, useState } from 'react';
 import ScreenshotsModal from './ScreenshotsModal';
 import AchievementsModal from './AchievementsModal';
 import GameStatsMidjourney from './GameStatsMidjourney';
+import GamesHideBar from './GamesHideBar';
 import { AnimationUtils } from '@/utils/animations';
 
 interface GamesPageMidjourneyProps {
@@ -150,23 +151,6 @@ export default function GamesPageMidjourney({ children }: GamesPageMidjourneyPro
 
   return (
     <div className="games-page-midjourney">
-      {/* Navigation */}
-      <nav className={`games-nav ${isScrolled ? 'scrolled' : ''}`}>
-        <div className="games-nav-content">
-          <a href="/" className="games-nav-logo">
-            Gosloto
-          </a>
-          <div className="games-nav-links">
-            <a href="/hobbies" className="games-nav-link">
-              <i className="fas fa-arrow-left mr-2"></i>
-              Назад к хобби
-            </a>
-            <a href="/contact" className="games-nav-link">
-              Контакты
-            </a>
-          </div>
-        </div>
-      </nav>
 
       {/* Hero Section */}
       <section className="games-hero">
@@ -232,14 +216,12 @@ export default function GamesPageMidjourney({ children }: GamesPageMidjourneyPro
             </p>
           </div>
           
-          <div className="games-top-section">
-            <div className="steam-games">
-              {Array.isArray(children) && children[1] && (
-                <div className="games-scroll-reveal">
-                  {children[1]}
-                </div>
-              )}
-            </div>
+          <div className="top-games-container">
+            {Array.isArray(children) && children[0] && (
+              <div className="games-scroll-reveal">
+                {children[0]}
+              </div>
+            )}
           </div>
         </section>
 
@@ -254,9 +236,9 @@ export default function GamesPageMidjourney({ children }: GamesPageMidjourneyPro
           
           <div className="games-current-section">
             <div className="games-current-list">
-              {Array.isArray(children) && children[2] && (
+              {Array.isArray(children) && children[1] && (
                 <div className="games-scroll-reveal">
-                  {children[2]}
+                  {children[1]}
                 </div>
               )}
             </div>
@@ -272,25 +254,15 @@ export default function GamesPageMidjourney({ children }: GamesPageMidjourneyPro
             </p>
           </div>
           
-          <div className="games-grid">
-            {Array.isArray(children) && children[3] && (
+          <div className="steam-games-container">
+            {Array.isArray(children) && children[2] && (
               <div className="games-scroll-reveal">
-                {children[3]}
+                {children[2]}
               </div>
             )}
           </div>
         </section>
 
-        {/* Sidebar */}
-        <section className="games-section">
-          <div className="games-sidebar">
-            {Array.isArray(children) && children[4] && (
-              <div className="games-scroll-reveal">
-                {children[4]}
-              </div>
-            )}
-          </div>
-        </section>
       </main>
 
       {/* Modals */}
@@ -307,6 +279,9 @@ export default function GamesPageMidjourney({ children }: GamesPageMidjourneyPro
         onClose={() => setAchievementsModal(prev => ({ ...prev, isOpen: false }))}
         achievements={achievementsModal.achievements}
       />
+
+      {/* Hide Bar */}
+      <GamesHideBar />
     </div>
   );
 }

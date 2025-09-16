@@ -6,7 +6,6 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import NewsTab from '@/components/NewsTab';
 import ScrollToTop from '@/components/ScrollToTop';
-import StubbornButton from '@/components/StubbornButton';
 
 export default function SkillsPage() {
   return (
@@ -17,7 +16,6 @@ export default function SkillsPage() {
       </main>
       <Footer />
       <NewsTab />
-      <StubbornButton />
       <ScrollToTop />
     </div>
   );

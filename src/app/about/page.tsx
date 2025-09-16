@@ -6,7 +6,6 @@ import '@/styles/professional-growth.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Timeline from '@/components/Timeline';
-import StubbornButton from '@/components/StubbornButton';
 import NewsTab from '@/components/NewsTab';
 import EducationSection from '@/components/EducationSection';
 import ExperienceSection from '@/components/ExperienceSection';
@@ -268,7 +267,6 @@ const AboutPage = () => {
       
       {/* Компоненты интерактивных элементов */}
       <NewsTab showModal={showNewsModal} setShowModal={setShowNewsModal} />
-      <StubbornButton />
       <ScrollToTop />
     </div>
   );

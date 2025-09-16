@@ -64,16 +64,24 @@ body {
   min-height: 100vh;
   background: var(--primary-bg);
   position: relative;
+  margin-top: 0; /* Remove any top margin since we have Header */
+}
+
+/* Games page wrapper to handle header spacing */
+.games-page-wrapper {
+  background: var(--primary-bg);
+  min-height: 100vh;
 }
 
 /* Hero Section with Background */
 .games-hero {
   position: relative;
-  height: 100vh;
+  height: calc(100vh - 80px); /* Subtract header height */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  margin-top: 80px; /* Add header height as margin */
 }
 
 .games-hero-bg {
@@ -900,16 +908,13 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .games-hero {
+    height: calc(100vh - 60px); /* Adjust for mobile header */
+    margin-top: 60px;
+  }
+  
   .games-hero-stats {
     gap: 2rem;
-  }
-  
-  .games-nav-content {
-    padding: 1rem;
-  }
-  
-  .games-nav-links {
-    gap: 1rem;
   }
   
   .games-section {
@@ -921,6 +926,10 @@ body {
   }
   
   .games-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  
+  .steam-games {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
   
@@ -944,6 +953,11 @@ body {
 }
 
 @media (max-width: 480px) {
+  .games-hero {
+    height: calc(100vh - 50px); /* Adjust for very small header */
+    margin-top: 50px;
+  }
+  
   .games-hero-title {
     font-size: 2.5rem;
   }
@@ -958,6 +972,10 @@ body {
   }
   
   .games-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  .steam-games {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
   
@@ -1007,14 +1025,13 @@ body {
 /* Steam Games Gallery (VA-style mosaic) */
 .steam-games {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  grid-auto-rows: 160px;
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
   grid-auto-flow: dense;
 }
 
 .steam-games .games-card {
-  height: auto;
+  height: 320px;
   background-size: cover;
   background-position: center;
   border-radius: var(--border-radius-lg);
