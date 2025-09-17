@@ -2,238 +2,273 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getGameIconColor, getGameInitials } from '@/data/achievementsData';
 
 interface Achievement {
   id: string;
-  name: string;
+  title: string;
+  game: string;
+  gameId: string;
   description: string;
+  date: string;
+  timestamp: number;
   icon: string;
-  unlocked: boolean;
-  unlockedAt?: string;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
 }
 
 interface AchievementsModalProps {
-  gameName: string;
   isOpen: boolean;
   onClose: () => void;
-  achievements: Achievement[];
+  gameName?: string;
+  achievements?: Achievement[];
 }
 
-export default function AchievementsModal({ gameName, isOpen, onClose, achievements }: AchievementsModalProps) {
-  const [filter, setFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'rarity' | 'unlocked'>('unlocked');
-  const [searchTerm, setSearchTerm] = useState('');
+// Mock data for achievements
+const achievementsData: Achievement[] = [
+  {
+    id: '1',
+    title: 'Мастер Ведьмака',
+    game: 'The Witcher 3: Wild Hunt',
+    gameId: 'witcher3',
+    description: 'Прошел игру на максимальной сложности',
+    date: '2023-12-15',
+    timestamp: 1702598400000,
+    icon: 'fas fa-crown',
+    rarity: 'legendary'
+  },
+  {
+    id: '2',
+    title: 'Выживший',
+    game: 'GTFO',
+    gameId: 'gtfo',
+    description: 'Выжил в самых сложных рейдах',
+    date: '2023-11-20',
+    timestamp: 1700438400000,
+    icon: 'fas fa-shield-alt',
+    rarity: 'epic'
+  },
+  {
+    id: '3',
+    title: 'Стратег',
+    game: 'Dawn of War III',
+    gameId: 'dow3',
+    description: 'Победил в 100 сражениях',
+    date: '2023-10-10',
+    timestamp: 1696896000000,
+    icon: 'fas fa-chess',
+    rarity: 'rare'
+  },
+  {
+    id: '4',
+    title: 'Космический пилот',
+    game: 'EVE Online',
+    gameId: 'eve',
+    description: 'Накопил 1 миллион ISK',
+    date: '2023-09-05',
+    timestamp: 1693843200000,
+    icon: 'fas fa-rocket',
+    rarity: 'common'
+  },
+  {
+    id: '5',
+    title: 'Строитель',
+    game: 'Factorio',
+    gameId: 'factorio',
+    description: 'Построил автоматизированную фабрику',
+    date: '2023-08-15',
+    timestamp: 1692057600000,
+    icon: 'fas fa-cogs',
+    rarity: 'rare'
+  }
+];
 
+const getUniqueGames = (achievementsList: Achievement[] = achievementsData) => {
+  const games = achievementsList.map(achievement => ({
+    id: achievement.gameId,
+    name: achievement.game
+  }));
+  return games.filter((game, index, self) => 
+    index === self.findIndex(g => g.id === game.id)
+  );
+};
+
+export default function AchievementsModal({ isOpen, onClose, gameName, achievements }: AchievementsModalProps) {
+  const [selectedGame, setSelectedGame] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [filteredAchievements, setFilteredAchievements] = useState<Achievement[]>(achievements || achievementsData);
+
+  const games = getUniqueGames(achievements || achievementsData);
+
+  // Обновляем фильтрованные достижения при изменении фильтров
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+    let filtered = achievements || achievementsData;
+    
+    // Фильтр по игре
+    if (selectedGame) {
+      filtered = filtered.filter(achievement => achievement.gameId === selectedGame);
     }
+    
+    // Сортировка по дате
+    filtered = filtered.sort((a, b) => {
+      if (sortOrder === 'newest') {
+        return b.timestamp - a.timestamp; // Новые сначала
+      } else {
+        return a.timestamp - b.timestamp; // Старые сначала
+      }
+    });
+    
+    setFilteredAchievements(filtered);
+  }, [selectedGame, sortOrder, achievements]);
 
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
+  // Обработка клавиш и блокировка скролла
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return;
-      
       if (e.key === 'Escape') {
         onClose();
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+    document.body.style.overflow = 'hidden';
 
-  const filteredAchievements = achievements
-    .filter(achievement => {
-      const matchesFilter = filter === 'all' || 
-        (filter === 'unlocked' && achievement.unlocked) ||
-        (filter === 'locked' && !achievement.unlocked);
-      
-      const matchesSearch = achievement.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        achievement.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      return matchesFilter && matchesSearch;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return a.name.localeCompare(b.name);
-        case 'rarity':
-          const rarityOrder = { legendary: 4, epic: 3, rare: 2, common: 1 };
-          return rarityOrder[b.rarity] - rarityOrder[a.rarity];
-        case 'unlocked':
-          return Number(b.unlocked) - Number(a.unlocked);
-        default:
-          return 0;
-      }
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
+
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
-
-  const unlockedCount = achievements.filter(a => a.unlocked).length;
-  const totalCount = achievements.length;
-  const completionPercentage = Math.round((unlockedCount / totalCount) * 100);
+  };
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
-      case 'legendary': return 'text-yellow-500 bg-yellow-100';
-      case 'epic': return 'text-purple-500 bg-purple-100';
-      case 'rare': return 'text-blue-500 bg-blue-100';
-      case 'common': return 'text-gray-500 bg-gray-100';
-      default: return 'text-gray-500 bg-gray-100';
+      case 'common': return '#6b7280';
+      case 'rare': return '#3b82f6';
+      case 'epic': return '#8b5cf6';
+      case 'legendary': return '#f59e0b';
+      default: return '#6b7280';
     }
   };
 
-  const getRarityIcon = (rarity: string) => {
+  const getRarityText = (rarity: string) => {
     switch (rarity) {
-      case 'legendary': return 'fas fa-crown';
-      case 'epic': return 'fas fa-gem';
-      case 'rare': return 'fas fa-star';
-      case 'common': return 'fas fa-circle';
-      default: return 'fas fa-circle';
+      case 'common': return 'Обычное';
+      case 'rare': return 'Редкое';
+      case 'epic': return 'Эпическое';
+      case 'legendary': return 'Легендарное';
+      default: return 'Обычное';
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="games-modal" onClick={onClose}>
-      <div className="games-modal-content max-w-5xl" onClick={(e) => e.stopPropagation()}>
-        <div className="games-modal-header">
-          <h2 className="games-modal-title">
-            <i className="fas fa-trophy mr-2"></i>
-            {gameName} - Достижения
+    <div className="achievements-modal-overlay">
+      <div className="achievements-modal">
+        {/* Header */}
+        <div className="achievements-header">
+          <h2 className="achievements-title">
+            <i className="fas fa-trophy"></i>
+            {gameName || 'Достижения и челенджи'}
           </h2>
-          <button className="games-modal-close" onClick={onClose}>
+          <button 
+            className="achievements-close-btn"
+            onClick={onClose}
+            title="Закрыть"
+          >
             <i className="fas fa-times"></i>
           </button>
         </div>
 
-        <div className="games-modal-body">
-          {/* Stats Bar */}
-          <div className="games-modal-section">
-            <div className="flex items-center justify-between mb-6 p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-500/20">
-              <div className="flex items-center gap-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-400">{unlockedCount}</div>
-                  <div className="text-sm text-gray-400">Разблокировано</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-white">{totalCount}</div>
-                  <div className="text-sm text-gray-400">Всего</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-400">{completionPercentage}%</div>
-                  <div className="text-sm text-gray-400">Завершено</div>
-                </div>
-              </div>
-              <div className="w-32 bg-gray-700 rounded-full h-3">
-                <div 
-                  className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${completionPercentage}%` }}
-                ></div>
-              </div>
-            </div>
+        {/* Filters */}
+        <div className="achievements-filters">
+          <div className="filter-group">
+            <label className="filter-label">
+              <i className="fas fa-gamepad"></i>
+              Игра:
+            </label>
+            <select 
+              className="filter-select"
+              value={selectedGame}
+              onChange={(e) => setSelectedGame(e.target.value)}
+            >
+              <option value="">Все игры</option>
+              {games.map(game => (
+                <option key={game.id} value={game.id}>
+                  {game.name}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* Controls */}
-          <div className="games-modal-section">
-            <div className="flex flex-wrap gap-4 items-center mb-6">
-              {/* Search */}
-              <div className="flex-1 min-w-64">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Поиск достижений..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400"
-                  />
-                  <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                </div>
-              </div>
-
-              {/* Filter */}
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value as any)}
-                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white"
-              >
-                <option value="all">Все достижения</option>
-                <option value="unlocked">Разблокированные</option>
-                <option value="locked">Заблокированные</option>
-              </select>
-
-              {/* Sort */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white"
-              >
-                <option value="unlocked">По статусу</option>
-                <option value="name">По названию</option>
-                <option value="rarity">По редкости</option>
-              </select>
-            </div>
+          <div className="filter-group">
+            <label className="filter-label">
+              <i className="fas fa-sort"></i>
+              Сортировка:
+            </label>
+            <select 
+              className="filter-select"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
+            >
+              <option value="newest">Сначала новые</option>
+              <option value="oldest">Сначала старые</option>
+            </select>
           </div>
 
-          {/* Achievements List */}
-          <div className="games-modal-section">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredAchievements.map((achievement) => (
-                <div
-                  key={achievement.id}
-                  className={`games-modal-card ${
-                    achievement.unlocked
-                      ? 'border-green-500/30 bg-green-500/5'
-                      : 'border-gray-600/30 bg-gray-500/5 opacity-60'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    {/* Icon */}
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                      achievement.unlocked ? 'bg-green-500' : 'bg-gray-600'
-                    }`}>
-                      <i className={`fas fa-trophy text-white ${achievement.unlocked ? '' : 'opacity-50'}`}></i>
-                    </div>
+          <button 
+            className="filter-clear-btn"
+            onClick={() => {
+              setSelectedGame('');
+              setSortOrder('newest');
+            }}
+          >
+            <i className="fas fa-times"></i>
+            Очистить
+          </button>
+        </div>
 
-                    {/* Content */}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className={`font-semibold ${achievement.unlocked ? 'text-white' : 'text-gray-500'}`}>
-                          {achievement.name}
-                        </h3>
-                        <span className={`games-modal-achievement-rarity ${achievement.rarity}`}>
-                          <i className={`${getRarityIcon(achievement.rarity)} mr-1`}></i>
-                          {achievement.rarity}
-                        </span>
-                      </div>
-                      <p className={`text-sm ${achievement.unlocked ? 'text-gray-300' : 'text-gray-500'}`}>
-                        {achievement.description}
-                      </p>
-                      {achievement.unlocked && achievement.unlockedAt && (
-                        <p className="text-xs text-green-400 mt-1">
-                          <i className="fas fa-calendar mr-1"></i>
-                          Разблокировано: {achievement.unlockedAt}
-                        </p>
-                      )}
+        {/* Achievements Grid */}
+        <div className="achievements-content">
+          <div className="achievements-stats">
+            <span className="stats-text">
+              Показано: {filteredAchievements.length} из {achievementsData.length} достижений
+            </span>
+          </div>
+          
+          <div className="achievements-grid">
+            {filteredAchievements.length > 0 ? (
+              filteredAchievements.map(achievement => (
+                <div key={achievement.id} className="achievement-card">
+                  <div className="achievement-icon" style={{ color: getRarityColor(achievement.rarity) }}>
+                    <i className={achievement.icon}></i>
+                  </div>
+                  <div className="achievement-info">
+                    <h3 className="achievement-title">{achievement.title}</h3>
+                    <p className="achievement-game">{achievement.game}</p>
+                    <p className="achievement-description">{achievement.description}</p>
+                    <div className="achievement-meta">
+                      <span className="achievement-date">{formatDate(achievement.timestamp)}</span>
+                      <span 
+                        className="achievement-rarity"
+                        style={{ color: getRarityColor(achievement.rarity) }}
+                      >
+                        {getRarityText(achievement.rarity)}
+                      </span>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {filteredAchievements.length === 0 && (
-              <div className="text-center py-8 text-gray-400">
-                <i className="fas fa-search text-4xl mb-4"></i>
+              ))
+            ) : (
+              <div className="achievements-empty">
+                <i className="fas fa-search"></i>
                 <p>Достижения не найдены</p>
-                <p className="text-sm">Попробуйте изменить фильтры или поисковый запрос</p>
               </div>
             )}
           </div>

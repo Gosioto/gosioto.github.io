@@ -73,7 +73,7 @@ export const topGames: TopGame[] = [
   { name: 'Wild Hunt: The Witcher 3', hours: 6945, lastLaunch: '22 июн.', achievements: '78/78', image: '/img/The-Witcher-3.jpg', rank: 1 },
   { name: 'GTFO', hours: 989, lastLaunch: 'Активная игра', achievements: '56/57', image: '/img/gtfo.png', rank: 2 },
   { name: 'Dawn of War Soulstorm', hours: 794, lastLaunch: '29 нояб. 2024', achievements: '', image: '/img/soulstorm.png', rank: 3 },
-  { name: 'Tradesman Deal to Dealer', hours: 445, lastLaunch: 'Активная игра', achievements: 'Скоро будут ;)', image: '/img/tradesman-deal-to-dealer.jpg', rank: 4 },
+  { name: 'Tradesman Deal to Dealer', hours: 445, lastLaunch: 'Активная игра', achievements: 'Скоро будут ;)', image: '/img/tradesman-deal-to-dealer.png', rank: 4 },
   { name: 'EVE Frontier', hours: 52, lastLaunch: 'Активная игра', achievements: '-', image: '/img/eve-frontier.jpg', rank: 5 }
 ];
 

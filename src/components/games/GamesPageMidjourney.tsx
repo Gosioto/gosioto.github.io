@@ -5,14 +5,17 @@ import { useEffect, ReactNode, useState } from 'react';
 import ScreenshotsModal from './ScreenshotsModal';
 import AchievementsModal from './AchievementsModal';
 import GameStatsMidjourney from './GameStatsMidjourney';
+import GamesHeader from './GamesHeader';
 import GamesHideBar from './GamesHideBar';
+import ScreenshotsGallery from './ScreenshotsGallery';
 import { AnimationUtils } from '@/utils/animations';
 
 interface GamesPageMidjourneyProps {
   children: ReactNode;
+  onBackToHobbies?: () => void;
 }
 
-export default function GamesPageMidjourney({ children }: GamesPageMidjourneyProps) {
+export default function GamesPageMidjourney({ children, onBackToHobbies }: GamesPageMidjourneyProps) {
   const [screenshotsModal, setScreenshotsModal] = useState<{
     isOpen: boolean;
     gameName: string;
@@ -34,6 +37,9 @@ export default function GamesPageMidjourney({ children }: GamesPageMidjourneyPro
   });
 
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isScreenshotsGalleryOpen, setIsScreenshotsGalleryOpen] = useState(false);
+  const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     // Initialize animations
@@ -151,6 +157,13 @@ export default function GamesPageMidjourney({ children }: GamesPageMidjourneyPro
 
   return (
     <div className="games-page-midjourney">
+      
+      {/* Games Header */}
+      <GamesHeader 
+        onOpenMenu={() => setIsMenuOpen(true)}
+        isMenuOpen={isMenuOpen}
+        onBackToHobbies={onBackToHobbies || (() => window.history.back())}
+      />
 
       {/* Hero Section */}
       <section className="games-hero">
@@ -280,8 +293,26 @@ export default function GamesPageMidjourney({ children }: GamesPageMidjourneyPro
         achievements={achievementsModal.achievements}
       />
 
+
+      {/* Screenshots Gallery */}
+      <ScreenshotsGallery 
+        isOpen={isScreenshotsGalleryOpen}
+        onClose={() => setIsScreenshotsGalleryOpen(false)}
+      />
+
+      {/* Achievements Modal */}
+      <AchievementsModal 
+        isOpen={isAchievementsModalOpen}
+        onClose={() => setIsAchievementsModalOpen(false)}
+      />
+
       {/* Hide Bar */}
-      <GamesHideBar />
+      <GamesHideBar 
+        onOpenGallery={() => setIsScreenshotsGalleryOpen(true)}
+        onOpenAchievements={() => setIsAchievementsModalOpen(true)}
+        isMenuOpen={isMenuOpen}
+        onCloseMenu={() => setIsMenuOpen(false)}
+      />
     </div>
   );
 }
