@@ -245,7 +245,7 @@ export default function FreelanceCursor() {
         justifyContent: 'center',
         textTransform: 'uppercase' as const,
         letterSpacing: '0.5px',
-        transform: 'none',
+        // transform управляется CSS
         transition: 'width 0.1s ease-out, height 0.1s ease-out 0.1s',
         pointerEvents: 'none' as const,
       };
@@ -266,7 +266,7 @@ export default function FreelanceCursor() {
         justifyContent: 'inherit',
         textTransform: 'inherit' as const,
         letterSpacing: 'inherit',
-        transform: 'none',
+        // transform управляется CSS
         transition: 'width 0.2s ease-out, height 0.2s ease-out, border-radius 0.2s ease-out',
         pointerEvents: 'none' as const,
       };
@@ -287,7 +287,7 @@ export default function FreelanceCursor() {
         justifyContent: 'center',
         textTransform: 'none' as const,
         letterSpacing: 'normal',
-        transform: 'none',
+        // transform управляется CSS
         transition: 'all 0.2s ease-out',
         pointerEvents: 'none' as const,
       };
@@ -309,7 +309,7 @@ export default function FreelanceCursor() {
         justifyContent: 'inherit',
         textTransform: 'inherit' as const,
         letterSpacing: 'inherit',
-        transform: 'none',
+        // transform управляется CSS
         transition: 'width 0.2s ease-out, height 0.2s ease-out, border-radius 0.2s ease-out',
         pointerEvents: 'none' as const,
       };
@@ -330,11 +330,17 @@ export default function FreelanceCursor() {
       data-states={`button:${isButton},text:${isButtonText},avatar:${isAvatar},hover:${isHovering}`}
     >
       {isButton && 'CLICK'}
-      {isAvatar && (
-        <div style={{ fontSize: '24px', lineHeight: 1 }}>
-          🧔👓
-        </div>
-      )}
+             {isAvatar && (
+               <img 
+                 src="/img/ysi.png" 
+                 alt="Усы" 
+                 style={{ 
+                   width: '93%', // Уменьшаем на 7% (100% - 7% = 93%)
+                   height: '93%', // Уменьшаем на 7% (100% - 7% = 93%)
+                   objectFit: 'contain'
+                 }} 
+               />
+             )}
     </div>
   );
 }

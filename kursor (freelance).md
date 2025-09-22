@@ -295,12 +295,14 @@ console.log('Cursor classes:', classes, { isVisible, isWindowFocused, isHovering
 - **Размер:** 20x20px
 - **Форма:** квадрат (borderRadius: 0)
 - **Цвет:** белый (#ffffff) с инверсией через `mix-blend-mode: difference`
+- **Анимация:** плавная трансформация (0.3s cubic-bezier)
 - **Триггер:** обычное состояние, не наведение на интерактивные элементы
 
 #### 2. Первое активное состояние (круг)
 - **Размер:** 40x40px  
 - **Форма:** круг (borderRadius: 50%)
 - **Цвет:** белый (#ffffff) с инверсией через `mix-blend-mode: difference`
+- **Анимация:** плавная трансформация (0.3s cubic-bezier)
 - **Триггер:** наведение на кликабельные элементы (но не кнопки)
 
 #### 3. Второе активное состояние (кнопка CLICK)
@@ -309,13 +311,16 @@ console.log('Cursor classes:', classes, { isVisible, isWindowFocused, isHovering
 - **Цвет:** черный фон, белый текст, белая рамка
 - **Текст:** "CLICK"
 - **Триггер:** наведение на кнопки, ссылки, project-card
-- **Анимация:** двухэтапная - сначала расширение по ширине, затем по высоте
+- **Анимация:** двухэтапная - равномерное расширение по ширине (0.15s), затем по высоте (0.15s)
+- **Центрирование:** Все расширения происходят от центра курсора
 
 #### 4. Третье активное состояние (аватар)
-- **Размер:** 60x60px
-- **Форма:** круг (borderRadius: 50%)
-- **Цвет:** белый фон (#ffffff) с белым текстом (эмодзи)
-- **Содержимое:** эмодзи усы и борода с моноклем 🧔👓
+- **Размер:** 60x60px контейнер, изображение усов 93% от размера
+- **Форма:** прозрачный контейнер (без фона и границ)
+- **Цвет:** статичный черный цвет изображения усов (без инверсии)
+- **Содержимое:** изображение усов (ysi.png) в оригинальном цвете
+- **Blend mode:** normal (без инверсии для видимости)
+- **Анимация:** плавная трансформация (0.3s cubic-bezier)
 - **Триггер:** наведение на аватар профиля
 
 ### Элементы для трансформации
@@ -338,8 +343,13 @@ console.log('Cursor classes:', classes, { isVisible, isWindowFocused, isHovering
 - `.project-overlay`
 - `.contact-item`, `.contact-icon`
 
-#### Аватар (показывает усы и бороду)
+#### Аватар (показывает только изображение усов)
 - `.profile-avatar` и элементы внутри
+- Использует изображение `/img/ysi.png`
+- Статичный черный цвет изображения (без инверсии)
+- Размер изображения: 93% от контейнера (уменьшено на 7%)
+- Прозрачный фон без границ и круговой формы
+- `mix-blend-mode: normal` для видимости усов
 
 ### Приоритет состояний
 1. **Аватар** (высший приоритет)
@@ -350,14 +360,16 @@ console.log('Cursor classes:', classes, { isVisible, isWindowFocused, isHovering
 ### Анимации
 
 #### Трансформация в кнопку CLICK
-1. **Этап 1:** Квадрат (20x20px) расширяется по ширине до 80px
-2. **Этап 2:** Затем расширяется по высоте до 30px
+1. **Этап 1:** Квадрат (20x20px) равномерно расширяется по ширине до 80px (0.15s)
+2. **Этап 2:** Затем равномерно расширяется по высоте до 30px (0.15s)
 3. **Результат:** Кнопка CLICK (80x30px) с текстом
+4. **Центрирование:** Все расширения происходят от центра курсора через `transform: translate(-50%, -50%)`
 
 #### Центрирование анимации
 - Все расширения происходят от центра курсора
 - Использование `transform: translate(-50%, -50%)` для центрирования
 - Позиционирование через `left: centerX, top: centerY` в JavaScript
+- Квадрат является центром всех других форм (круг, кнопка CLICK, аватар)
 
 ### Технические требования
 
@@ -370,15 +382,22 @@ console.log('Cursor classes:', classes, { isVisible, isWindowFocused, isHovering
   mix-blend-mode: difference !important;
   opacity: 1 !important;
   visibility: visible !important;
-  transform: translate(-50%, -50%) !important;
+  transform: translate(-50%, -50%) !important; /* Центрирование всех форм */
   pointer-events: none !important;
   z-index: 99999 !important;
+  /* Предотвращаем влияние на layout страницы */
+  contain: layout style paint !important;
+  isolation: isolate !important;
 }
 
 .freelance-cursor.button {
   background: #000000 !important; /* Черный для кнопки */
   border: 2px solid #ffffff !important;
   color: #ffffff !important;
+  position: fixed !important; /* Используем fixed вместо relative */
+  transform: translate(-50%, -50%) !important; /* Центрирование кнопки */
+  contain: layout style paint !important;
+  isolation: isolate !important;
 }
 ```
 
