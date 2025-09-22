@@ -32,6 +32,13 @@
   }
 }
 
+/* На touch устройствах также скрываем стандартный курсор */
+@media (hover: none) or (pointer: coarse) {
+  * {
+    cursor: none !important;
+  }
+}
+
 .freelance-cursor {
   position: fixed !important;
   background: #ffffff !important; /* Белый цвет для видимости с difference */
@@ -220,11 +227,7 @@
   pointer-events: none !important;
 }
 
-@media (hover: none) or (pointer: coarse) {
-  .freelance-cursor {
-    display: none !important;
-  }
-}
+/* Убираем скрытие курсора на touch устройствах - теперь он работает */
 
 
 /* Base Styles */
@@ -1632,5 +1635,108 @@
   
   .stat-item {
     padding: 0.75rem;
+  }
+}
+
+/* Response Status Styles */
+.response-time.fast {
+  color: var(--freelance-accent);
+}
+
+.response-time.slow {
+  color: #ffa500; /* Orange for slow response */
+}
+
+.response-time.sleeping {
+  color: #ff6b6b; /* Red for sleeping/unavailable */
+}
+
+
+.response-warning {
+  font-size: 0.7rem;
+  color: var(--freelance-text-light);
+  font-style: italic;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.time-until-change {
+  font-size: 0.65rem;
+  color: var(--freelance-text-light);
+  font-weight: 500;
+  margin-top: 0.25rem;
+  display: block;
+  opacity: 0.8;
+}
+
+.time-highlight {
+  background: var(--freelance-accent);
+  color: var(--freelance-black);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.9em;
+  margin-left: 2px;
+  box-shadow: 0 2px 4px rgba(0, 255, 136, 0.3);
+  border: 1px solid rgba(0, 255, 136, 0.5);
+}
+
+/* Status dots for different states */
+.status-dot.slow {
+  background: #ffa500;
+  animation: pulse-slow 2s infinite;
+}
+
+.status-dot.unavailable {
+  background: #ff6b6b;
+  animation: pulse-sleeping 3s infinite;
+}
+
+
+/* Availability note styles */
+.availability-note.fast {
+  color: var(--freelance-accent);
+}
+
+.availability-note.slow {
+  color: #ffa500;
+}
+
+.availability-note.sleeping {
+  color: #ff6b6b;
+}
+
+
+.availability-warning {
+  font-size: 0.75rem;
+  color: var(--freelance-text-light);
+  font-style: italic;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(255, 107, 107, 0.1);
+  border-left: 3px solid #ff6b6b;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Animations for status dots */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-sleeping {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
   }
 }

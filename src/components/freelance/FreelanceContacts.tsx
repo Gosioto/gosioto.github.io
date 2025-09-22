@@ -1,7 +1,8 @@
 // src/components/freelance/FreelanceContacts.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getResponseStatus, ResponseStatus } from '@/utils/responseTime';
 
 export default function FreelanceContacts() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,22 @@ export default function FreelanceContacts() {
     email: '',
     message: ''
   });
+  
+  const [responseStatus, setResponseStatus] = useState<ResponseStatus>({
+    timeText: 'Отвечаю за 5-7 мин',
+    status: 'fast'
+  });
+
+  useEffect(() => {
+    const updateStatus = () => {
+      setResponseStatus(getResponseStatus());
+    };
+
+    updateStatus();
+    const interval = setInterval(updateStatus, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,12 +104,29 @@ export default function FreelanceContacts() {
 
             <div className="contact-availability">
               <div className="availability-status">
-                <span className="status-dot available"></span>
+                <span className={`status-dot ${responseStatus.status === 'fast' ? 'available' : responseStatus.status === 'slow' ? 'slow' : 'unavailable'}`}></span>
                 <span className="status-text">Доступен для новых проектов</span>
               </div>
-              <p className="availability-note">
-                Отвечаю в течение 5-7 минут
+              <p className={`availability-note ${responseStatus.status}`}>
+                {responseStatus.timeTextHighlight ? (
+                  <>
+                    {responseStatus.timeText.replace(responseStatus.timeTextHighlight, '')}
+                    <span className="time-highlight">{responseStatus.timeTextHighlight}</span>
+                  </>
+                ) : (
+                  responseStatus.timeText
+                )}
               </p>
+              {responseStatus.timeUntilChange && (
+                <p className="time-until-change">
+                  {responseStatus.changeDescription}: {responseStatus.timeUntilChange}
+                </p>
+              )}
+              {responseStatus.warning && (
+                <p className="availability-warning">
+                  {responseStatus.warning}
+                </p>
+              )}
             </div>
           </div>
 

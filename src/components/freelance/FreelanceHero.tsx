@@ -2,24 +2,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getMoscowTime, getResponseStatus, ResponseStatus } from '@/utils/responseTime';
 
 export default function FreelanceHero() {
   const [currentTime, setCurrentTime] = useState('');
+  const [responseStatus, setResponseStatus] = useState<ResponseStatus>({
+    timeText: 'Отвечаю за 5-7 мин',
+    status: 'fast'
+  });
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const moscowTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Moscow"}));
-      const timeString = moscowTime.toLocaleTimeString('ru-RU', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-      setCurrentTime(timeString);
+    const updateTimeAndStatus = () => {
+      setCurrentTime(getMoscowTime());
+      setResponseStatus(getResponseStatus());
     };
 
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
+    updateTimeAndStatus();
+    const interval = setInterval(updateTimeAndStatus, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -46,7 +45,26 @@ export default function FreelanceHero() {
               <h1 className="freelance-name">Gosloto</h1>
               <div className="freelance-time-status">
                 <span className="current-time-msk">{currentTime}</span>
-                <span className="response-time">Отвечаю за 5-7 мин</span>
+                <span className={`response-time ${responseStatus.status}`}>
+                  {responseStatus.timeTextHighlight ? (
+                    <>
+                      {responseStatus.timeText.replace(responseStatus.timeTextHighlight, '')}
+                      <span className="time-highlight">{responseStatus.timeTextHighlight}</span>
+                    </>
+                  ) : (
+                    responseStatus.timeText
+                  )}
+                </span>
+                {responseStatus.timeUntilChange && (
+                  <span className="time-until-change">
+                    {responseStatus.changeDescription}: {responseStatus.timeUntilChange}
+                  </span>
+                )}
+                {responseStatus.warning && (
+                  <span className="response-warning">
+                    {responseStatus.warning}
+                  </span>
+                )}
               </div>
             </div>
             <p className="freelance-real-name">Иван</p>

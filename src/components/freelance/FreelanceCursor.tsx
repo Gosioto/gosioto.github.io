@@ -15,6 +15,8 @@ export default function FreelanceCursor() {
   const animationFrameId = useRef<number | null>(null);
   const lastUpdateTime = useRef(0);
   const pendingPosition = useRef({ x: 100, y: 100 });
+  const lastElementCheckTime = useRef(0);
+  const lastTouchElementCheckTime = useRef(0);
 
   // Инициализация курсора
   useLayoutEffect(() => {
@@ -24,8 +26,20 @@ export default function FreelanceCursor() {
       // Сохраняем позицию для следующего обновления
       pendingPosition.current = { x: e.clientX, y: e.clientY };
       
-      // Throttling: обновляем максимум 60 раз в секунду (16ms)
+      // Оптимизированная проверка элементов - максимум 30 раз в секунду (33ms)
       const now = performance.now();
+      if (now - lastElementCheckTime.current >= 33) {
+        lastElementCheckTime.current = now;
+        
+        // Проверяем элемент под курсором
+        const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement;
+        if (target) {
+          // Используем ту же логику, что и для mouseover
+          handleMouseOver({ target } as unknown as MouseEvent);
+        }
+      }
+      
+      // Throttling для позиции: обновляем максимум 60 раз в секунду (16ms)
       if (now - lastUpdateTime.current >= 16) {
         lastUpdateTime.current = now;
         
@@ -39,6 +53,46 @@ export default function FreelanceCursor() {
           setCursorPosition(pendingPosition.current);
           animationFrameId.current = null;
         });
+      }
+    };
+
+    // Обработчик касаний для мобильных устройств
+    const handleTouchMove = (e: TouchEvent) => {
+      // НЕ предотвращаем скролл - позволяем пользователю скроллить
+      
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        // Сохраняем позицию для следующего обновления
+        pendingPosition.current = { x: touch.clientX, y: touch.clientY };
+        
+        // Оптимизированная проверка элементов для touch - максимум 60 раз в секунду (16ms)
+        const now = performance.now();
+        if (now - lastTouchElementCheckTime.current >= 16) {
+          lastTouchElementCheckTime.current = now;
+          
+          // Проверяем элемент под пальцем
+          const target = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
+          if (target) {
+            // Используем ту же логику, что и для mouseover
+            handleMouseOver({ target } as unknown as MouseEvent);
+          }
+        }
+        
+        // Throttling для позиции: обновляем максимум 60 раз в секунду (16ms)
+        if (now - lastUpdateTime.current >= 16) {
+          lastUpdateTime.current = now;
+          
+          // Отменяем предыдущий кадр если он еще не выполнился
+          if (animationFrameId.current) {
+            cancelAnimationFrame(animationFrameId.current);
+          }
+          
+          // Используем requestAnimationFrame для плавного обновления
+          animationFrameId.current = requestAnimationFrame(() => {
+            setCursorPosition(pendingPosition.current);
+            animationFrameId.current = null;
+          });
+        }
       }
     };
     
@@ -173,6 +227,32 @@ export default function FreelanceCursor() {
       setIsAvatar(false);
     };
     
+    // Обработчик касаний для определения элементов
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        // Обновляем позицию курсора сразу при касании
+        pendingPosition.current = { x: touch.clientX, y: touch.clientY };
+        setCursorPosition(pendingPosition.current);
+        
+        const target = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
+        
+        if (target) {
+          // Используем ту же логику, что и для mouseover
+          handleMouseOver({ target } as unknown as MouseEvent);
+        }
+      }
+    };
+
+    // Обработчик окончания касания
+    const handleTouchEnd = () => {
+      // Сбрасываем все состояния при окончании касания
+      setIsHovering(false);
+      setIsButton(false);
+      setIsButtonText(false);
+      setIsAvatar(false);
+    };
+
     // Обработчик скролла для обновления позиции курсора
     const handleScroll = () => {
       // При скролле обновляем позицию курсора без throttling
@@ -205,6 +285,11 @@ export default function FreelanceCursor() {
     document.addEventListener('mouseout', handleMouseOut);
     document.addEventListener('scroll', handleScroll, { passive: true });
     document.addEventListener('wheel', handleWheel, { passive: true });
+    
+    // Добавляем touch события для мобильных устройств
+    document.addEventListener('touchmove', handleTouchMove, { passive: true }); // Разрешаем скролл
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       // Отменяем pending animation frame
@@ -217,6 +302,11 @@ export default function FreelanceCursor() {
       document.removeEventListener('mouseout', handleMouseOut);
       document.removeEventListener('scroll', handleScroll);
       document.removeEventListener('wheel', handleWheel);
+      
+      // Удаляем touch события
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchend', handleTouchEnd);
     };
   }, []); // Empty dependency array to ensure handlers are added once
 

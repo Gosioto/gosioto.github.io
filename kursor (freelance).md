@@ -186,9 +186,14 @@ document.addEventListener('mouseup', handleMouseUp);
 document.addEventListener('mouseover', handleMouseOver);
 document.addEventListener('mouseout', handleMouseOut);
 
-// Фокус окна
-window.addEventListener('focus', handleWindowFocus);
-window.addEventListener('blur', handleWindowBlur);
+// Touch события для мобильных устройств
+document.addEventListener('touchmove', handleTouchMove, { passive: false });
+document.addEventListener('touchstart', handleTouchStart, { passive: true });
+document.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+// Скролл и колесико
+document.addEventListener('scroll', handleScroll, { passive: true });
+document.addEventListener('wheel', handleWheel, { passive: true });
 ```
 
 ### Очистка
@@ -210,11 +215,13 @@ return () => {
 
 ### Оптимизации
 
-1. **Throttling:** обновления максимум 60 раз в секунду (16ms)
-2. **requestAnimationFrame:** для плавной анимации
-3. **useCallback:** мемоизация функций
-4. **useMemo:** мемоизация стилей и классов
-5. **passive: true:** для mousemove событий
+1. **Throttling позиции:** обновления максимум 60 раз в секунду (16ms)
+2. **Throttling проверки элементов (мышь):** максимум 30 раз в секунду (33ms) для оптимизации
+3. **Throttling проверки элементов (touch):** максимум 60 раз в секунду (16ms) для плавности на мобильных
+4. **requestAnimationFrame:** для плавной анимации
+5. **useCallback:** мемоизация функций
+6. **useMemo:** мемоизация стилей и классов
+7. **passive: true:** для mousemove событий
 
 ### CSS оптимизации
 
@@ -409,15 +416,20 @@ console.log('Cursor classes:', classes, { isVisible, isWindowFocused, isHovering
 - Обработка событий: `mousemove`, `mouseover`, `mouseout`, `scroll`, `wheel`
 
 #### Производительность
-- Throttling mousemove до 60 FPS (16ms)
+- Throttling позиции курсора до 60 FPS (16ms)
+- Throttling проверки элементов для мыши до 30 FPS (33ms) для оптимизации
+- Throttling проверки элементов для touch до 60 FPS (16ms) для плавности на мобильных
 - `requestAnimationFrame` для плавности
 - `passive: true` для событий
 - Отмена предыдущих animation frames
 - Минимум console.log в продакшене
 
 ### Адаптивность
-- Скрытие на touch устройствах: `@media (hover: none) or (pointer: coarse)`
-- Скрытие стандартного курсора только на устройствах с мышью: `@media (hover: hover) and (pointer: fine)`
+- **Поддержка touch устройств:** Курсор работает на мобильных устройствах
+- **Touch события:** `touchstart`, `touchmove`, `touchend` для отслеживания касаний
+- **Скрытие стандартного курсора:** На всех устройствах (мышь и touch)
+- **Разрешение скролла:** `passive: true` для touchmove событий - пользователь может скроллить
+- **Проверка элементов:** При каждом движении пальца проверяется элемент под курсором
 
 ### Отладка
 - Атрибут `data-debug="cursor-element"`
