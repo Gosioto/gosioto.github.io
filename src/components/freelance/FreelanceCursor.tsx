@@ -240,14 +240,14 @@ export default function FreelanceCursor() {
         top: `${centerY}px`,   // Позиционируем по центру курсора
         fontSize: '12px',
         fontWeight: '600',
-        display: 'flex',
+        display: 'flex' as const,
         alignItems: 'center',
         justifyContent: 'center',
-        textTransform: 'uppercase',
+        textTransform: 'uppercase' as const,
         letterSpacing: '0.5px',
         transform: 'none',
         transition: 'width 0.1s ease-out, height 0.1s ease-out 0.1s',
-        pointerEvents: 'none',
+        pointerEvents: 'none' as const,
       };
     } else if (isButtonText) {
       // Стили для текста внутри кнопки - показываем круг, центрируем относительно центра курсора
@@ -261,14 +261,14 @@ export default function FreelanceCursor() {
         top: `${centerY}px`,   // Позиционируем по центру курсора
         fontSize: 'inherit',
         fontWeight: 'inherit',
-        display: 'block',
+        display: 'block' as const,
         alignItems: 'inherit',
         justifyContent: 'inherit',
-        textTransform: 'inherit',
+        textTransform: 'inherit' as const,
         letterSpacing: 'inherit',
         transform: 'none',
         transition: 'width 0.2s ease-out, height 0.2s ease-out, border-radius 0.2s ease-out',
-        pointerEvents: 'none',
+        pointerEvents: 'none' as const,
       };
     } else if (isAvatar) {
       // Стили для аватара - показываем усы и бороду с моноклем, центрируем относительно центра курсора
@@ -282,14 +282,14 @@ export default function FreelanceCursor() {
         top: `${centerY}px`,   // Позиционируем по центру курсора
         fontSize: '24px',
         fontWeight: 'normal',
-        display: 'flex',
+        display: 'flex' as const,
         alignItems: 'center',
         justifyContent: 'center',
-        textTransform: 'none',
+        textTransform: 'none' as const,
         letterSpacing: 'normal',
         transform: 'none',
         transition: 'all 0.2s ease-out',
-        pointerEvents: 'none',
+        pointerEvents: 'none' as const,
       };
     } else {
       // Обычные стили для квадрата/круга - центрируем относительно центра невидимого курсора
@@ -304,13 +304,14 @@ export default function FreelanceCursor() {
         top: `${centerY}px`,  // Позиционируем по центру курсора
         fontSize: 'inherit',
         fontWeight: 'inherit',
-        display: 'block',
+        display: 'block' as const,
         alignItems: 'inherit',
         justifyContent: 'inherit',
-        textTransform: 'inherit',
+        textTransform: 'inherit' as const,
         letterSpacing: 'inherit',
         transform: 'none',
         transition: 'width 0.2s ease-out, height 0.2s ease-out, border-radius 0.2s ease-out',
+        pointerEvents: 'none' as const,
       };
     }
   }, [cursorPosition.x, cursorPosition.y, isHovering, isButton, isButtonText, isAvatar]);

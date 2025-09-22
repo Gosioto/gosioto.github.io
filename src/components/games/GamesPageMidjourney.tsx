@@ -287,10 +287,8 @@ export default function GamesPageMidjourney({ children, onBackToHobbies }: Games
       />
 
       <AchievementsModal
-        gameName={achievementsModal.gameName}
         isOpen={achievementsModal.isOpen}
         onClose={() => setAchievementsModal(prev => ({ ...prev, isOpen: false }))}
-        achievements={achievementsModal.achievements}
       />
 
 

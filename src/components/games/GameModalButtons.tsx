@@ -19,51 +19,6 @@ export default function GameModalButtons() {
     '/img/screenshot/screenshot2.jpg'
   ];
 
-  const mockAchievements = [
-    {
-      id: '1',
-      name: 'Мастер Witcher 3',
-      description: 'Завершите все основные квесты',
-      icon: 'fas fa-crown',
-      unlocked: true,
-      unlockedAt: '2024-01-15',
-      rarity: 'legendary' as const
-    },
-    {
-      id: '2',
-      name: 'Выживший GTFO',
-      description: 'Пройдите все уровни сложности',
-      icon: 'fas fa-skull',
-      unlocked: true,
-      unlockedAt: '2024-02-20',
-      rarity: 'epic' as const
-    },
-    {
-      id: '3',
-      name: 'Стратег Dawn of War',
-      description: 'Победите в 100 сражениях',
-      icon: 'fas fa-chess',
-      unlocked: true,
-      unlockedAt: '2024-03-10',
-      rarity: 'rare' as const
-    },
-    {
-      id: '4',
-      name: 'Космический пилот',
-      description: 'Исследуйте 50 систем',
-      icon: 'fas fa-rocket',
-      unlocked: false,
-      rarity: 'rare' as const
-    },
-    {
-      id: '5',
-      name: 'Торговец',
-      description: 'Заработайте 1,000,000 кредитов',
-      icon: 'fas fa-coins',
-      unlocked: false,
-      rarity: 'common' as const
-    }
-  ];
 
   return (
     <>
@@ -113,10 +68,8 @@ export default function GameModalButtons() {
       />
 
       <AchievementsModal
-        gameName="Общие достижения"
         isOpen={achievementsModal}
         onClose={() => setAchievementsModal(false)}
-        achievements={mockAchievements}
       />
     </>
   );

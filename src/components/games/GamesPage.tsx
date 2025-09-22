@@ -302,10 +302,8 @@ export default function GamesPage({ children }: GamesPageProps) {
       />
 
       <AchievementsModal
-        gameName={achievementsModal.gameName}
         isOpen={achievementsModal.isOpen}
         onClose={() => setAchievementsModal(prev => ({ ...prev, isOpen: false }))}
-        achievements={achievementsModal.achievements}
       />
     </div>
   );
