@@ -276,8 +276,11 @@ console.log('Cursor classes:', classes, { isVisible, isWindowFocused, isHovering
 
 3. **Пиксельная инверсия цветов**
    - Использовать `mix-blend-mode: difference`
-   - При наложении на черный объект - часть курсора становится белой
-   - При наложении на белый объект - часть курсора становится черной
+   - Базовые состояния (квадрат, круг): белый цвет (#ffffff) для видимости
+   - Кнопка CLICK: черный фон с белым текстом и рамкой
+   - Аватар: белый фон с белым текстом (эмодзи)
+   - При наложении на черный объект - часть курсора становится черной
+   - При наложении на белый объект - часть курсора становится белой
    - Каждый пиксель инвертируется отдельно, не весь курсор
 
 4. **Производительность**
@@ -291,13 +294,13 @@ console.log('Cursor classes:', classes, { isVisible, isWindowFocused, isHovering
 #### 1. Пассивное состояние (квадрат)
 - **Размер:** 20x20px
 - **Форма:** квадрат (borderRadius: 0)
-- **Цвет:** черный с инверсией через `mix-blend-mode: difference`
+- **Цвет:** белый (#ffffff) с инверсией через `mix-blend-mode: difference`
 - **Триггер:** обычное состояние, не наведение на интерактивные элементы
 
 #### 2. Первое активное состояние (круг)
 - **Размер:** 40x40px  
 - **Форма:** круг (borderRadius: 50%)
-- **Цвет:** черный с инверсией через `mix-blend-mode: difference`
+- **Цвет:** белый (#ffffff) с инверсией через `mix-blend-mode: difference`
 - **Триггер:** наведение на кликабельные элементы (но не кнопки)
 
 #### 3. Второе активное состояние (кнопка CLICK)
@@ -311,6 +314,7 @@ console.log('Cursor classes:', classes, { isVisible, isWindowFocused, isHovering
 #### 4. Третье активное состояние (аватар)
 - **Размер:** 60x60px
 - **Форма:** круг (borderRadius: 50%)
+- **Цвет:** белый фон (#ffffff) с белым текстом (эмодзи)
 - **Содержимое:** эмодзи усы и борода с моноклем 🧔👓
 - **Триггер:** наведение на аватар профиля
 
@@ -361,14 +365,20 @@ console.log('Cursor classes:', classes, { isVisible, isWindowFocused, isHovering
 ```css
 .freelance-cursor {
   position: fixed !important;
-  background: #000000 !important;
-  border: 2px solid #000000 !important;
+  background: #ffffff !important; /* Белый для видимости */
+  border: 2px solid #ffffff !important;
   mix-blend-mode: difference !important;
   opacity: 1 !important;
   visibility: visible !important;
   transform: translate(-50%, -50%) !important;
   pointer-events: none !important;
   z-index: 99999 !important;
+}
+
+.freelance-cursor.button {
+  background: #000000 !important; /* Черный для кнопки */
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
 }
 ```
 

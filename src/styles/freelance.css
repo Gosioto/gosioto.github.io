@@ -34,8 +34,8 @@
 
 .freelance-cursor {
   position: fixed !important;
-  background: #000000 !important; /* Черный цвет для правильной инверсии с difference */
-  border: 2px solid #000000 !important; /* Черная граница */
+  background: #ffffff !important; /* Белый цвет для видимости с difference */
+  border: 2px solid #ffffff !important; /* Белая граница */
   pointer-events: none !important;
   z-index: 99999 !important;
   transition: width 0.2s ease-out, 
@@ -68,14 +68,14 @@
 }
 
 .freelance-cursor.hover {
-  background: #000000 !important;
-  border: 2px solid #000000 !important;
+  background: #ffffff !important;
+  border: 2px solid #ffffff !important;
   mix-blend-mode: difference !important;
 }
 
 .freelance-cursor.click {
-  background: #000000 !important;
-  border: 2px solid #000000 !important;
+  background: #ffffff !important;
+  border: 2px solid #ffffff !important;
   mix-blend-mode: difference !important;
 }
 
@@ -167,8 +167,8 @@
 
 /* Стили для текста внутри кнопки - показываем круг */
 .freelance-cursor.button-text {
-  background: #000000 !important;
-  border: 2px solid #000000 !important;
+  background: #ffffff !important;
+  border: 2px solid #ffffff !important;
   mix-blend-mode: difference !important;
   width: 40px !important;
   height: 40px !important;
@@ -184,8 +184,8 @@
 
 /* Стили для аватара - усы и борода с моноклем */
 .freelance-cursor.avatar {
-  background: #000000 !important;
-  border: 2px solid #000000 !important;
+  background: #ffffff !important;
+  border: 2px solid #ffffff !important;
   color: #ffffff !important;
   mix-blend-mode: difference !important;
   width: 60px !important;
