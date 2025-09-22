@@ -1,131 +1,339 @@
-// src/components/freelance/FreelanceCursor.tsx
 'use client';
 
-import { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useLayoutEffect, useMemo, useRef } from 'react';
 
 export default function FreelanceCursor() {
-  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [cursorPosition, setCursorPosition] = useState({ x: 100, y: 100 });
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
+  const [isButton, setIsButton] = useState(false);
+  const [isButtonText, setIsButtonText] = useState(false);
+  const [isAvatar, setIsAvatar] = useState(false);
+  const [isAnimatingToButton, setIsAnimatingToButton] = useState(false);
   
-  // Refs для throttling
-  const lastUpdateTime = useRef(0);
+  // Refs для оптимизации
   const animationFrameId = useRef<number | null>(null);
+  const lastUpdateTime = useRef(0);
+  const pendingPosition = useRef({ x: 100, y: 100 });
 
-  // Мемоизируем проверку интерактивности
-  const isInteractiveElement = useCallback((target: HTMLElement) => {
-    const interactiveClasses = [
-      'action-btn', 'nav-link', 'contact-item', 'footer-link', 
-      'cta-button', 'form-submit', 'project-link', 'service-card', 
-      'project-card', 'stat-item', 'form-input', 'form-textarea'
-    ];
+  // Инициализация курсора
+  useLayoutEffect(() => {
     
-    const interactiveTags = ['BUTTON', 'A', 'INPUT', 'TEXTAREA'];
-    
-    // Проверяем тег
-    if (interactiveTags.includes(target.tagName)) {
-      return true;
-    }
-    
-    // Проверяем классы
-    if (interactiveClasses.some(cls => target.classList.contains(cls))) {
-      return true;
-    }
-    
-    // Проверяем родительские элементы
-    return interactiveClasses.some(cls => target.closest(`.${cls}`)) ||
-           interactiveTags.some(tag => target.closest(tag.toLowerCase()));
-  }, []);
-
-  // Асинхронный обработчик движения мыши с throttling
-  const updateCursorPosition = useCallback((e: MouseEvent) => {
-    const now = performance.now();
-    
-    // Throttling: обновляем максимум 60 раз в секунду
-    if (now - lastUpdateTime.current >= 16) {
-      lastUpdateTime.current = now;
+    // Оптимизированный обработчик движения мыши с throttling
+    const handleMouseMove = (e: MouseEvent) => {
+      // Сохраняем позицию для следующего обновления
+      pendingPosition.current = { x: e.clientX, y: e.clientY };
       
-      // Отменяем предыдущий кадр если он еще не выполнился
+      // Throttling: обновляем максимум 60 раз в секунду (16ms)
+      const now = performance.now();
+      if (now - lastUpdateTime.current >= 16) {
+        lastUpdateTime.current = now;
+        
+        // Отменяем предыдущий кадр если он еще не выполнился
+        if (animationFrameId.current) {
+          cancelAnimationFrame(animationFrameId.current);
+        }
+        
+        // Используем requestAnimationFrame для плавного обновления
+        animationFrameId.current = requestAnimationFrame(() => {
+          setCursorPosition(pendingPosition.current);
+          animationFrameId.current = null;
+        });
+      }
+    };
+    
+
+      // Оптимизированный обработчик hover (без throttling для мгновенного отклика)
+      const handleMouseOver = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        
+      
+      // Список только кликабельных элементов (инпуты, но не кнопки и ссылки)
+      const clickableTags = ['INPUT', 'TEXTAREA', 'SELECT'];
+      const clickableClasses = [
+        // Основные кликабельные элементы (без кнопок)
+        'nav-link', 'project-link',
+        'form-input', 'form-textarea',
+        
+        // Header кликабельные элементы (без кнопок)
+        'freelance-header-logo', 'mobile-nav-link',
+        
+        // Profile кликабельные элементы
+        'profile-avatar',
+        
+        // Service кликабельные элементы (только если они кликабельные)
+        'service-card', // только если карточка кликабельная
+        
+        // Project кликабельные элементы
+        'project-overlay',
+        
+        // Contact кликабельные элементы
+        'contact-item', 'contact-icon'
+      ];
+      
+      // Проверяем тег (только кликабельные теги)
+      const hasClickableTag = clickableTags.includes(target.tagName);
+      
+      // Проверяем классы элемента (только кликабельные классы)
+      const hasClickableClass = clickableClasses.some(cls => 
+        target.classList.contains(cls)
+      );
+      
+      // Проверяем родительские элементы (только кликабельные)
+      const hasClickableParent = clickableClasses.some(cls => 
+        target.closest(`.${cls}`)
+      ) || clickableTags.some(tag => 
+        target.closest(tag.toLowerCase())
+      );
+      
+      // Проверяем, находится ли элемент внутри project-card
+      const isInsideProjectCard = target.closest('.project-card');
+      
+      // Проверяем, является ли элемент действительно кликабельным
+      const computedStyle = window.getComputedStyle(target);
+      const hasPointerCursor = computedStyle.cursor === 'pointer';
+      const hasClickHandler = target.onclick !== null;
+      const hasRoleButton = target.getAttribute('role') === 'button';
+      const hasTabIndex = target.getAttribute('tabindex') !== null;
+      const hasHref = target.getAttribute('href') !== null;
+      
+      // Проверяем, является ли элемент кнопкой (включая элементы внутри кнопок)
+      const isInsideButton = target.closest('.action-btn, .cta-button, .form-submit, .freelance-header-menu-btn, .footer-link, .nav-link, .project-card, button');
+      const isButtonElement = target.tagName === 'BUTTON' || 
+                             target.classList.contains('action-btn') ||
+                             target.classList.contains('cta-button') ||
+                             target.classList.contains('form-submit') ||
+                             target.classList.contains('freelance-header-menu-btn') ||
+                             target.classList.contains('footer-link') ||
+                             target.classList.contains('nav-link') ||
+                             target.classList.contains('project-card') ||
+                             isInsideProjectCard || // Элементы внутри project-card
+                             target.getAttribute('role') === 'button' ||
+                             !!isInsideButton; // Если элемент внутри кнопки - считаем его кнопкой
+      
+      // Проверяем, находится ли курсор над кнопкой (по всей площади)
+      const isOverButton = isButtonElement || isInsideButton;
+      
+      // Проверяем, является ли элемент текстом внутри кнопки
+      // Текст внутри кнопки - это когда элемент внутри кнопки, но сам элемент не является кнопкой
+      // И это именно текстовые элементы (не иконки, не изображения)
+      const isButtonTextElement = isInsideButton && !isButtonElement && (
+        target.tagName === 'SPAN' || 
+        target.tagName === 'P' || 
+        target.nodeType === Node.TEXT_NODE ||
+        (target.tagName === 'DIV' && target.textContent && target.textContent.trim().length > 0)
+      );
+      
+      // Проверяем, является ли элемент аватаром
+      const isAvatarElement = target.classList.contains('profile-avatar') || 
+                             target.closest('.profile-avatar');
+      
+      // Проверяем, является ли элемент формой или инпутом (но не кнопкой)
+      const isFormElement = (target.tagName === 'INPUT' || 
+                            target.tagName === 'TEXTAREA' || 
+                            target.tagName === 'SELECT') && !isButtonElement;
+      
+      const isClickable = hasClickableTag || hasClickableClass || hasClickableParent || 
+                         hasPointerCursor || hasClickHandler || hasRoleButton || 
+                         hasTabIndex || isFormElement;
+      
+      // Приоритет состояний: аватар > кнопка (включая текст внутри) > обычный hover
+      if (isAvatarElement) {
+        setIsAvatar(true);
+        setIsButton(false);
+        setIsButtonText(false);
+        setIsHovering(false);
+      } else if (isOverButton) {
+        // Если курсор над кнопкой (по всей площади) - показываем кнопку CLICK
+        setIsAvatar(false);
+        setIsButton(true);
+        setIsButtonText(false);
+        setIsHovering(false);
+        
+        // Запускаем анимацию трансформации в кнопку
+        if (!isButton) {
+          setIsAnimatingToButton(true);
+          // Через 200ms завершаем анимацию
+          setTimeout(() => {
+            setIsAnimatingToButton(false);
+          }, 200);
+        }
+      } else {
+        setIsAvatar(false);
+        setIsButton(false);
+        setIsButtonText(false);
+        setIsHovering(isClickable);
+      }
+    };
+    
+    const handleMouseOut = () => {
+      setIsHovering(false);
+      setIsButton(false);
+      setIsButtonText(false);
+      setIsAvatar(false);
+    };
+    
+    // Обработчик скролла для обновления позиции курсора
+    const handleScroll = () => {
+      // При скролле обновляем позицию курсора без throttling
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
       
-      // Используем requestAnimationFrame для асинхронного обновления
       animationFrameId.current = requestAnimationFrame(() => {
-        setCursorPosition({ x: e.clientX, y: e.clientY });
+        setCursorPosition(pendingPosition.current);
         animationFrameId.current = null;
       });
-    }
-  }, []);
+    };
 
-  // Асинхронный обработчик наведения
-  const handleMouseOver = useCallback((e: MouseEvent) => {
-    const target = e.target as HTMLElement;
-    const isInteractive = isInteractiveElement(target);
-    
-    // Используем requestAnimationFrame для асинхронного обновления
-    requestAnimationFrame(() => {
-      setIsHovering(isInteractive);
-    });
-  }, [isInteractiveElement]);
-
-  // Асинхронные обработчики клика
-  const handleMouseDown = useCallback(() => {
-    requestAnimationFrame(() => {
-      setIsClicking(true);
-    });
-  }, []);
-  
-  const handleMouseUp = useCallback(() => {
-    requestAnimationFrame(() => {
-      setIsClicking(false);
-    });
-  }, []);
-  
-  const handleMouseOut = useCallback(() => {
-    requestAnimationFrame(() => {
-      setIsHovering(false);
-    });
-  }, []);
-
-  // Используем useLayoutEffect для синхронизации с браузерным рендерингом
-  useLayoutEffect(() => {
-    // Добавляем обработчики событий
-    document.addEventListener('mousemove', updateCursorPosition, { passive: true });
-    document.addEventListener('mousedown', handleMouseDown);
-    document.addEventListener('mouseup', handleMouseUp);
-    document.addEventListener('mouseover', handleMouseOver);
-    document.addEventListener('mouseout', handleMouseOut);
-
-    return () => {
-      // Очищаем animation frame
+    // Обработчик колесика мыши для обновления позиции курсора
+    const handleWheel = () => {
+      // При прокрутке колесиком также обновляем позицию курсора
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
       
-      document.removeEventListener('mousemove', updateCursorPosition);
-      document.removeEventListener('mousedown', handleMouseDown);
-      document.removeEventListener('mouseup', handleMouseUp);
+      animationFrameId.current = requestAnimationFrame(() => {
+        setCursorPosition(pendingPosition.current);
+        animationFrameId.current = null;
+      });
+    };
+
+    // Добавляем обработчики событий
+    document.addEventListener('mousemove', handleMouseMove, { passive: true });
+    document.addEventListener('mouseover', handleMouseOver);
+    document.addEventListener('mouseout', handleMouseOut);
+    document.addEventListener('scroll', handleScroll, { passive: true });
+    document.addEventListener('wheel', handleWheel, { passive: true });
+
+    return () => {
+      // Отменяем pending animation frame
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+      
+      document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseover', handleMouseOver);
       document.removeEventListener('mouseout', handleMouseOut);
+      document.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('wheel', handleWheel);
     };
-  }, [updateCursorPosition, handleMouseDown, handleMouseUp, handleMouseOver, handleMouseOut]);
+  }, []); // Empty dependency array to ensure handlers are added once
 
-  // Мемоизируем стили курсора с использованием transform для лучшей производительности
-  const cursorStyles = useMemo(() => ({
-    transform: `translate3d(${cursorPosition.x}px, ${cursorPosition.y}px, 0)`,
-  }), [cursorPosition.x, cursorPosition.y]);
+  // Оптимизированные стили курсора с единым центрированием
+  const cursorStyles = useMemo(() => {
+    // Единая точка центрирования - центр невидимого системного курсора
+    // cursorPosition.x и cursorPosition.y уже представляют центр курсора
+    const centerX = cursorPosition.x;
+    const centerY = cursorPosition.y;
+    
+    if (isButton) {
+      // Стили для кнопки CLICK - центрируем относительно центра невидимого курсора
+      const buttonWidth = 80;
+      const buttonHeight = 30;
+      
+      return {
+        width: `${buttonWidth}px`,
+        height: `${buttonHeight}px`,
+        borderRadius: '0px',
+        left: `${centerX}px`, // Позиционируем по центру курсора
+        top: `${centerY}px`,   // Позиционируем по центру курсора
+        fontSize: '12px',
+        fontWeight: '600',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
+        transform: 'none',
+        transition: 'width 0.1s ease-out, height 0.1s ease-out 0.1s',
+        pointerEvents: 'none',
+      };
+    } else if (isButtonText) {
+      // Стили для текста внутри кнопки - показываем круг, центрируем относительно центра курсора
+      const size = 40;
+      
+      return {
+        width: `${size}px`,
+        height: `${size}px`,
+        borderRadius: '50%',
+        left: `${centerX}px`, // Позиционируем по центру курсора
+        top: `${centerY}px`,   // Позиционируем по центру курсора
+        fontSize: 'inherit',
+        fontWeight: 'inherit',
+        display: 'block',
+        alignItems: 'inherit',
+        justifyContent: 'inherit',
+        textTransform: 'inherit',
+        letterSpacing: 'inherit',
+        transform: 'none',
+        transition: 'width 0.2s ease-out, height 0.2s ease-out, border-radius 0.2s ease-out',
+        pointerEvents: 'none',
+      };
+    } else if (isAvatar) {
+      // Стили для аватара - показываем усы и бороду с моноклем, центрируем относительно центра курсора
+      const size = 60;
+      
+      return {
+        width: `${size}px`,
+        height: `${size}px`,
+        borderRadius: '50%',
+        left: `${centerX}px`, // Позиционируем по центру курсора
+        top: `${centerY}px`,   // Позиционируем по центру курсора
+        fontSize: '24px',
+        fontWeight: 'normal',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textTransform: 'none',
+        letterSpacing: 'normal',
+        transform: 'none',
+        transition: 'all 0.2s ease-out',
+        pointerEvents: 'none',
+      };
+    } else {
+      // Обычные стили для квадрата/круга - центрируем относительно центра невидимого курсора
+      const size = isHovering ? 40 : 20;
+      const borderRadius = isHovering ? 50 : 0;
+      
+      return {
+        width: `${size}px`,
+        height: `${size}px`,
+        borderRadius: `${borderRadius}%`,
+        left: `${centerX}px`, // Позиционируем по центру курсора
+        top: `${centerY}px`,  // Позиционируем по центру курсора
+        fontSize: 'inherit',
+        fontWeight: 'inherit',
+        display: 'block',
+        alignItems: 'inherit',
+        justifyContent: 'inherit',
+        textTransform: 'inherit',
+        letterSpacing: 'inherit',
+        transform: 'none',
+        transition: 'width 0.2s ease-out, height 0.2s ease-out, border-radius 0.2s ease-out',
+      };
+    }
+  }, [cursorPosition.x, cursorPosition.y, isHovering, isButton, isButtonText, isAvatar]);
 
-  // Мемоизируем классы курсора
+  // Оптимизированные классы курсора
   const cursorClasses = useMemo(() => 
-    `freelance-cursor ${isHovering ? 'hover' : ''} ${isClicking ? 'click' : ''}`,
-    [isHovering, isClicking]
+    `freelance-cursor ${isHovering && !isButton && !isButtonText ? 'hover' : ''} ${isClicking ? 'click' : ''} ${isButton ? 'button' : ''} ${isButtonText ? 'button-text' : ''} ${isAvatar ? 'avatar' : ''} ${isAnimatingToButton ? 'animating-to-button' : ''}`,
+    [isHovering, isClicking, isButton, isButtonText, isAvatar, isAnimatingToButton]
   );
-
+  
   return (
     <div
       className={cursorClasses}
       style={cursorStyles}
-    />
+      data-debug="cursor-element"
+      data-states={`button:${isButton},text:${isButtonText},avatar:${isAvatar},hover:${isHovering}`}
+    >
+      {isButton && 'CLICK'}
+      {isAvatar && (
+        <div style={{ fontSize: '24px', lineHeight: 1 }}>
+          🧔👓
+        </div>
+      )}
+    </div>
   );
 }

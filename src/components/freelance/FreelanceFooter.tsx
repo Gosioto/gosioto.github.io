@@ -81,7 +81,7 @@ export default function FreelanceFooter() {
 
         {/* Copyright */}
         <div className="footer-copyright">
-          <p>&copy; 2024 Geralt. Создано с ❤️ и кофе</p>
+          <p>&copy; 2025 Gosloto. Сделано за 6 часов с ❤️</p>
           <div className="footer-tech">
             <span>Powered by</span>
             <span className="tech-stack">React • Next.js • TypeScript</span>

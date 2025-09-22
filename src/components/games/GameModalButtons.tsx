@@ -22,57 +22,45 @@ export default function GameModalButtons() {
   const mockAchievements = [
     {
       id: '1',
-      title: 'Мастер Witcher 3',
-      game: 'The Witcher 3: Wild Hunt',
-      gameId: 'witcher3',
+      name: 'Мастер Witcher 3',
       description: 'Завершите все основные квесты',
-      date: '15 янв. 2024',
-      timestamp: 1705276800000,
       icon: 'fas fa-crown',
+      unlocked: true,
+      unlockedAt: '2024-01-15',
       rarity: 'legendary' as const
     },
     {
       id: '2',
-      title: 'Выживший GTFO',
-      game: 'GTFO',
-      gameId: 'gtfo',
+      name: 'Выживший GTFO',
       description: 'Пройдите все уровни сложности',
-      date: '20 фев. 2024',
-      timestamp: 1708387200000,
       icon: 'fas fa-skull',
+      unlocked: true,
+      unlockedAt: '2024-02-20',
       rarity: 'epic' as const
     },
     {
       id: '3',
-      title: 'Стратег Dawn of War',
-      game: 'Dawn of War Soulstorm',
-      gameId: 'soulstorm',
+      name: 'Стратег Dawn of War',
       description: 'Победите в 100 сражениях',
-      date: '10 мар. 2024',
-      timestamp: 1710115200000,
       icon: 'fas fa-chess',
+      unlocked: true,
+      unlockedAt: '2024-03-10',
       rarity: 'rare' as const
     },
     {
       id: '4',
-      title: 'Космический пилот',
-      game: 'EVE Frontier',
-      gameId: 'eve',
+      name: 'Космический пилот',
       description: 'Исследуйте 50 систем',
-      date: 'В процессе',
-      timestamp: 0,
       icon: 'fas fa-rocket',
+      unlocked: false,
       rarity: 'rare' as const
     },
     {
       id: '5',
-      title: 'Торговец',
-      game: 'Tradesman Deal to Dealer',
-      gameId: 'tradesman',
+      name: 'Торговец',
       description: 'Заработайте 1,000,000 кредитов',
-      date: 'В процессе',
-      timestamp: 0,
       icon: 'fas fa-coins',
+      unlocked: false,
       rarity: 'common' as const
     }
   ];

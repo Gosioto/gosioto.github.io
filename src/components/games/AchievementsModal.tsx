@@ -18,8 +18,6 @@ interface Achievement {
 interface AchievementsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  gameName?: string;
-  achievements?: Achievement[];
 }
 
 // Mock data for achievements
@@ -81,8 +79,8 @@ const achievementsData: Achievement[] = [
   }
 ];
 
-const getUniqueGames = (achievementsList: Achievement[] = achievementsData) => {
-  const games = achievementsList.map(achievement => ({
+const getUniqueGames = () => {
+  const games = achievementsData.map(achievement => ({
     id: achievement.gameId,
     name: achievement.game
   }));
@@ -91,16 +89,16 @@ const getUniqueGames = (achievementsList: Achievement[] = achievementsData) => {
   );
 };
 
-export default function AchievementsModal({ isOpen, onClose, gameName, achievements }: AchievementsModalProps) {
+export default function AchievementsModal({ isOpen, onClose }: AchievementsModalProps) {
   const [selectedGame, setSelectedGame] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [filteredAchievements, setFilteredAchievements] = useState<Achievement[]>(achievements || achievementsData);
+  const [filteredAchievements, setFilteredAchievements] = useState<Achievement[]>(achievementsData);
 
-  const games = getUniqueGames(achievements || achievementsData);
+  const games = getUniqueGames();
 
   // Обновляем фильтрованные достижения при изменении фильтров
   useEffect(() => {
-    let filtered = achievements || achievementsData;
+    let filtered = achievementsData;
     
     // Фильтр по игре
     if (selectedGame) {
@@ -117,7 +115,7 @@ export default function AchievementsModal({ isOpen, onClose, gameName, achieveme
     });
     
     setFilteredAchievements(filtered);
-  }, [selectedGame, sortOrder, achievements]);
+  }, [selectedGame, sortOrder]);
 
   // Обработка клавиш и блокировка скролла
   useEffect(() => {
@@ -175,7 +173,7 @@ export default function AchievementsModal({ isOpen, onClose, gameName, achieveme
         <div className="achievements-header">
           <h2 className="achievements-title">
             <i className="fas fa-trophy"></i>
-            {gameName || 'Достижения и челенджи'}
+            Достижения и челенджи
           </h2>
           <button 
             className="achievements-close-btn"

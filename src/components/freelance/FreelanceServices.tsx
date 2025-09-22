@@ -1,7 +1,28 @@
 // src/components/freelance/FreelanceServices.tsx
 'use client';
 
+import { useRef, useEffect } from 'react';
+
 export default function FreelanceServices() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        scrollContainer.scrollLeft += e.deltaY;
+      }
+    };
+
+    scrollContainer.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      scrollContainer.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
   const services = [
     {
       icon: 'fas fa-code',
@@ -56,7 +77,7 @@ export default function FreelanceServices() {
           <p className="section-subtitle">Полный спектр IT-услуг для вашего бизнеса</p>
         </div>
 
-        <div className="services-grid">
+        <div className="services-grid" ref={scrollContainerRef}>
           {services.map((service, index) => (
             <div key={index} className="service-card">
               <div className="service-icon">

@@ -1,7 +1,28 @@
 // src/components/freelance/FreelanceHero.tsx
 'use client';
 
+import { useState, useEffect } from 'react';
+
 export default function FreelanceHero() {
+  const [currentTime, setCurrentTime] = useState('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const moscowTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Moscow"}));
+      const timeString = moscowTime.toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      setCurrentTime(timeString);
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
   return (
     <section className="freelance-hero" id="hero">
       <div className="freelance-hero-content">
@@ -24,7 +45,7 @@ export default function FreelanceHero() {
             <div className="freelance-name-container">
               <h1 className="freelance-name">Gosloto</h1>
               <div className="freelance-time-status">
-                <span className="current-time-msk">МСК</span>
+                <span className="current-time-msk">{currentTime}</span>
                 <span className="response-time">Отвечаю за 5-7 мин</span>
               </div>
             </div>
