@@ -18,25 +18,18 @@ export default function FreelanceProjects() {
       link: '/sentinelguard/index.html'
     },
     {
-      title: 'Оптимизация Пиксельной Экосистемы',
+      title: 'мини игра "пиксельная экосистема"',
       description: 'Полный рефакторинг игры с React на Vanilla JS. Уменьшение размера бандла на 85%',
       tech: ['JavaScript ES6+', 'Canvas 2D API', 'Web Workers', 'CSS Custom Properties'],
       image: '/img/pixel.png',
-      link: '/index.html#pixel-ecosystem-game'
+      link: '/#pixel-ecosystem-game'
     },
     {
-      title: 'Static MarkForge - генератор сайтов',
-      description: 'Браузерный генератор статических сайтов из Markdown. Drag-and-drop файл → готовый HTML за 60 секунд',
-      tech: ['Vanilla JS ES2023', 'Marked.js', 'FileSaver.js', 'CSS Grid/Flex'],
-      image: '/img/casein.png',
-      link: '/static-site-gen/index.html'
-    },
-    {
-      title: 'Стриминговая платформа',
-      description: 'В разработке - современная платформа для стриминга контента',
-      tech: ['React', 'Node.js', 'WebRTC', 'MongoDB'],
-      image: '/img/projects/streaming.jpg',
-      link: '/projects',
+      title: 'ACHERON',
+      description: 'Личный стартап - современная платформа для стриминга контента с лендингом. Первый релиз планируется на ноябрь-декабрь 2025',
+      tech: ['React', 'Node.js', 'WebRTC', 'PostgreSQL'],
+      image: '/img/ACHERON_logo.png',
+      link: '/ACHERON/index.html',
       comingSoon: true
     }
   ];
@@ -52,19 +45,23 @@ export default function FreelanceProjects() {
 
         <div className="projects-grid">
           {featuredProjects.map((project, index) => (
-            <div key={index} className={`project-card ${project.comingSoon ? 'coming-soon' : ''}`}>
+            <a 
+              key={index} 
+              href={project.link} 
+              className={`project-card ${project.comingSoon ? 'coming-soon' : ''}`}
+            >
               <div className="project-image">
                 <img src={project.image} alt={project.title} />
                 <div className="project-overlay">
                   {project.comingSoon ? (
                     <div className="project-coming-soon">
-                      <i className="fas fa-clock"></i>
-                      <span>Скоро</span>
+                      <i className="fas fa-globe"></i>
+                      <span>Лендинг сервиса</span>
                     </div>
                   ) : (
-                    <a href={project.link} className="project-link">
+                    <div className="project-link">
                       <i className="fas fa-external-link-alt"></i>
-                    </a>
+                    </div>
                   )}
                 </div>
               </div>
@@ -79,7 +76,7 @@ export default function FreelanceProjects() {
                   ))}
                 </div>
               </div>
-            </div>
+            </a>
           ))}
         </div>
 

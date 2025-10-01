@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACHERON - Поток в цифровом Аиде</title>
+    <meta name="description" content="ACHERON - революционный стриминговый сервис с голосовой связью, авторскими профилями и уникальным дизайном. Погрузитесь в цифровой Аид.">
+    <link rel="icon" href="images/logos/ACHERON_logo.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="images/logos/ACHERON_logo.png" alt="ACHERON" class="logo-img">
+                <span class="logo-text">ACHERON</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#features" class="nav-link">Возможности</a>
+                <a href="#tech" class="nav-link">Технологии</a>
+                <a href="#about" class="nav-link">О проекте</a>
+                <a href="#contact" class="nav-link">Контакты</a>
+                <a href="/freelance" class="nav-link">Проекты</a>
+            </div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Главная секция -->
+    <section class="hero">
+        <div class="hero-background">
+            <div class="river-flow"></div>
+            <div class="particles"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="title-main">ACHERON</span>
+                <span class="title-subtitle">Поток в цифровом Аиде</span>
+            </h1>
+            <p class="hero-description">
+                Революционный стриминговый сервис, где контент течет как река Ахерон. 
+                Голосовая связь, авторские профили, уникальный дизайн и мини-игры с призами.
+            </p>
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="scrollToSection('features')">
+                    <i class="fas fa-play"></i>
+                    Узнать больше
+                </button>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">0%</span>
+                    <span class="stat-label">Комиссия</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">∞</span>
+                    <span class="stat-label">Кастомизация</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">Q4 2025</span>
+                    <span class="stat-label">Релиз</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Возможности -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Возможности ACHERON</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="images/ui-elements/Всевидящее око Оракула.png" alt="Стриминг" class="feature-icon-img">
+                    </div>
+                    <h3>Стриминг</h3>
+                    <p>Высококачественный стриминг с минимальной задержкой и поддержкой всех форматов на территории РФ</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="images/ui-elements/Секретный символ.png" alt="Голосовые комнаты" class="feature-icon-img">
+                    </div>
+                    <h3>Голосовые комнаты</h3>
+                    <p>Мгновенное создание голосовых комнат с видео и демонстрацией экрана</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="images/ui-elements/Иконка автора.png" alt="Авторские профили" class="feature-icon-img">
+                    </div>
+                    <h3>Авторские профили</h3>
+                    <p>Замена Boosty и Patreon - безкомиссионная поддержка от зрителей</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="images/ui-elements/icon_pen (1).png" alt="Уникальный дизайн" class="feature-icon-img">
+                    </div>
+                    <h3>Уникальный дизайн</h3>
+                    <p>Полная кастомизация интерфейса с возможностью создания и монетизации тем</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="images/ui-elements/icon_play (1).png" alt="Мини-игры" class="feature-icon-img">
+                    </div>
+                    <h3>Мини-игры</h3>
+                    <p>Интерактивные игры с возможностью выиграть реальные призы</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="images/ui-elements/icon_guard (1).png" alt="Безопасность" class="feature-icon-img">
+                    </div>
+                    <h3>Безопасность</h3>
+                    <p>Защита контента и приватности пользователей на высшем уровне</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Технологии -->
+    <section id="tech" class="tech">
+        <div class="container">
+            <h2 class="section-title">Технологии ACHERON</h2>
+            <div class="tech-content">
+                <div class="tech-description">
+                    <h3>Современный стек технологий</h3>
+                    <p>ACHERON построен на передовых технологиях, обеспечивающих высокую производительность, безопасность и масштабируемость платформы.</p>
+                </div>
+                <div class="tech-grid">
+                    <div class="tech-category">
+                        <h4>Frontend</h4>
+                        <div class="tech-items">
+                            <div class="tech-item">
+                                <i class="fab fa-react"></i>
+                                <span>React</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fab fa-node-js"></i>
+                                <span>Node.js</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fas fa-code"></i>
+                                <span>TypeScript</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tech-category">
+                        <h4>Backend</h4>
+                        <div class="tech-items">
+                            <div class="tech-item">
+                                <i class="fas fa-database"></i>
+                                <span>PostgreSQL</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fas fa-video"></i>
+                                <span>WebRTC</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fas fa-cloud"></i>
+                                <span>Cloud Storage</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tech-category">
+                        <h4>Инфраструктура</h4>
+                        <div class="tech-items">
+                            <div class="tech-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>SSL/TLS</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fas fa-rocket"></i>
+                                <span>CDN</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fas fa-cogs"></i>
+                                <span>Docker</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- О проекте -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Мифология ACHERON</h2>
+                    <p>
+                        Ахерон - одна из пяти рек Аида в греческой мифологии, река скорби и боли. 
+                        Но в нашем цифровом мире ACHERON становится рекой возможностей и творчества.
+                    </p>
+                    <p>
+                        Наш сервис объединяет лучшие технологии стриминга с уникальными возможностями 
+                        монетизации и взаимодействия. Мы создаем не просто платформу, а целую экосистему 
+                        для контент-мейкеров и их аудитории.
+                    </p>
+                    <div class="about-features">
+                        <div class="about-feature">
+                            <i class="fas fa-rocket"></i>
+                            <span>Инновационные технологии</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-heart"></i>
+                            <span>Сообщество в центре</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-gem"></i>
+                            <span>Уникальный опыт</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-visual">
+                    <div class="river-animation">
+                        <div class="river-path"></div>
+                        <div class="river-flow"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Контакты -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Следите за развитием ACHERON</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Будьте в курсе новостей проекта</h3>
+                    <p>Присоединяйтесь к сообществу ACHERON и узнавайте первыми о новых возможностях и релизах</p>
+                    <div class="contact-methods">
+                        <a href="mailto:gosioto@yandex.ru" class="contact-method">
+                            <i class="fas fa-envelope"></i>
+                            gosioto@yandex.ru
+                        </a>
+                        <a href="https://t.me/G0SL0T0" class="contact-method">
+                            <i class="fab fa-telegram"></i>
+                            @G0SL0T0
+                        </a>
+                    </div>
+                </div>
+                <div class="contact-visual">
+                    <div class="contact-stats">
+                        <div class="contact-stat">
+                            <div class="stat-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number">200K+</span>
+                                <span class="stat-label">Строк кода</span>
+                            </div>
+                        </div>
+                        <div class="contact-stat">
+                            <div class="stat-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number">Q4 2025</span>
+                                <span class="stat-label">Планируемый релиз</span>
+                            </div>
+                        </div>
+                        <div class="contact-stat">
+                            <div class="stat-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number">24/7</span>
+                                <span class="stat-label">Разработка проекта</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logos/ACHERON_logo.png" alt="ACHERON" class="logo-img">
+                    <span class="logo-text">ACHERON</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#features">Возможности</a>
+                    <a href="#tech">Технологии</a>
+                    <a href="#about">О проекте</a>
+                    <a href="#contact">Контакты</a>
+                    <a href="/freelance">Проекты</a>
+                </div>
+                <div class="footer-social">
+                    <a href="https://t.me/G0SL0T0"><i class="fab fa-telegram"></i></a>
+                    <a href="mailto:gosioto@yandex.ru"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ACHERON. Все права защищены. Погружайтесь в цифровой Аид.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
