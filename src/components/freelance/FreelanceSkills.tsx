@@ -1,6 +1,9 @@
 // src/components/freelance/FreelanceSkills.tsx
 'use client';
 
+import { useEffect, useRef } from 'react';
+import LiveCodeSection from './LiveCodeSection';
+
 export default function FreelanceSkills() {
   const skillCategories = [
     {
@@ -35,6 +38,34 @@ export default function FreelanceSkills() {
     }
   ];
 
+  const skillBarsRef = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    // Анимация шкал навыков при появлении в viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const skillBar = entry.target as HTMLDivElement;
+            const level = skillBar.dataset.level;
+            if (level) {
+              setTimeout(() => {
+                skillBar.style.width = `${level}%`;
+              }, 200);
+            }
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    skillBarsRef.current.forEach((bar) => {
+      if (bar) observer.observe(bar);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section className="freelance-skills" id="skills">
       <div className="freelance-skills-content">
@@ -59,9 +90,11 @@ export default function FreelanceSkills() {
                     
                     <div className="skill-bar">
                       <div 
+                        ref={(el) => (skillBarsRef.current[skillIndex] = el)}
                         className="skill-progress"
+                        data-level={skill.level}
                         style={{ 
-                          width: `${skill.level}%`,
+                          width: '0%',
                           backgroundColor: skill.color
                         }}
                       ></div>
@@ -71,6 +104,10 @@ export default function FreelanceSkills() {
               </div>
             </div>
           ))}
+        </div>
+        
+        <div className="code-section-wrapper">
+          <LiveCodeSection />
         </div>
 
       </div>
