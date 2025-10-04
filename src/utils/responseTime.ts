@@ -83,7 +83,7 @@ export function getResponseStatus(): ResponseStatus {
         timeText: 'Могу не ответить до утра',
         status: 'sleeping',
         warning: 'Сплю и могу не ответить до утра',
-        timeUntilChange: getTimeUntilChange(0),
+        timeUntilChange: getTimeUntilChange(6),
         changeDescription: 'До начала рабочего дня'
       };
     }
