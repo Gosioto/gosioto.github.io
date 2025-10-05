@@ -1718,6 +1718,70 @@
   transform: translateX(5px);
 }
 
+.file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.file-progress {
+  font-size: 0.8rem;
+  color: var(--freelance-text-secondary);
+  opacity: 0.7;
+}
+
+.code-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dependencies {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dependency-tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 107, 53, 0.2);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  border-radius: 4px;
+  color: var(--freelance-accent);
+}
+
+.typing-status {
+  font-size: 0.8rem;
+  color: var(--freelance-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.language-javascript {
+  color: #f7df1e;
+}
+
+.language-typescript {
+  color: #3178c6;
+}
+
+.language-css {
+  color: #1572b6;
+}
+
+.language-json {
+  color: #f7df1e;
+}
+
+.language-dockerfile {
+  color: #2496ed;
+}
+
 .code-content {
   padding: 2rem;
   background: #1a1a1a;
