@@ -90,7 +90,9 @@ export default function FreelanceSkills() {
                     
                     <div className="skill-bar">
                       <div 
-                        ref={(el) => (skillBarsRef.current[skillIndex] = el)}
+                        ref={(el) => {
+                          skillBarsRef.current[skillIndex] = el;
+                        }}
                         className="skill-progress"
                         data-level={skill.level}
                         style={{ 
