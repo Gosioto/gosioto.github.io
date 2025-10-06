@@ -130,7 +130,10 @@ export default function DPSCalculator() {
                     <span>⚔️ {unit.damage}</span>
                     <span>⚡ {unit.attackSpeed}</span>
                   </div>
-                  <p className="unit-cost">💰 {unit.cost}</p>
+                  <p className="unit-cost">
+                    <img src="/TradeDamage/ui/Мешок с деньгами.png" alt="Стоимость" style={{width: '16px', height: '16px', marginRight: '4px', verticalAlign: 'middle'}} />
+                    {unit.cost}
+                  </p>
                 </div>
               </div>
             ))}
@@ -143,101 +146,140 @@ export default function DPSCalculator() {
             <h3>Активный отряд</h3>
           </div>
 
-          {/* Transport slot */}
-          <div className="transport-slot">
-            <h4>Транспорт (1)</h4>
-            {squad.transport ? (
-              <div className="squad-unit-card">
-                <img src={squad.transport.unit.icon} alt={squad.transport.unit.name} />
-                <div className="unit-details">
-                  <h5>{squad.transport.unit.name}</h5>
-                  <div className="unit-stats">
-                    <span>❤️ {calculateUnitHealth(squad.transport)}</span>
-                    <span>⚔️ {calculateUnitDamage(squad.transport)}</span>
-                    <span>💥 {calculateUnitDPS(squad.transport).toFixed(1)} DPS</span>
+          {/* Squad units in 5 columns - order: mercenaries 2-5, then transport 1 */}
+          <div className="squad-units">
+            {/* Mercenary slots (positions 2-5) */}
+            {[0, 1, 2, 3].map((index) => (
+              <div key={index} className="squad-unit-slot">
+                <span className="slot-number">{index + 2}</span>
+                {squad.units[index] ? (
+                  <div 
+                    className={`squad-unit-card ${selectedSquadUnit?.unit.id === squad.units[index].unit.id ? 'active' : ''}`}
+                    onClick={() => setSelectedSquadUnit(squad.units[index])}
+                  >
+                    <img src={squad.units[index].unit.icon} alt={squad.units[index].unit.name} />
                   </div>
-                  <button onClick={removeTransport} className="remove-btn">Удалить</button>
-                </div>
+                ) : (
+                  <div className="empty-slot">Пустой слот</div>
+                )}
               </div>
-            ) : (
-              <div className="empty-slot">Пустой слот</div>
-            )}
-          </div>
+            ))}
 
-          {/* Mercenary slots */}
-          <div className="mercenary-slots">
-            <h4>Наемники (2-5)</h4>
-            <div className="squad-units">
-              {[0, 1, 2, 3].map((index) => (
-                <div key={index} className="squad-unit-slot">
-                  <span className="slot-number">{index + 2}</span>
-                  {squad.units[index] ? (
-                    <div className="squad-unit-card">
-                      <img src={squad.units[index].unit.icon} alt={squad.units[index].unit.name} />
-                      <div className="unit-details">
-                        <h5>{squad.units[index].unit.name}</h5>
-                        <div className="unit-stats">
-                          <span>❤️ {calculateUnitHealth(squad.units[index])}</span>
-                          <span>⚔️ {calculateUnitDamage(squad.units[index])}</span>
-                          <span>💥 {calculateUnitDPS(squad.units[index]).toFixed(1)} DPS</span>
-                        </div>
-                        <div className="unit-modifiers">
-                          <div className="scrolls">
-                            {squad.units[index].scrolls.map((scroll, i) => (
-                              <span key={i} className="modifier scroll">📜 {scroll.name}</span>
-                            ))}
-                          </div>
-                          <div className="badges">
-                            {squad.units[index].badges.map((badge, i) => (
-                              <span key={i} className="modifier badge">🏅 {badge.name}</span>
-                            ))}
-                          </div>
-                          {squad.units[index].food && (
-                            <span className="modifier food">🍖 {squad.units[index].food!.name}</span>
-                          )}
-                        </div>
-                        <button onClick={() => removeUnitFromSquad(index)} className="remove-btn">Удалить</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="empty-slot">Пустой слот</div>
-                  )}
+            {/* Transport slot (position 1) - rightmost */}
+            <div className="squad-unit-slot">
+              <span className="slot-number">1</span>
+              {squad.transport ? (
+                <div 
+                  className={`squad-unit-card ${selectedSquadUnit?.unit.id === squad.transport.unit.id ? 'active' : ''}`}
+                  onClick={() => setSelectedSquadUnit(squad.transport)}
+                >
+                  <img src={squad.transport.unit.icon} alt={squad.transport.unit.name} />
                 </div>
-              ))}
+              ) : (
+                <div className="empty-slot">Пустой слот</div>
+              )}
             </div>
           </div>
 
-          {/* Squad statistics */}
+          {/* Selected unit info */}
+          {selectedSquadUnit && (
+            <div className="unit-info">
+              <h4>{selectedSquadUnit.unit.name}</h4>
+              <div className="unit-details">
+                <p><strong>Тип:</strong> {selectedSquadUnit.unit.type === 'melee' ? 'Ближний бой' : 'Дальний бой'}</p>
+                <p><strong>Редкость:</strong> {selectedSquadUnit.unit.rarity}</p>
+                <p><strong>Уровень:</strong> {selectedSquadUnit.unit.level}/{selectedSquadUnit.unit.maxLevel}</p>
+                <p><strong>Стоимость:</strong> {selectedSquadUnit.unit.cost} монет</p>
+                <div className="unit-modifiers">
+                  <div className="scrolls">
+                    <h5>Свитки:</h5>
+                    {selectedSquadUnit.scrolls.map((scroll, i) => (
+                      <span key={i} className="modifier scroll">{scroll.name}</span>
+                    ))}
+                  </div>
+                  <div className="badges">
+                    <h5>Значки:</h5>
+                    {selectedSquadUnit.badges.map((badge, i) => (
+                      <span key={i} className="modifier badge">{badge.name}</span>
+                    ))}
+                  </div>
+                  <div className="food">
+                    <h5>Еда:</h5>
+                    {selectedSquadUnit.food && (
+                      <span className="modifier food">{selectedSquadUnit.food.name}</span>
+                    )}
+                  </div>
+                </div>
+                <button 
+                  onClick={() => {
+                    if (selectedSquadUnit.unit.category === 'transport') {
+                      removeTransport();
+                    } else {
+                      const index = squad.units.findIndex(u => u.unit.id === selectedSquadUnit.unit.id);
+                      if (index !== -1) removeUnitFromSquad(index);
+                    }
+                    setSelectedSquadUnit(null);
+                  }} 
+                  className="remove-btn"
+                >
+                  Удалить
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Squad stats */}
           <div className="squad-stats">
             <h4>Статистика отряда</h4>
             <div className="stats-grid">
               <div className="stat-item">
-                <span className="stat-label">Общий DPS:</span>
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/урон.png" alt="Урон" />
+                  Общий DPS
+                </span>
                 <span className="stat-value">{squadStats.totalDPS}</span>
               </div>
               <div className="stat-item">
-                <span className="stat-label">Общее здоровье:</span>
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/здоровье.png" alt="Здоровье" />
+                  Общее здоровье
+                </span>
                 <span className="stat-value">{squadStats.totalHealth}</span>
               </div>
               <div className="stat-item">
-                <span className="stat-label">Урон без критов:</span>
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/урон.png" alt="Урон" />
+                  Урон без критов
+                </span>
                 <span className="stat-value">{squadStats.totalDamage}</span>
               </div>
               <div className="stat-item">
-                <span className="stat-label">Урон с макс критами:</span>
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/урон.png" alt="Урон" />
+                  Урон с макс критами
+                </span>
                 <span className="stat-value">{squadStats.totalDamageWithCrits}</span>
               </div>
               <div className="stat-item">
-                <span className="stat-label">Средний шанс крита:</span>
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/крит шанс.png" alt="Крит шанс" />
+                  Средний шанс крита
+                </span>
                 <span className="stat-value">{squadStats.averageCritChance}%</span>
               </div>
               <div className="stat-item">
-                <span className="stat-label">Средняя сила крита:</span>
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/сила крита.png" alt="Сила крита" />
+                  Средняя сила крита
+                </span>
                 <span className="stat-value">x{squadStats.averageCritDamage}</span>
               </div>
               <div className="stat-item">
-                <span className="stat-label">Общая стоимость:</span>
-                <span className="stat-value">💰 {squadStats.totalCost}</span>
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/уровень.png" alt="Уровень" />
+                  Общая стоимость
+                </span>
+                <span className="stat-value">{squadStats.totalCost}</span>
               </div>
             </div>
           </div>

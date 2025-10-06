@@ -4,6 +4,9 @@ import { useState } from 'react';
 import '@/styles/tradedamage.css';
 import TradedamageHeader from '@/components/tradedamage/TradedamageHeader';
 import DPSCalculator from '@/components/tradedamage/DPSCalculator';
+import SquadBuilder from '@/components/tradedamage/SquadBuilder';
+import SquadAddition from '@/components/tradedamage/SquadAddition';
+import Sandbox from '@/components/tradedamage/Sandbox';
 
 export default function TradedamagePage() {
   const [activeModal, setActiveModal] = useState('dps-calculator');
@@ -13,11 +16,11 @@ export default function TradedamagePage() {
       case 'dps-calculator':
         return <DPSCalculator />;
       case 'squad-builder':
-        return <div className="modal-placeholder">Подобрать отряд под бюджет с 0</div>;
+        return <SquadBuilder />;
       case 'squad-addition':
-        return <div className="modal-placeholder">Дополнение к отряду</div>;
+        return <SquadAddition />;
       case 'sandbox':
-        return <div className="modal-placeholder">Песочница</div>;
+        return <Sandbox />;
       default:
         return <DPSCalculator />;
     }
@@ -25,11 +28,11 @@ export default function TradedamagePage() {
 
   return (
     <div className="tradedamage-page">
-      <TradedamageHeader 
-        activeModal={activeModal} 
-        onModalChange={setActiveModal} 
+      <TradedamageHeader
+        activeModal={activeModal}
+        onModalChange={setActiveModal}
       />
-      
+
       <main className="tradedamage-main">
         {renderActiveModal()}
       </main>

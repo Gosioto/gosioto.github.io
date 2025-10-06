@@ -9,9 +9,9 @@ interface TradedamageHeaderProps {
 
 export default function TradedamageHeader({ activeModal, onModalChange }: TradedamageHeaderProps) {
   const modalButtons = [
-    { id: 'dps-calculator', label: 'Расчет DPS отряда' },
-    { id: 'squad-builder', label: 'Подобрать отряд под бюджет с 0' },
-    { id: 'squad-addition', label: 'Дополнение к отряду' },
+    { id: 'dps-calculator', label: 'DPS' },
+    { id: 'squad-builder', label: 'Бюджет' },
+    { id: 'squad-addition', label: 'Дополнение' },
     { id: 'sandbox', label: 'Песочница' }
   ];
 
