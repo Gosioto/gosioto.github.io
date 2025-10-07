@@ -1267,40 +1267,239 @@ export const badges: Badge[] = [
 
 // Food Database
 export const food: Food[] = [
+  // Обычная еда
   {
-    id: 'bread',
-    name: 'Хлеб',
-    icon: '/img/food/bread.png',
-    effect: 'Увеличивает здоровье',
-    effectValue: 10,
-    cost: 5,
-    description: '+10% к здоровью',
-  },
-  {
-    id: 'meat',
-    name: 'Мясо',
-    icon: '/img/food/meat.png',
-    effect: 'Увеличивает урон',
-    effectValue: 8,
-    cost: 8,
-    description: '+8% к урону',
-  },
-  {
-    id: 'wine',
-    name: 'Вино',
-    icon: '/img/food/wine.png',
-    effect: 'Увеличивает скорость атаки',
-    effectValue: 6,
-    cost: 12,
-    description: '+6% к скорости атаки',
-  },
-  {
-    id: 'cheese',
-    name: 'Сыр',
-    icon: '/img/food/cheese.png',
-    effect: 'Увеличивает шанс крита',
-    effectValue: 5,
+    id: 'kasha',
+    name: 'Каша',
+    icon: '/TradeDamage/ui/food/kasha.png',
+    rarity: 'common',
+    healthRestore: 60,
+    damageBonus: 5,
     cost: 10,
-    description: '+5% к шансу критического удара',
+    description: 'Восстанавливает 60 HP, +5 урона'
+  },
+  {
+    id: 'garlic_toast',
+    name: 'Гренки с чесноком',
+    icon: '/TradeDamage/ui/food/garlic_toast.png',
+    rarity: 'common',
+    healthRestore: 60,
+    attackSpeedBonus: 0.1,
+    cost: 12,
+    description: 'Восстанавливает 60 HP, +0.1 скорости атаки'
+  },
+  {
+    id: 'cabbage_cutlet',
+    name: 'Капустная котлета',
+    icon: '/TradeDamage/ui/food/cabbage_cutlet.png',
+    rarity: 'common',
+    healthRestore: 60,
+    critChanceBonus: 10,
+    cost: 15,
+    description: 'Восстанавливает 60 HP, +10% шанс крита'
+  },
+  {
+    id: 'ash_potato',
+    name: 'Картофель в золе',
+    icon: '/TradeDamage/ui/food/ash_potato.png',
+    rarity: 'common',
+    healthRestore: 60,
+    critDamageBonus: 1,
+    cost: 18,
+    description: 'Восстанавливает 60 HP, +x1 крит урон'
+  },
+
+  // Необычная еда
+  {
+    id: 'random_steak',
+    name: 'Стейк случайной прожарки',
+    icon: '/TradeDamage/ui/food/random_steak.png',
+    rarity: 'uncommon',
+    healthRestore: 100,
+    damageBonus: 5,
+    critChanceBonus: 10,
+    cost: 25,
+    description: 'Восстанавливает 100 HP, +5 урона, +10% шанс крита'
+  },
+  {
+    id: 'donut',
+    name: 'Пончик',
+    icon: '/TradeDamage/ui/food/donut.png',
+    rarity: 'uncommon',
+    healthRestore: 200,
+    damageBonus: 1,
+    attackSpeedBonus: 0.01,
+    critChanceBonus: 1,
+    critDamageBonus: 1,
+    cost: 30,
+    description: 'Восстанавливает 200 HP, +1 урон, +0.01 скорости атаки, +1% шанс крита, +x1 крит'
+  },
+  {
+    id: 'milk_soup',
+    name: 'Молочный суп',
+    icon: '/TradeDamage/ui/food/milk_soup.png',
+    rarity: 'uncommon',
+    healthRestore: 100,
+    attackSpeedBonus: 0.1,
+    critChanceBonus: 12,
+    cost: 28,
+    description: 'Восстанавливает 100 HP, +0.1 скорости атаки, +12% шанс крита'
+  },
+  {
+    id: 'vegetable_stew',
+    name: 'Овощное рагу',
+    icon: '/TradeDamage/ui/food/vegetable_stew.png',
+    rarity: 'uncommon',
+    healthRestore: 100,
+    damageBonus: 2,
+    critDamageBonus: 1.5,
+    cost: 32,
+    description: 'Восстанавливает 100 HP, +2 урона, +x1.5 крит урон'
+  },
+
+  // Редкая еда
+  {
+    id: 'battered_chicken',
+    name: 'Курица в кляре',
+    icon: '/TradeDamage/ui/food/battered_chicken.png',
+    rarity: 'rare',
+    healthRestore: 200,
+    damageBonus: 8,
+    attackSpeedBonus: 0.1,
+    critChanceBonus: 15,
+    cost: 45,
+    description: 'Восстанавливает 200 HP, +8 урона, +0.1 скорости атаки, +15% шанс крита'
+  },
+  {
+    id: 'pickled_eggs',
+    name: 'Яички в маринаде',
+    icon: '/TradeDamage/ui/food/pickled_eggs.png',
+    rarity: 'rare',
+    healthRestore: 150,
+    damageBonus: 5,
+    critDamageBonus: 2,
+    cost: 50,
+    description: 'Восстанавливает 150 HP, +5 урона, +x2 крит урон'
+  },
+  {
+    id: 'strong_pancakes',
+    name: 'Крепкие драники',
+    icon: '/TradeDamage/ui/food/strong_pancakes.png',
+    rarity: 'rare',
+    healthRestore: 150,
+    damageBonus: 10,
+    critChanceBonus: 10,
+    cost: 48,
+    description: 'Восстанавливает 150 HP, +10 урона, +10% шанс крита'
+  },
+  {
+    id: 'sauerkraut',
+    name: 'Квашенка',
+    icon: '/TradeDamage/ui/food/sauerkraut.png',
+    rarity: 'rare',
+    healthRestore: 150,
+    attackSpeedBonus: 0.2,
+    cost: 42,
+    description: 'Восстанавливает 150 HP, +0.2 скорости атаки'
+  },
+
+  // Эпическая еда
+  {
+    id: 'fish_on_grains',
+    name: 'Рыба на белых зернах',
+    icon: '/TradeDamage/ui/food/fish_on_grains.png',
+    rarity: 'epic',
+    healthRestore: 200,
+    damageBonus: 7,
+    critChanceBonus: 10,
+    critDamageBonus: 1.5,
+    cost: 65,
+    description: 'Восстанавливает 200 HP, +7 урона, +10% шанс крита, +x1.5 крит урон'
+  },
+  {
+    id: 'whipped_eggs_honey',
+    name: 'Взбитые яйца с мёдом',
+    icon: '/TradeDamage/ui/food/whipped_eggs_honey.png',
+    rarity: 'epic',
+    healthRestore: 200,
+    damageBonus: 2,
+    attackSpeedBonus: 0.25,
+    critDamageBonus: 1,
+    cost: 70,
+    description: 'Восстанавливает 200 HP, +2 урона, +0.25 скорости атаки, +x1 крит урон'
+  },
+  {
+    id: 'sweet_roll',
+    name: 'Твой сладкий рулет',
+    icon: '/TradeDamage/ui/food/sweet_roll.png',
+    rarity: 'epic',
+    healthRestore: 300,
+    damageBonus: 2,
+    attackSpeedBonus: 0.02,
+    critChanceBonus: 2,
+    critDamageBonus: 2,
+    cost: 80,
+    description: 'Восстанавливает 300 HP, +2 урона, +0.02 скорости атаки, +2% шанс крита, +x2 крит урон'
+  },
+  {
+    id: 'pumpkin_pie',
+    name: 'Тыквенный пирог',
+    icon: '/TradeDamage/ui/food/pumpkin_pie.png',
+    rarity: 'epic',
+    healthRestore: 200,
+    damageBonus: 13,
+    critChanceBonus: 13,
+    cost: 75,
+    description: 'Восстанавливает 200 HP, +13 урона, +13% шанс крита'
+  },
+
+  // Легендарная еда
+  {
+    id: 'royal_pasta',
+    name: 'Королевская паста',
+    icon: '/TradeDamage/ui/food/royal_pasta.png',
+    rarity: 'legendary',
+    healthRestore: 250,
+    damageBonus: 14,
+    critChanceBonus: 20,
+    critDamageBonus: 1,
+    cost: 100,
+    description: 'Восстанавливает 250 HP, +14 урона, +20% шанс крита, +x1 крит урон'
+  },
+  {
+    id: 'divine_shawarma',
+    name: 'Божественная шаверма',
+    icon: '/TradeDamage/ui/food/divine_shawarma.png',
+    rarity: 'legendary',
+    healthRestore: 250,
+    damageBonus: 10,
+    attackSpeedBonus: 0.1,
+    critChanceBonus: 10,
+    critDamageBonus: 2,
+    cost: 120,
+    description: 'Восстанавливает 250 HP, +10 урона, +0.1 скорости атаки, +10% шанс крита, +x2 крит урон'
+  },
+  {
+    id: 'energy_goo',
+    name: 'Энергетическая жижа',
+    icon: '/TradeDamage/ui/food/energy_goo.png',
+    rarity: 'legendary',
+    healthRestore: 250,
+    attackSpeedBonus: 0.2,
+    critChanceBonus: 10,
+    critDamageBonus: 2,
+    cost: 110,
+    description: 'Восстанавливает 250 HP, +0.2 скорости атаки, +10% шанс крита, +x2 крит урон'
+  },
+  {
+    id: 'fish_ice_cream',
+    name: 'Рыбная мороженка',
+    icon: '/TradeDamage/ui/food/fish_ice_cream.png',
+    rarity: 'legendary',
+    healthRestore: 250,
+    damageBonus: 15,
+    attackSpeedBonus: 0.15,
+    cost: 115,
+    description: 'Восстанавливает 250 HP, +15 урона, +0.15 скорости атаки'
   }
 ];

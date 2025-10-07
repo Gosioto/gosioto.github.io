@@ -55,8 +55,12 @@ export interface Food {
   id: string;
   name: string;
   icon: string;
-  effect: string;
-  effectValue: number;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  healthRestore: number; // Восстанавливает HP
+  damageBonus?: number; // +урон
+  attackSpeedBonus?: number; // +скорость атаки
+  critChanceBonus?: number; // +% шанс крита
+  critDamageBonus?: number; // +x крит урон
   cost: number;
   description: string;
 }

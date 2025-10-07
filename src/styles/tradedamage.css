@@ -636,6 +636,7 @@
   border-radius: 16px;
   padding: 1.5rem;
   overflow-y: auto;
+  position: relative;
   /* Скрываем скроллбары */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
@@ -1194,51 +1195,44 @@
   }
 }
 
-/* Modal Styles */
-.unit-details-modal,
-.customization-modal {
-  position: fixed;
-  top: 0;
+/* Dropdown Styles */
+.unit-details-dropdown,
+.customization-dropdown {
+  position: absolute;
+  top: 100%;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
   background: #1a1a1a;
   border: 2px solid #333;
-  border-radius: 12px;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-  width: 90%;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  margin-top: 0.5rem;
 }
 
-.modal-header {
+.dropdown-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 0.75rem;
   border-bottom: 1px solid #333;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px 6px 0 0;
 }
 
-.modal-header h3 {
+.dropdown-header h3 {
   color: #ffffff;
   margin: 0;
+  font-size: 1rem;
 }
 
 .close-btn {
   background: none;
   border: none;
   color: #ffffff;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 4px;
   transition: background 0.3s ease;
 }
@@ -1247,9 +1241,11 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Unit Details Modal */
+/* Unit Details Dropdown */
 .unit-details-content {
   padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .unit-avatar {
@@ -1258,8 +1254,8 @@
 }
 
 .unit-avatar img {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
 }
 
@@ -1271,7 +1267,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
+  padding: 0.4rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -1282,19 +1278,19 @@
 .unit-stats-detailed .stat-label {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
+  gap: 0.4rem;
+  font-size: 0.85rem;
   color: #cccccc;
 }
 
 .unit-stats-detailed .stat-label img {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
 }
 
 .unit-stats-detailed .stat-value {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #ffffff;
 }
@@ -1302,62 +1298,65 @@
 .unit-enhancements h4 {
   color: #ffffff;
   margin-bottom: 0.5rem;
+  font-size: 0.9rem;
 }
 
 .enhancement-category {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .enhancement-category h5 {
   color: #cccccc;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
 }
 
 .enhancement-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0;
+  gap: 0.4rem;
+  padding: 0.2rem 0;
   color: #cccccc;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .enhancement-item img {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   object-fit: contain;
 }
 
-/* Customization Modal */
+/* Customization Dropdown */
 .customization-content {
   padding: 1rem;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .customization-slots {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .customization-slot {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 1rem;
+  border-radius: 6px;
+  padding: 0.75rem;
   text-align: center;
 }
 
 .customization-slot .slot-number {
   display: block;
   color: #cccccc;
-  font-size: 0.8rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  margin-bottom: 0.4rem;
 }
 
 .customization-options {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   justify-content: center;
 }
 
@@ -1365,7 +1364,7 @@
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
-  padding: 0.5rem;
+  padding: 0.4rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -1376,8 +1375,8 @@
 }
 
 .customization-btn img {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 

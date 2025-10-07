@@ -360,140 +360,135 @@ export default function DPSCalculator() {
         </div>
       </div>
 
-      {/* Unit Details Modal */}
+      {/* Unit Details Dropdown */}
       {showUnitDetails && selectedSquadUnit && (
-        <div className="unit-details-modal">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>{selectedSquadUnit.unit.name}</h3>
-              <button 
-                className="close-btn"
-                onClick={() => {
-                  setShowUnitDetails(false);
-                  setSelectedSquadUnit(null);
-                }}
-              >
-                ×
-              </button>
+        <div className="unit-details-dropdown">
+          <div className="dropdown-header">
+            <h3>{selectedSquadUnit.unit.name}</h3>
+            <button 
+              className="close-btn"
+              onClick={() => {
+                setShowUnitDetails(false);
+                setSelectedSquadUnit(null);
+              }}
+            >
+              ×
+            </button>
+          </div>
+          <div className="unit-details-content">
+            <div className="unit-avatar">
+              <img src={selectedSquadUnit.unit.icon} alt={selectedSquadUnit.unit.name} />
             </div>
-            <div className="unit-details-content">
-              <div className="unit-avatar">
-                <img src={selectedSquadUnit.unit.icon} alt={selectedSquadUnit.unit.name} />
+            <div className="unit-stats-detailed">
+              <div className="stat-item">
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/здоровье.png" alt="Здоровье" />
+                  Здоровье
+                </span>
+                <span className="stat-value">{calculateUnitHealth(selectedSquadUnit)}</span>
               </div>
-              <div className="unit-stats-detailed">
-                <div className="stat-item">
-                  <span className="stat-label">
-                    <img src="/TradeDamage/ui/здоровье.png" alt="Здоровье" />
-                    Здоровье
-                  </span>
-                  <span className="stat-value">{calculateUnitHealth(selectedSquadUnit)}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">
-                    <img src="/TradeDamage/ui/урон.png" alt="Урон" />
-                    Урон
-                  </span>
-                  <span className="stat-value">{calculateUnitDamage(selectedSquadUnit)}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">
-                    <img src="/TradeDamage/ui/урон.png" alt="DPS" />
-                    Урон в сек
-                  </span>
-                  <span className="stat-value">{calculateUnitDPS(selectedSquadUnit)}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Скорость атаки</span>
-                  <span className="stat-value">{selectedSquadUnit.unit.attackSpeed}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">
-                    <img src="/TradeDamage/ui/крит шанс.png" alt="Крит шанс" />
-                    Крит шанс
-                  </span>
-                  <span className="stat-value">{selectedSquadUnit.unit.critChance}%</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">
-                    <img src="/TradeDamage/ui/сила крита.png" alt="Сила крита" />
-                    Сила крита
-                  </span>
-                  <span className="stat-value">x{selectedSquadUnit.unit.critDamage}</span>
-                </div>
+              <div className="stat-item">
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/урон.png" alt="Урон" />
+                  Урон
+                </span>
+                <span className="stat-value">{calculateUnitDamage(selectedSquadUnit)}</span>
               </div>
-              <div className="unit-enhancements">
-                <h4>Примененные усиления:</h4>
-                <div className="enhancement-list">
-                  {selectedSquadUnit.scrolls.length > 0 && (
-                    <div className="enhancement-category">
-                      <h5>Свитки:</h5>
-                      {selectedSquadUnit.scrolls.map((scroll, index) => (
-                        <div key={index} className="enhancement-item">
-                          <img src={scroll.icon} alt={scroll.name} />
-                          <span>{scroll.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {selectedSquadUnit.badges.length > 0 && (
-                    <div className="enhancement-category">
-                      <h5>Значки:</h5>
-                      {selectedSquadUnit.badges.map((badge, index) => (
-                        <div key={index} className="enhancement-item">
-                          <img src={badge.icon} alt={badge.name} />
-                          <span>{badge.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              <div className="stat-item">
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/урон.png" alt="DPS" />
+                  Урон в сек
+                </span>
+                <span className="stat-value">{calculateUnitDPS(selectedSquadUnit)}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Скорость атаки</span>
+                <span className="stat-value">{selectedSquadUnit.unit.attackSpeed}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/крит шанс.png" alt="Крит шанс" />
+                  Крит шанс
+                </span>
+                <span className="stat-value">{selectedSquadUnit.unit.critChance}%</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">
+                  <img src="/TradeDamage/ui/сила крита.png" alt="Сила крита" />
+                  Сила крита
+                </span>
+                <span className="stat-value">x{selectedSquadUnit.unit.critDamage}</span>
+              </div>
+            </div>
+            <div className="unit-enhancements">
+              <h4>Примененные усиления:</h4>
+              <div className="enhancement-list">
+                {selectedSquadUnit.scrolls.length > 0 && (
+                  <div className="enhancement-category">
+                    <h5>Свитки:</h5>
+                    {selectedSquadUnit.scrolls.map((scroll, index) => (
+                      <div key={index} className="enhancement-item">
+                        <img src={scroll.icon} alt={scroll.name} />
+                        <span>{scroll.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {selectedSquadUnit.badges.length > 0 && (
+                  <div className="enhancement-category">
+                    <h5>Значки:</h5>
+                    {selectedSquadUnit.badges.map((badge, index) => (
+                      <div key={index} className="enhancement-item">
+                        <img src={badge.icon} alt={badge.name} />
+                        <span>{badge.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Customization Modal */}
+      {/* Customization Dropdown */}
       {showCustomizationModal && customizationUnit && (
-        <div className="customization-modal">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Кастомизация: {customizationUnit.unit.name}</h3>
-              <button 
-                className="close-btn"
-                onClick={() => {
-                  setShowCustomizationModal(false);
-                  setCustomizationUnit(null);
-                }}
-              >
-                ×
-              </button>
-            </div>
-            <div className="customization-content">
-              <div className="customization-slots">
-                {Array.from({ length: 10 }, (_, index) => (
-                  <div key={index} className="customization-slot">
-                    <span className="slot-number">{index + 1}</span>
-                    <div className="slot-content">
-                      {/* Placeholder for customization options */}
-                      <div className="customization-options">
-                        <button className="customization-btn">
-                          <img src="/TradeDamage/ui/урон.png" alt="Урон" />
-                        </button>
-                        <button className="customization-btn">
-                          <img src="/TradeDamage/ui/крит шанс.png" alt="Крит шанс" />
-                        </button>
-                        <button className="customization-btn">
-                          <img src="/TradeDamage/ui/сила крита.png" alt="Сила крита" />
-                        </button>
-                        <button className="customization-btn">
-                          <img src="/TradeDamage/ui/здоровье.png" alt="Здоровье" />
-                        </button>
-                      </div>
+        <div className="customization-dropdown">
+          <div className="dropdown-header">
+            <h3>Кастомизация: {customizationUnit.unit.name}</h3>
+            <button 
+              className="close-btn"
+              onClick={() => {
+                setShowCustomizationModal(false);
+                setCustomizationUnit(null);
+              }}
+            >
+              ×
+            </button>
+          </div>
+          <div className="customization-content">
+            <div className="customization-slots">
+              {Array.from({ length: 10 }, (_, index) => (
+                <div key={index} className="customization-slot">
+                  <span className="slot-number">{index + 1}</span>
+                  <div className="slot-content">
+                    <div className="customization-options">
+                      <button className="customization-btn">
+                        <img src="/TradeDamage/ui/урон.png" alt="Урон" />
+                      </button>
+                      <button className="customization-btn">
+                        <img src="/TradeDamage/ui/крит шанс.png" alt="Крит шанс" />
+                      </button>
+                      <button className="customization-btn">
+                        <img src="/TradeDamage/ui/сила крита.png" alt="Сила крита" />
+                      </button>
+                      <button className="customization-btn">
+                        <img src="/TradeDamage/ui/здоровье.png" alt="Здоровье" />
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
