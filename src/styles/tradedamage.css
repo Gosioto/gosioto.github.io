@@ -1001,58 +1001,120 @@
   z-index: 1;
 }
 
-.squad-unit-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 0.5rem;
+/* Squad unit container - wrapper for card and actions */
+.squad-unit-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.5rem;
+}
+
+.squad-unit-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-height: 80px;
+  width: 80px; /* Square container for larger icons */
+  height: 80px; /* Square container for larger icons */
+  position: relative;
 }
 
 .squad-unit-card:hover {
-  background: rgba(255, 107, 53, 0.1);
-  border-color: #ff6b35;
+  transform: scale(1.05);
 }
 
 .squad-unit-card.active {
-  background: rgba(255, 107, 53, 0.2);
-  border-color: #ff6b35;
+  transform: scale(1.1);
 }
 
 .squad-unit-card img {
-  width: 50px;
-  height: 50px;
+  width: 62px; /* Increased by 25% from 50px */
+  height: 62px; /* Increased by 25% from 50px */
   object-fit: contain;
-  margin-bottom: 0.5rem;
+}
+
+/* Unit action buttons - no container, just icons */
+.unit-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.action-btn {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  transform: scale(1.2);
+}
+
+.action-btn img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+.delete-btn:hover img {
+  content: url('/TradeDamage/ui/UI_button/active_icon_delete.png');
+}
+
+.edit-btn:hover img {
+  content: url('/TradeDamage/ui/UI_button/active_icon_allow.png');
 }
 
 /* Responsive squad unit cards */
 @media (max-width: 768px) {
   .squad-unit-card {
+    width: 60px;
+    height: 60px;
     padding: 0.4rem;
-    min-height: 70px;
   }
   
   .squad-unit-card img {
-    width: 40px;
-    height: 40px;
+    width: 48px; /* Increased by 10% from 40px */
+    height: 48px; /* Increased by 10% from 40px */
+  }
+
+  .action-btn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .action-btn img {
+    width: 14px;
+    height: 14px;
   }
 }
 
 @media (max-width: 480px) {
   .squad-unit-card {
+    width: 50px;
+    height: 50px;
     padding: 0.3rem;
-    min-height: 60px;
   }
   
   .squad-unit-card img {
-    width: 32px;
-    height: 32px;
+    width: 40px; /* Increased by 10% from 32px */
+    height: 40px; /* Increased by 10% from 32px */
+  }
+
+  .action-btn {
+    width: 18px;
+    height: 18px;
+  }
+
+  .action-btn img {
+    width: 12px;
+    height: 12px;
   }
 }
 

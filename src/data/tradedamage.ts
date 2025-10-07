@@ -286,7 +286,7 @@ export const units: Unit[] = [
   {
     id: 'ghost_hunter',
     name: 'Охотник на призраков',
-    icon: '/TradeDamage/ui/1_Охотник на призраков.png',
+    icon: '/TradeDamage/ui/1_Охотник_на_призраков.png',
     type: 'ranged',
     category: 'mercenary',
     rarity: 'common',
@@ -346,7 +346,7 @@ export const units: Unit[] = [
   {
     id: 'gioi_vagabond',
     name: 'Джиой Бродяга',
-    icon: '/TradeDamage/ui/1_Джиой Бродяга.png',
+    icon: '/TradeDamage/ui/1_Джиой_Бродяга.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -366,7 +366,7 @@ export const units: Unit[] = [
   {
     id: 'loud_roar',
     name: 'Громкий Рёв',
-    icon: '/TradeDamage/ui/1_Громкий Рёв.png',
+    icon: '/TradeDamage/ui/1_Громкий_Рёв.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -386,7 +386,7 @@ export const units: Unit[] = [
   {
     id: 'duncan_sanders',
     name: 'Данкан Сандерс',
-    icon: '/TradeDamage/ui/1_Данкан Сандерс.png',
+    icon: '/TradeDamage/ui/1_Данкан_Сандерс.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -406,7 +406,7 @@ export const units: Unit[] = [
   {
     id: 'white_terror',
     name: 'Белый Ужас',
-    icon: '/TradeDamage/ui/1_Белый Ужас.png',
+    icon: '/TradeDamage/ui/1_Белый_Ужас.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -426,7 +426,7 @@ export const units: Unit[] = [
   {
     id: 'digger_gimli',
     name: 'Копатель Гимли',
-    icon: '/TradeDamage/ui/1_Копатель Гимли.png',
+    icon: '/TradeDamage/ui/1_Копатель_Гимли.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -446,7 +446,7 @@ export const units: Unit[] = [
   {
     id: 'zael_depressing',
     name: 'Заэль Удручающий',
-    icon: '/TradeDamage/ui/1_Заэль Удручающий.png',
+    icon: '/TradeDamage/ui/1_Заэль_Удручающий.png',
     type: 'ranged',
     category: 'mercenary',
     rarity: 'common',
@@ -466,7 +466,7 @@ export const units: Unit[] = [
   {
     id: 'isma_deadly',
     name: 'Исма Смертельная',
-    icon: '/TradeDamage/ui/1_Исма Смертельная.png',
+    icon: '/TradeDamage/ui/1_Исма_Смертельная.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -486,7 +486,7 @@ export const units: Unit[] = [
   {
     id: 'bordo_hungry',
     name: 'Бордо Голодный',
-    icon: '/TradeDamage/ui/1_Бордо Голодный.png',
+    icon: '/TradeDamage/ui/1_Бордо_Голодный.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -506,7 +506,7 @@ export const units: Unit[] = [
   {
     id: 'neurobard_fofan',
     name: 'Нейробард Фофан',
-    icon: '/TradeDamage/ui/1_Нейробард Фофан.png',
+    icon: '/TradeDamage/ui/1_Нейробард_Фофан.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -526,7 +526,7 @@ export const units: Unit[] = [
   {
     id: 'vasya_digger',
     name: 'Вася Землекоп',
-    icon: '/TradeDamage/ui/1_Вася Землекоп.png',
+    icon: '/TradeDamage/ui/1_Вася_Землекоп.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -566,7 +566,7 @@ export const units: Unit[] = [
   {
     id: 'junior_bignog',
     name: 'Младший Большеног',
-    icon: '/TradeDamage/ui/2_Младший большеног.png',
+    icon: '/TradeDamage/ui/2_Младший_большеног.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -586,7 +586,7 @@ export const units: Unit[] = [
   {
     id: 'father_redzerker',
     name: 'Отец-Редзеркер',
-    icon: '/TradeDamage/ui/1_Отец Редзеркер.png',
+    icon: '/TradeDamage/ui/1_Отец_Редзеркер.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -626,7 +626,7 @@ export const units: Unit[] = [
   {
     id: 'forge_destroyer',
     name: 'Форж Разрушающий',
-    icon: '/TradeDamage/ui/1_Форж Разрушающий.png',
+    icon: '/TradeDamage/ui/1_Форж_Разрушающий.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -646,7 +646,7 @@ export const units: Unit[] = [
   {
     id: 'seniron_soifist',
     name: 'Сенирон Сойфист',
-    icon: '/TradeDamage/ui/1_Сенирон Сойфист.png',
+    icon: '/TradeDamage/ui/1_Сенирон_Сойфист.png',
     type: 'melee',
     category: 'mercenary',
     rarity: 'common',
@@ -686,7 +686,7 @@ export const units: Unit[] = [
   {
     id: 'holy_guard_crossbowman',
     name: 'Святохранский Арбалетчик',
-    icon: '/TradeDamage/ui/2_Святохранский Арбалетчик.png',
+    icon: '/TradeDamage/ui/2_Святохранский_Арбалетчик.png',
     type: 'ranged',
     category: 'mercenary',
     rarity: 'common',
@@ -826,7 +826,7 @@ export const units: Unit[] = [
   {
     id: 'peasant_with_chicken',
     name: 'Крестьянин с курочкой',
-    icon: '/TradeDamage/ui/Крестьянин с курочкой.png',
+    icon: '/TradeDamage/ui/Крестьянин_с_курочкой.png',
     type: 'ranged',
     category: 'mercenary',
     rarity: 'common',
@@ -847,7 +847,7 @@ export const units: Unit[] = [
   {
     id: 'cargo_bignog',
     name: 'Грузовой Большеног',
-    icon: '/TradeDamage/ui/1_Грузовой Большеног.png',
+    icon: '/TradeDamage/ui/1_Грузовой_Большеног.png',
     type: 'melee',
     category: 'transport',
     rarity: 'legendary',
@@ -867,7 +867,7 @@ export const units: Unit[] = [
   {
     id: 'cargo_bear',
     name: 'Грузовой Медведь',
-    icon: '/TradeDamage/ui/2_Грузовой Медведь.png',
+    icon: '/TradeDamage/ui/2_Грузовой_Медведь.png',
     type: 'melee',
     category: 'transport',
     rarity: 'epic',
@@ -887,7 +887,7 @@ export const units: Unit[] = [
   {
     id: 'cargo_blindmole',
     name: 'Грузовой Слепошар',
-    icon: '/TradeDamage/ui/2_Грузовой Слепошар.png',
+    icon: '/TradeDamage/ui/2_Грузовой_Слепошар.png',
     type: 'melee',
     category: 'transport',
     rarity: 'epic',
@@ -907,7 +907,7 @@ export const units: Unit[] = [
   {
     id: 'cargo_boar',
     name: 'Грузовой Кабанище',
-    icon: '/TradeDamage/ui/2_Грузовой кабанище.png',
+    icon: '/TradeDamage/ui/2_Грузовой_кабанище.png',
     type: 'melee',
     category: 'transport',
     rarity: 'epic',
@@ -947,7 +947,7 @@ export const units: Unit[] = [
   {
     id: 'righteous_horse',
     name: 'Праведная лошадь',
-    icon: '/TradeDamage/ui/2_Праведная лошадь.png',
+    icon: '/TradeDamage/ui/2_Праведная_лошадь.png',
     type: 'melee',
     category: 'transport',
     rarity: 'epic',
@@ -967,7 +967,7 @@ export const units: Unit[] = [
   {
     id: 'war_horse',
     name: 'Военная лошадь',
-    icon: '/TradeDamage/ui/2_Военная лошадь.png',
+    icon: '/TradeDamage/ui/2_Военная_лошадь.png',
     type: 'melee',
     category: 'transport',
     rarity: 'epic',

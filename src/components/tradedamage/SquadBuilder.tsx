@@ -188,22 +188,32 @@ export default function SquadBuilder() {
             </div>
           </div>
 
-          {/* Squad units */}
+          {/* Squad units in 5 columns - order: 5-4-3-2-1 (1=transport, 2-5=mercenaries) */}
           <div className="squad-units">
-            {/* Mercenary slots (positions 2-5) */}
-            {[0, 1, 2, 3].map((index) => (
+            {/* Mercenary slots (positions 5-4-3-2) */}
+            {[3, 2, 1, 0].map((index) => (
               <div key={index} className="squad-unit-slot">
                 <span className="slot-number">{index + 2}</span>
                 {squad.units[index] ? (
-                  <div className="squad-unit-card">
-                    <img src={squad.units[index].unit.icon} alt={squad.units[index].unit.name} />
-                    <div className="unit-details">
-                      <h5>{squad.units[index].unit.name}</h5>
-                      <p className="unit-cost">
-                        <img src="/TradeDamage/ui/Мешок с деньгами.png" alt="Стоимость" style={{width: '12px', height: '12px', marginRight: '2px', verticalAlign: 'middle'}} />
-                        {squad.units[index].unit.cost}
-                      </p>
-                      <button onClick={() => removeUnitFromSquad(index)} className="remove-btn">×</button>
+                  <div className="squad-unit-container">
+                    <div className="squad-unit-card">
+                      <img src={squad.units[index].unit.icon} alt={squad.units[index].unit.name} />
+                    </div>
+                    <div className="unit-actions">
+                      <button 
+                        className="action-btn delete-btn"
+                        onClick={() => removeUnitFromSquad(index)}
+                        title="Удалить наемника"
+                      >
+                        <img src="/TradeDamage/ui/UI_button/icon_delete.png" alt="Удалить" />
+                      </button>
+                      <button 
+                        className="action-btn edit-btn"
+                        onClick={() => {/* TODO: Add edit functionality */}}
+                        title="Редактировать наемника"
+                      >
+                        <img src="/TradeDamage/ui/UI_button/icon_allow.png" alt="Редактировать" />
+                      </button>
                     </div>
                   </div>
                 ) : (
@@ -216,15 +226,25 @@ export default function SquadBuilder() {
             <div className="squad-unit-slot">
               <span className="slot-number">1</span>
               {squad.transport ? (
-                <div className="squad-unit-card">
-                  <img src={squad.transport.unit.icon} alt={squad.transport.unit.name} />
-                  <div className="unit-details">
-                    <h5>{squad.transport.unit.name}</h5>
-                    <p className="unit-cost">
-                      <img src="/TradeDamage/ui/Мешок с деньгами.png" alt="Стоимость" style={{width: '12px', height: '12px', marginRight: '2px', verticalAlign: 'middle'}} />
-                      {squad.transport.unit.cost}
-                    </p>
-                    <button onClick={removeTransport} className="remove-btn">×</button>
+                <div className="squad-unit-container">
+                  <div className="squad-unit-card">
+                    <img src={squad.transport.unit.icon} alt={squad.transport.unit.name} />
+                  </div>
+                  <div className="unit-actions">
+                    <button 
+                      className="action-btn delete-btn"
+                      onClick={() => removeTransport()}
+                      title="Удалить транспорт"
+                    >
+                      <img src="/TradeDamage/ui/UI_button/icon_delete.png" alt="Удалить" />
+                    </button>
+                    <button 
+                      className="action-btn edit-btn"
+                      onClick={() => {/* TODO: Add edit functionality */}}
+                      title="Редактировать транспорт"
+                    >
+                      <img src="/TradeDamage/ui/UI_button/icon_allow.png" alt="Редактировать" />
+                    </button>
                   </div>
                 </div>
               ) : (

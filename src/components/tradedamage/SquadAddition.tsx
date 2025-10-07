@@ -165,32 +165,44 @@ export default function SquadAddition() {
             <h3>Отряд с дополнениями</h3>
           </div>
 
-          {/* Squad units */}
+          {/* Squad units in 5 columns - order: 5-4-3-2-1 (1=transport, 2-5=mercenaries) */}
           <div className="squad-units">
-            {/* Mercenary slots (positions 2-5) */}
-            {[0, 1, 2, 3].map((index) => (
+            {/* Mercenary slots (positions 5-4-3-2) */}
+            {[3, 2, 1, 0].map((index) => (
               <div key={index} className="squad-unit-slot">
                 <span className="slot-number">{index + 2}</span>
                 {squad.units[index] ? (
-                  <div 
-                    className={`squad-unit-card ${selectedUnit?.unit.id === squad.units[index].unit.id ? 'active' : ''}`}
-                    onClick={() => setSelectedUnit(squad.units[index])}
-                  >
-                    <img src={squad.units[index].unit.icon} alt={squad.units[index].unit.name} />
-                    <div className="unit-details">
-                      <h5>{squad.units[index].unit.name}</h5>
-                      <div className="unit-modifiers">
-                        {squad.units[index].scrolls.map((scroll, i) => (
-                          <span key={i} className="modifier scroll">{scroll.name}</span>
-                        ))}
-                        {squad.units[index].badges.map((badge, i) => (
-                          <span key={i} className="modifier badge">{badge.name}</span>
-                        ))}
-                        {squad.units[index].food && (
-                          <span className="modifier food">{squad.units[index].food!.name}</span>
-                        )}
-                      </div>
-                      <button onClick={() => removeUnitFromSquad(index)} className="remove-btn">×</button>
+                  <div className="squad-unit-container">
+                    <div 
+                      className={`squad-unit-card ${selectedUnit?.unit.id === squad.units[index].unit.id ? 'active' : ''}`}
+                      onClick={() => setSelectedUnit(squad.units[index])}
+                    >
+                      <img src={squad.units[index].unit.icon} alt={squad.units[index].unit.name} />
+                    </div>
+                    <div className="unit-actions">
+                      <button 
+                        className="action-btn delete-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeUnitFromSquad(index);
+                          if (selectedUnit?.unit.id === squad.units[index].unit.id) {
+                            setSelectedUnit(null);
+                          }
+                        }}
+                        title="Удалить наемника"
+                      >
+                        <img src="/TradeDamage/ui/UI_button/icon_delete.png" alt="Удалить" />
+                      </button>
+                      <button 
+                        className="action-btn edit-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedUnit(squad.units[index]);
+                        }}
+                        title="Редактировать наемника"
+                      >
+                        <img src="/TradeDamage/ui/UI_button/icon_allow.png" alt="Редактировать" />
+                      </button>
                     </div>
                   </div>
                 ) : (
@@ -203,25 +215,37 @@ export default function SquadAddition() {
             <div className="squad-unit-slot">
               <span className="slot-number">1</span>
               {squad.transport ? (
-                <div 
-                  className={`squad-unit-card ${selectedUnit?.unit.id === squad.transport.unit.id ? 'active' : ''}`}
-                  onClick={() => setSelectedUnit(squad.transport)}
-                >
-                  <img src={squad.transport.unit.icon} alt={squad.transport.unit.name} />
-                  <div className="unit-details">
-                    <h5>{squad.transport.unit.name}</h5>
-                    <div className="unit-modifiers">
-                      {squad.transport.scrolls.map((scroll, i) => (
-                        <span key={i} className="modifier scroll">{scroll.name}</span>
-                      ))}
-                      {squad.transport.badges.map((badge, i) => (
-                        <span key={i} className="modifier badge">{badge.name}</span>
-                      ))}
-                      {squad.transport.food && (
-                        <span className="modifier food">{squad.transport.food.name}</span>
-                      )}
-                    </div>
-                    <button onClick={removeTransport} className="remove-btn">×</button>
+                <div className="squad-unit-container">
+                  <div 
+                    className={`squad-unit-card ${selectedUnit?.unit.id === squad.transport.unit.id ? 'active' : ''}`}
+                    onClick={() => setSelectedUnit(squad.transport)}
+                  >
+                    <img src={squad.transport.unit.icon} alt={squad.transport.unit.name} />
+                  </div>
+                  <div className="unit-actions">
+                    <button 
+                      className="action-btn delete-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeTransport();
+                        if (selectedUnit?.unit.id === squad.transport?.unit.id) {
+                          setSelectedUnit(null);
+                        }
+                      }}
+                      title="Удалить транспорт"
+                    >
+                      <img src="/TradeDamage/ui/UI_button/icon_delete.png" alt="Удалить" />
+                    </button>
+                    <button 
+                      className="action-btn edit-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedUnit(squad.transport);
+                      }}
+                      title="Редактировать транспорт"
+                    >
+                      <img src="/TradeDamage/ui/UI_button/icon_allow.png" alt="Редактировать" />
+                    </button>
                   </div>
                 </div>
               ) : (

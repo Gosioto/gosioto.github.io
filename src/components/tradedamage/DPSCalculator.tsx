@@ -146,18 +146,45 @@ export default function DPSCalculator() {
             <h3>Активный отряд</h3>
           </div>
 
-          {/* Squad units in 5 columns - order: mercenaries 2-5, then transport 1 */}
+          {/* Squad units in 5 columns - order: 5-4-3-2-1 (1=transport, 2-5=mercenaries) */}
           <div className="squad-units">
-            {/* Mercenary slots (positions 2-5) */}
-            {[0, 1, 2, 3].map((index) => (
+            {/* Mercenary slots (positions 5-4-3-2) */}
+            {[3, 2, 1, 0].map((index) => (
               <div key={index} className="squad-unit-slot">
                 <span className="slot-number">{index + 2}</span>
                 {squad.units[index] ? (
-                  <div 
-                    className={`squad-unit-card ${selectedSquadUnit?.unit.id === squad.units[index].unit.id ? 'active' : ''}`}
-                    onClick={() => setSelectedSquadUnit(squad.units[index])}
-                  >
-                    <img src={squad.units[index].unit.icon} alt={squad.units[index].unit.name} />
+                  <div className="squad-unit-container">
+                    <div 
+                      className={`squad-unit-card ${selectedSquadUnit?.unit.id === squad.units[index].unit.id ? 'active' : ''}`}
+                      onClick={() => setSelectedSquadUnit(squad.units[index])}
+                    >
+                      <img src={squad.units[index].unit.icon} alt={squad.units[index].unit.name} />
+                    </div>
+                    <div className="unit-actions">
+                      <button 
+                        className="action-btn delete-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeUnitFromSquad(index);
+                          if (selectedSquadUnit?.unit.id === squad.units[index].unit.id) {
+                            setSelectedSquadUnit(null);
+                          }
+                        }}
+                        title="Удалить наемника"
+                      >
+                        <img src="/TradeDamage/ui/UI_button/icon_delete.png" alt="Удалить" />
+                      </button>
+                      <button 
+                        className="action-btn edit-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSquadUnit(squad.units[index]);
+                        }}
+                        title="Редактировать наемника"
+                      >
+                        <img src="/TradeDamage/ui/UI_button/icon_allow.png" alt="Редактировать" />
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <div className="empty-slot">Пустой слот</div>
@@ -169,11 +196,38 @@ export default function DPSCalculator() {
             <div className="squad-unit-slot">
               <span className="slot-number">1</span>
               {squad.transport ? (
-                <div 
-                  className={`squad-unit-card ${selectedSquadUnit?.unit.id === squad.transport.unit.id ? 'active' : ''}`}
-                  onClick={() => setSelectedSquadUnit(squad.transport)}
-                >
-                  <img src={squad.transport.unit.icon} alt={squad.transport.unit.name} />
+                <div className="squad-unit-container">
+                  <div 
+                    className={`squad-unit-card ${selectedSquadUnit?.unit.id === squad.transport.unit.id ? 'active' : ''}`}
+                    onClick={() => setSelectedSquadUnit(squad.transport)}
+                  >
+                    <img src={squad.transport.unit.icon} alt={squad.transport.unit.name} />
+                  </div>
+                  <div className="unit-actions">
+                    <button 
+                      className="action-btn delete-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeTransport();
+                        if (selectedSquadUnit?.unit.id === squad.transport?.unit.id) {
+                          setSelectedSquadUnit(null);
+                        }
+                      }}
+                      title="Удалить транспорт"
+                    >
+                      <img src="/TradeDamage/ui/UI_button/icon_delete.png" alt="Удалить" />
+                    </button>
+                    <button 
+                      className="action-btn edit-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedSquadUnit(squad.transport);
+                      }}
+                      title="Редактировать транспорт"
+                    >
+                      <img src="/TradeDamage/ui/UI_button/icon_allow.png" alt="Редактировать" />
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="empty-slot">Пустой слот</div>
