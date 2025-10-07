@@ -9,7 +9,6 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/3_Снайпер.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
     level: 8,
     maxLevel: 8,
     health: 93,
@@ -20,7 +19,11 @@ export const units: Unit[] = [
     cost: 200,
     skill1: 'Время на подготовку',
     skill2: 'Бандит',
-    description: 'Точный стрелок с высоким шансом критического удара'
+    description: 'Точный стрелок с высоким шансом критического удара',
+    uniqueness: 75,
+    power: 85,
+    specialty: 'криты',
+    enhancement: 'Увеличить шанс крита и урон крита'
   },
   // Кротовух
   {
@@ -29,7 +32,6 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/3_Кротовух.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
     level: 8,
     maxLevel: 8,
     health: 187,
@@ -40,7 +42,11 @@ export const units: Unit[] = [
     cost: 180,
     skill1: 'Подкоп',
     skill2: 'Зверь (Оборотень)',
-    description: 'Подземный боец с уникальными способностями'
+    description: 'Подземный боец с уникальными способностями',
+    uniqueness: 90,
+    power: 70,
+    specialty: 'танк',
+    enhancement: 'Увеличить здоровье и защиту'
   },
   // Ветеран
   {
@@ -49,7 +55,6 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/3_Ветеран.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
     level: 8,
     maxLevel: 8,
     health: 297,
@@ -60,7 +65,11 @@ export const units: Unit[] = [
     cost: 220,
     skill1: 'Ошеломление',
     skill2: 'Перехват',
-    description: 'Опытный воин с защитными способностями'
+    description: 'Опытный воин с защитными способностями',
+    uniqueness: 60,
+    power: 70,
+    specialty: 'оглушение',
+    enhancement: 'Увеличить шанс оглушения и защиту'
   },
   // Крутила
   {
@@ -69,7 +78,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Крутила.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 255,
@@ -80,7 +89,11 @@ export const units: Unit[] = [
     cost: 190,
     skill1: 'Сокрушение',
     skill2: 'Бандит',
-    description: 'Боец с цепным оружием'
+    description: 'Боец с цепным оружием',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Пасечник
   {
@@ -89,7 +102,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Пасечник.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 238,
@@ -100,7 +113,11 @@ export const units: Unit[] = [
     cost: 210,
     skill1: 'Пчёлушки',
     skill2: 'Простолюдин',
-    description: 'Стрелок с ядовитыми способностями'
+    description: 'Стрелок с ядовитыми способностями',
+    uniqueness: 80,
+    power: 65,
+    specialty: 'яд',
+    enhancement: 'Увеличить урон от яда'
   },
   // Драчун
   {
@@ -109,7 +126,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/3_Драчун.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 187,
@@ -120,7 +137,11 @@ export const units: Unit[] = [
     cost: 160,
     skill1: 'Раз-два!',
     skill2: 'Простолюдин',
-    description: 'Быстрый боец с оглушающими ударами'
+    description: 'Быстрый боец с оглушающими ударами',
+    uniqueness: 65,
+    power: 80,
+    specialty: 'оглушение',
+    enhancement: 'Увеличить шанс оглушения'
   },
   // Дровосеркер
   {
@@ -129,7 +150,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/3_Дровосеркер.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 195,
@@ -140,7 +161,11 @@ export const units: Unit[] = [
     cost: 170,
     skill1: 'Фанатик',
     skill2: 'Последний бой',
-    description: 'Берсеркер с топором'
+    description: 'Берсеркер с топором',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Лучница
   {
@@ -149,7 +174,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/4_Лучница.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 12,
     maxLevel: 12,
     health: 157,
@@ -160,7 +185,11 @@ export const units: Unit[] = [
     cost: 140,
     skill1: 'Стрельба с двух рук',
     skill2: 'Точность',
-    description: 'Опытная лучница'
+    description: 'Опытная лучница',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Челотавр
   {
@@ -169,7 +198,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Челотавр.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 272,
@@ -180,7 +209,11 @@ export const units: Unit[] = [
     cost: 250,
     skill1: 'Казнь',
     skill2: 'Родео',
-    description: 'Мощный минотавр'
+    description: 'Мощный минотавр',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Стражник-Мечник
   {
@@ -189,7 +222,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/4_Стражник_Мечник.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 12,
     maxLevel: 12,
     health: 252,
@@ -200,7 +233,11 @@ export const units: Unit[] = [
     cost: 180,
     skill1: 'Солдафон',
     skill2: 'Стражник',
-    description: 'Защитник с мечом'
+    description: 'Защитник с мечом',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Стражник-Арбалетчик
   {
@@ -209,7 +246,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/4_Стражник_Арбалетчик.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 12,
     maxLevel: 12,
     health: 168,
@@ -220,7 +257,11 @@ export const units: Unit[] = [
     cost: 160,
     skill1: 'Разрывные болты',
     skill2: 'Стражник',
-    description: 'Защитник с арбалетом'
+    description: 'Защитник с арбалетом',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Стражник-Защитник
   {
@@ -229,7 +270,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/4_Стражник_Защитник.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 12,
     maxLevel: 12,
     health: 399,
@@ -240,7 +281,11 @@ export const units: Unit[] = [
     cost: 200,
     skill1: 'Перехват',
     skill2: 'Стражник',
-    description: 'Тяжелый защитник'
+    description: 'Тяжелый защитник',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Стражник-Копейщик
   {
@@ -249,7 +294,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/4_Стражник_копейщик.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 12,
     maxLevel: 12,
     health: 252,
@@ -260,7 +305,11 @@ export const units: Unit[] = [
     cost: 170,
     skill1: 'Точность',
     skill2: 'Стражник',
-    description: 'Защитник с копьем'
+    description: 'Защитник с копьем',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Айвен Бобачад
   {
@@ -269,7 +318,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Бобачад_Айвен.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 342,
@@ -280,7 +329,11 @@ export const units: Unit[] = [
     cost: 300,
     skill1: 'Сквозные отверстия',
     skill2: 'Наставник',
-    description: 'Легендарный лучник'
+    description: 'Легендарный лучник',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Охотник на призраков
   {
@@ -289,7 +342,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Охотник_на_призраков.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 228,
@@ -300,7 +353,11 @@ export const units: Unit[] = [
     cost: 280,
     skill1: 'Автоарбалет',
     skill2: 'Серебряные стрелы',
-    description: 'Специалист по нежити'
+    description: 'Специалист по нежити',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Барбар
   {
@@ -309,7 +366,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Барвар.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 285,
@@ -320,7 +377,11 @@ export const units: Unit[] = [
     cost: 250,
     skill1: 'Выживальщик',
     skill2: 'Гурман',
-    description: 'Дикий воин'
+    description: 'Дикий воин',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Гаврюша
   {
@@ -329,7 +390,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Гаврюша.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 475,
@@ -340,7 +401,11 @@ export const units: Unit[] = [
     cost: 350,
     skill1: 'Долби, долби!',
     skill2: 'Бандит',
-    description: 'Мощный берсеркер'
+    description: 'Мощный берсеркер',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Джиой Бродяга
   {
@@ -349,7 +414,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Джиой_Бродяга.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 532,
@@ -360,7 +425,11 @@ export const units: Unit[] = [
     cost: 320,
     skill1: 'Героический перехват',
     skill2: 'Стражник',
-    description: 'Опытный защитник'
+    description: 'Опытный защитник',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Громкий Рёв
   {
@@ -369,7 +438,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Громкий_Рёв.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 665,
@@ -380,7 +449,11 @@ export const units: Unit[] = [
     cost: 400,
     skill1: 'Разрывающая лапа',
     skill2: 'Зверь',
-    description: 'Мощный медведь'
+    description: 'Мощный медведь',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Данкан Сандерс
   {
@@ -389,7 +462,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Данкан_Сандерс.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 285,
@@ -400,7 +473,11 @@ export const units: Unit[] = [
     cost: 240,
     skill1: 'Кураган',
     skill2: 'Снова человек',
-    description: 'Шотландский воин'
+    description: 'Шотландский воин',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Белый Ужас
   {
@@ -409,7 +486,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Белый_Ужас.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 418,
@@ -420,7 +497,11 @@ export const units: Unit[] = [
     cost: 300,
     skill1: 'Разрывание',
     skill2: 'Зверь',
-    description: 'Белый волк'
+    description: 'Белый волк',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Копатель Гимли
   {
@@ -429,7 +510,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Копатель_Гимли.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 380,
@@ -440,7 +521,11 @@ export const units: Unit[] = [
     cost: 280,
     skill1: 'Раскол',
     skill2: 'Ночное зрение',
-    description: 'Гном-шахтер'
+    description: 'Гном-шахтер',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Заэль Удручающий
   {
@@ -449,7 +534,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Заэль_Удручающий.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 266,
@@ -460,7 +545,11 @@ export const units: Unit[] = [
     cost: 260,
     skill1: 'Угнетающее присутствие',
     skill2: 'Избранный',
-    description: 'Темный маг'
+    description: 'Темный маг',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Исма Смертельная
   {
@@ -469,7 +558,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Исма_Смертельная.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 190,
@@ -480,7 +569,11 @@ export const units: Unit[] = [
     cost: 220,
     skill1: 'Удар милосердия',
     skill2: 'Избранный',
-    description: 'Убийца'
+    description: 'Убийца',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Бордо Голодный
   {
@@ -489,7 +582,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Бордо_Голодный.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 456,
@@ -500,7 +593,11 @@ export const units: Unit[] = [
     cost: 320,
     skill1: 'Перехват',
     skill2: 'Избранный',
-    description: 'Голодный кабан'
+    description: 'Голодный кабан',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Нейробард Фофан
   {
@@ -509,7 +606,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Нейробард_Фофан.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 285,
@@ -520,7 +617,11 @@ export const units: Unit[] = [
     cost: 200,
     skill1: 'Мощный аккорд',
     skill2: 'Простолюдин',
-    description: 'Музыкант-воин'
+    description: 'Музыкант-воин',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Вася Землекоп
   {
@@ -529,7 +630,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Вася_Землекоп.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 304,
@@ -540,7 +641,11 @@ export const units: Unit[] = [
     cost: 180,
     skill1: 'Лопатный мастер',
     skill2: 'Простолюдин',
-    description: 'Землекоп с лопатой'
+    description: 'Землекоп с лопатой',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Большеног
   {
@@ -549,7 +654,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Большеног.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 570,
@@ -560,7 +665,11 @@ export const units: Unit[] = [
     cost: 350,
     skill1: 'Метеорит',
     skill2: 'Зверь',
-    description: 'Большеногий йети'
+    description: 'Большеногий йети',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Младший Большеног
   {
@@ -569,7 +678,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Младший_большеног.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 238,
@@ -580,7 +689,11 @@ export const units: Unit[] = [
     cost: 200,
     skill1: 'Настырный охотник',
     skill2: 'Зверь',
-    description: 'Молодой йети'
+    description: 'Молодой йети',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Отец-Редзеркер
   {
@@ -589,7 +702,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Отец_Редзеркер.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 342,
@@ -600,7 +713,11 @@ export const units: Unit[] = [
     cost: 280,
     skill1: 'Два топора',
     skill2: 'Зверство',
-    description: 'Красный берсеркер'
+    description: 'Красный берсеркер',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Редзеркер-Метатель
   {
@@ -609,7 +726,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Редзеркер-Метатель.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 204,
@@ -620,7 +737,11 @@ export const units: Unit[] = [
     cost: 190,
     skill1: 'Протыкание',
     skill2: 'Перехват',
-    description: 'Красный метатель копий'
+    description: 'Красный метатель копий',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Форж Разрушающий
   {
@@ -629,7 +750,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Форж_Разрушающий.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 380,
@@ -640,7 +761,11 @@ export const units: Unit[] = [
     cost: 320,
     skill1: 'Азарт битвы',
     skill2: 'Избранный',
-    description: 'Кузнец-воин'
+    description: 'Кузнец-воин',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Сенирон Сойфист
   {
@@ -649,7 +774,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Сенирон_Сойфист.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 10,
     maxLevel: 10,
     health: 342,
@@ -660,7 +785,11 @@ export const units: Unit[] = [
     cost: 260,
     skill1: 'Медитация',
     skill2: 'Дисциплина',
-    description: 'Монах-воин'
+    description: 'Монах-воин',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Кабанище
   {
@@ -669,7 +798,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/3_Кабанище.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 289,
@@ -680,7 +809,11 @@ export const units: Unit[] = [
     cost: 180,
     skill1: 'Упорство',
     skill2: 'Зверь',
-    description: 'Дикий кабан'
+    description: 'Дикий кабан',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Святохранский Арбалетчик
   {
@@ -689,7 +822,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Святохранский_Арбалетчик.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 212,
@@ -700,7 +833,11 @@ export const units: Unit[] = [
     cost: 200,
     skill1: 'Протыкание',
     skill2: 'Серебряные стрелы',
-    description: 'Святой арбалетчик'
+    description: 'Святой арбалетчик',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Гробовщик
   {
@@ -709,7 +846,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Гробовщик.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 238,
@@ -720,7 +857,11 @@ export const units: Unit[] = [
     cost: 190,
     skill1: 'Добивание',
     skill2: 'Мародёр',
-    description: 'Могильщик'
+    description: 'Могильщик',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Аколит
   {
@@ -729,7 +870,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Аколит.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 204,
@@ -740,7 +881,11 @@ export const units: Unit[] = [
     cost: 160,
     skill1: 'Молитва о Суперскорости',
     skill2: 'Молитва о Силе мышц',
-    description: 'Святой служитель'
+    description: 'Святой служитель',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Палач
   {
@@ -749,7 +894,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Палач.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 425,
@@ -760,7 +905,11 @@ export const units: Unit[] = [
     cost: 250,
     skill1: 'Топор с зазубринами',
     skill2: 'Казнь',
-    description: 'Палач с топором'
+    description: 'Палач с топором',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Миротворец
   {
@@ -769,7 +918,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Миротворец.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 340,
@@ -780,7 +929,11 @@ export const units: Unit[] = [
     cost: 220,
     skill1: 'Покровительство',
     skill2: 'Добивание',
-    description: 'Рыцарь-миротворец'
+    description: 'Рыцарь-миротворец',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Инквизитор
   {
@@ -789,7 +942,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Инквизитор.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 306,
@@ -800,7 +953,11 @@ export const units: Unit[] = [
     cost: 200,
     skill1: 'Еретик!',
     skill2: 'Казнь',
-    description: 'Святой инквизитор'
+    description: 'Святой инквизитор',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Овца-Защитник
   {
@@ -809,7 +966,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Овца-защитник.png',
     type: 'melee',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 8,
     maxLevel: 8,
     health: 204,
@@ -820,7 +977,11 @@ export const units: Unit[] = [
     cost: 180,
     skill1: 'Перехват',
     skill2: 'Зверь',
-    description: 'Овца в доспехах'
+    description: 'Овца в доспехах',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Крестьянин с курочкой
   {
@@ -829,7 +990,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/Крестьянин_с_курочкой.png',
     type: 'ranged',
     category: 'mercenary',
-    rarity: 'common',
+
     level: 12,
     maxLevel: 12,
     health: 84,
@@ -840,7 +1001,11 @@ export const units: Unit[] = [
     cost: 80,
     skill1: 'Неожиданный приём',
     skill2: 'Простолюдин',
-    description: 'Простой крестьянин'
+    description: 'Простой крестьянин',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Транспортные наемники (позиция №1)
   // Грузовой Большеног
@@ -850,7 +1015,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/1_Грузовой_Большеног.png',
     type: 'melee',
     category: 'transport',
-    rarity: 'legendary',
+
     level: 10,
     maxLevel: 10,
     health: 475,
@@ -861,7 +1026,11 @@ export const units: Unit[] = [
     cost: 500,
     skill1: 'Апперкот',
     skill2: 'Зверь',
-    description: 'Мощный транспортный йети'
+    description: 'Мощный транспортный йети',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Грузовой Медведь
   {
@@ -870,7 +1039,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Грузовой_Медведь.png',
     type: 'melee',
     category: 'transport',
-    rarity: 'epic',
+
     level: 8,
     maxLevel: 8,
     health: 510,
@@ -881,7 +1050,11 @@ export const units: Unit[] = [
     cost: 400,
     skill1: 'Рёв',
     skill2: 'Зверь',
-    description: 'Транспортный медведь'
+    description: 'Транспортный медведь',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Грузовой Слепошар
   {
@@ -890,7 +1063,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Грузовой_Слепошар.png',
     type: 'melee',
     category: 'transport',
-    rarity: 'epic',
+
     level: 8,
     maxLevel: 8,
     health: 425,
@@ -901,7 +1074,11 @@ export const units: Unit[] = [
     cost: 350,
     skill1: 'Вспышка!',
     skill2: 'Зверь',
-    description: 'Подземный транспорт'
+    description: 'Подземный транспорт',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Грузовой Кабанище
   {
@@ -910,7 +1087,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Грузовой_кабанище.png',
     type: 'melee',
     category: 'transport',
-    rarity: 'epic',
+
     level: 8,
     maxLevel: 8,
     health: 323,
@@ -921,7 +1098,11 @@ export const units: Unit[] = [
     cost: 300,
     skill1: 'Упорство',
     skill2: 'Зверь',
-    description: 'Транспортный кабан'
+    description: 'Транспортный кабан',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Лошадь
   {
@@ -930,7 +1111,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/Лошадь.png',
     type: 'melee',
     category: 'transport',
-    rarity: 'common',
+
     level: 12,
     maxLevel: 12,
     health: 315,
@@ -941,7 +1122,11 @@ export const units: Unit[] = [
     cost: 150,
     skill1: 'Быстрота',
     skill2: 'Зверь',
-    description: 'Обычная лошадь'
+    description: 'Обычная лошадь',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Праведная лошадь
   {
@@ -950,7 +1135,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Праведная_лошадь.png',
     type: 'melee',
     category: 'transport',
-    rarity: 'epic',
+
     level: 8,
     maxLevel: 8,
     health: 425,
@@ -961,7 +1146,11 @@ export const units: Unit[] = [
     cost: 350,
     skill1: 'Парирование',
     skill2: 'Зверь',
-    description: 'Священная лошадь'
+    description: 'Священная лошадь',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   },
   // Военная лошадь
   {
@@ -970,7 +1159,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/2_Военная_лошадь.png',
     type: 'melee',
     category: 'transport',
-    rarity: 'epic',
+
     level: 8,
     maxLevel: 8,
     health: 425,
@@ -981,7 +1170,11 @@ export const units: Unit[] = [
     cost: 320,
     skill1: 'Лучший друг Стражника',
     skill2: 'Зверь',
-    description: 'Боевая лошадь'
+    description: 'Боевая лошадь',
+    uniqueness: 70,
+    power: 75,
+    specialty: 'урон',
+    enhancement: 'Увеличить базовый урон'
   }
 ];
 
@@ -994,7 +1187,7 @@ export const scrolls: Scroll[] = [
     effect: 'Увеличивает урон',
     effectValue: 15,
     cost: 25,
-    description: '+15% к урону'
+    description: '+15% к урону',
   },
   {
     id: 'health_scroll',
@@ -1003,7 +1196,7 @@ export const scrolls: Scroll[] = [
     effect: 'Увеличивает здоровье',
     effectValue: 20,
     cost: 30,
-    description: '+20% к здоровью'
+    description: '+20% к здоровью',
   },
   {
     id: 'speed_scroll',
@@ -1012,7 +1205,7 @@ export const scrolls: Scroll[] = [
     effect: 'Увеличивает скорость атаки',
     effectValue: 12,
     cost: 35,
-    description: '+12% к скорости атаки'
+    description: '+12% к скорости атаки',
   },
   {
     id: 'crit_scroll',
@@ -1021,7 +1214,7 @@ export const scrolls: Scroll[] = [
     effect: 'Увеличивает шанс крита',
     effectValue: 8,
     cost: 40,
-    description: '+8% к шансу критического удара'
+    description: '+8% к шансу критического удара',
   }
 ];
 
@@ -1050,7 +1243,7 @@ export const badges: Badge[] = [
     passiveBonus: 'Увеличивает урон в дальнем бою',
     bonusValue: 10,
     cost: 20,
-    description: '+10% урона для дальнего боя'
+    description: '+10% урона для дальнего боя',
   },
   {
     id: 'defender_badge',
@@ -1059,7 +1252,7 @@ export const badges: Badge[] = [
     passiveBonus: 'Увеличивает здоровье',
     bonusValue: 15,
     cost: 25,
-    description: '+15% к здоровью'
+    description: '+15% к здоровью',
   },
   {
     id: 'speed_badge',
@@ -1068,7 +1261,7 @@ export const badges: Badge[] = [
     passiveBonus: 'Увеличивает скорость атаки',
     bonusValue: 8,
     cost: 18,
-    description: '+8% к скорости атаки'
+    description: '+8% к скорости атаки',
   }
 ];
 
@@ -1081,7 +1274,7 @@ export const food: Food[] = [
     effect: 'Увеличивает здоровье',
     effectValue: 10,
     cost: 5,
-    description: '+10% к здоровью'
+    description: '+10% к здоровью',
   },
   {
     id: 'meat',
@@ -1090,7 +1283,7 @@ export const food: Food[] = [
     effect: 'Увеличивает урон',
     effectValue: 8,
     cost: 8,
-    description: '+8% к урону'
+    description: '+8% к урону',
   },
   {
     id: 'wine',
@@ -1099,7 +1292,7 @@ export const food: Food[] = [
     effect: 'Увеличивает скорость атаки',
     effectValue: 6,
     cost: 12,
-    description: '+6% к скорости атаки'
+    description: '+6% к скорости атаки',
   },
   {
     id: 'cheese',
@@ -1108,6 +1301,6 @@ export const food: Food[] = [
     effect: 'Увеличивает шанс крита',
     effectValue: 5,
     cost: 10,
-    description: '+5% к шансу критического удара'
+    description: '+5% к шансу критического удара',
   }
 ];

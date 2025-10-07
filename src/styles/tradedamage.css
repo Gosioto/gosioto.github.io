@@ -347,34 +347,7 @@
   margin-bottom: 1rem;
 }
 
-.action-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.action-btn.primary {
-  background: #ff6b35;
-  color: #ffffff;
-}
-
-.action-btn.primary:hover {
-  background: #ff8c5a;
-}
-
-.action-btn.secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.action-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
+/* Removed general action-btn styles - using specific squad-panel styles instead */
 
 .budget-info {
   display: flex;
@@ -611,10 +584,6 @@
     flex-direction: column;
   }
   
-  .action-btn {
-    width: 100%;
-  }
-  
   .modification-items {
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   }
@@ -779,29 +748,86 @@
   transform: translateY(-2px);
 }
 
-.unit-card.common {
-  border-color: #9ca3af;
+/* Новые стили для статистик */
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
-.unit-card.uncommon {
-  border-color: #10b981;
+.stat-label {
+  font-size: 0.8rem;
+  color: #cccccc;
+  min-width: 80px;
 }
 
-.unit-card.rare {
-  border-color: #3b82f6;
+.stat-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
-.unit-card.epic {
-  border-color: #8b5cf6;
+.stat-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b35, #ff8c42);
+  transition: width 0.3s ease;
 }
 
-.unit-card.legendary {
-  border-color: #f59e0b;
+.stat-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ff6b35;
+  min-width: 30px;
+  text-align: right;
+}
+
+.unit-specialty {
+  margin: 0.5rem 0;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 107, 53, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #ff6b35;
+}
+
+.specialty-label {
+  font-size: 0.7rem;
+  color: #cccccc;
+  display: block;
+}
+
+.specialty-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ff6b35;
+  text-transform: capitalize;
+}
+
+.unit-enhancement {
+  margin: 0.5rem 0;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  border-left: 3px solid #4ade80;
+}
+
+.enhancement-label {
+  font-size: 0.7rem;
+  color: #cccccc;
+  display: block;
+}
+
+.enhancement-value {
+  font-size: 0.75rem;
+  color: #4ade80;
+  line-height: 1.2;
 }
 
 .unit-icon {
-  width: 60px;
-  height: 60px;
+  width: 75px;
+  height: 75px;
   object-fit: contain;
   margin-bottom: 0.5rem;
 }
@@ -813,8 +839,8 @@
   }
   
   .unit-icon {
-    width: 50px;
-    height: 50px;
+    width: 62px;
+    height: 62px;
   }
   
   .unit-info h4 {
@@ -832,8 +858,8 @@
   }
   
   .unit-icon {
-    width: 45px;
-    height: 45px;
+    width: 56px;
+    height: 56px;
   }
   
   .unit-info h4 {
@@ -851,8 +877,8 @@
   }
   
   .unit-icon {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
   }
   
   .unit-info h4 {
@@ -870,8 +896,8 @@
   }
   
   .unit-icon {
-    width: 35px;
-    height: 35px;
+    width: 44px;
+    height: 44px;
   }
   
   .unit-info h4 {
@@ -889,8 +915,8 @@
   }
   
   .unit-icon {
-    width: 30px;
-    height: 30px;
+    width: 38px;
+    height: 38px;
   }
   
   .unit-info h4 {
@@ -1001,8 +1027,9 @@
   z-index: 1;
 }
 
-/* Squad unit container - wrapper for card and actions */
+/* Squad unit container - wrapper for card and actions with overlapping buttons */
 .squad-unit-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1016,8 +1043,8 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 80px; /* Square container for larger icons */
-  height: 80px; /* Square container for larger icons */
+  width: 120px; /* Increased to accommodate 100px icons */
+  height: 120px; /* Increased to accommodate 100px icons */
   position: relative;
 }
 
@@ -1030,37 +1057,58 @@
 }
 
 .squad-unit-card img {
-  width: 62px; /* Increased by 25% from 50px */
-  height: 62px; /* Increased by 25% from 50px */
+  width: 100px; /* Increased to 100px */
+  height: 100px; /* Increased to 100px */
   object-fit: contain;
 }
 
-/* Unit action buttons - no container, just icons */
+/* Unit action buttons - positioned to overlap mercenary icon by 50% */
 .unit-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
 }
 
 .action-btn {
+  position: absolute;
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 24px;
-  height: 24px;
+  border: none;
+  background: none;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
+  height: 34px;
 }
 
 .action-btn:hover {
-  transform: scale(1.2);
+  transform: scale(1.1);
 }
 
 .action-btn img {
-  width: 24px;
-  height: 24px;
+  height: 34px;
+  width: auto;
   object-fit: contain;
   transition: all 0.3s ease;
+  display: block;
+}
+
+/* Specific positioning for different button types */
+.delete-btn {
+  left: 30px; /* 28px + 2px (moved right by 2px) */
+  bottom: -14px; /* -17px + 3px (moved up by 3px) */
+  transform: translateY(0);
+}
+
+.edit-btn {
+  right: 31px; /* 34px - 1px (moved right by 1px) */
+  bottom: -14px; /* -17px + 3px (moved up by 3px) */
+  transform: translateY(0);
 }
 
 .delete-btn:hover img {
@@ -1074,52 +1122,263 @@
 /* Responsive squad unit cards */
 @media (max-width: 768px) {
   .squad-unit-card {
-    width: 60px;
-    height: 60px;
-    padding: 0.4rem;
+    width: 110px; /* Increased to accommodate larger icons */
+    height: 110px; /* Increased to accommodate larger icons */
   }
   
   .squad-unit-card img {
-    width: 48px; /* Increased by 10% from 40px */
-    height: 48px; /* Increased by 10% from 40px */
+    width: 90px; /* Increased to 90px */
+    height: 90px; /* Increased to 90px */
+  }
+
+  .empty-slot {
+    width: 90px; /* Match squad-unit-card img size */
+    height: 90px; /* Match squad-unit-card img size */
+    font-size: 0.7rem;
   }
 
   .action-btn {
-    width: 20px;
-    height: 20px;
+    height: 28px;
   }
 
   .action-btn img {
-    width: 14px;
-    height: 14px;
+    height: 28px;
+  }
+
+  /* Adjust positioning for smaller screens */
+  .delete-btn {
+    left: 26px; /* Adjusted for smaller container + 2px right */
+    bottom: -11px; /* -14px + 3px (moved up by 3px) */
+  }
+
+  .edit-btn {
+    right: 27px; /* 28px - 1px (moved right by 1px) */
+    bottom: -11px; /* -14px + 3px (moved up by 3px) */
   }
 }
 
 @media (max-width: 480px) {
   .squad-unit-card {
-    width: 50px;
-    height: 50px;
-    padding: 0.3rem;
+    width: 100px; /* Increased to accommodate larger icons */
+    height: 100px; /* Increased to accommodate larger icons */
   }
   
   .squad-unit-card img {
-    width: 40px; /* Increased by 10% from 32px */
-    height: 40px; /* Increased by 10% from 32px */
+    width: 80px; /* Increased to 80px */
+    height: 80px; /* Increased to 80px */
+  }
+
+  .empty-slot {
+    width: 80px; /* Match squad-unit-card img size */
+    height: 80px; /* Match squad-unit-card img size */
+    font-size: 0.6rem;
   }
 
   .action-btn {
-    width: 18px;
-    height: 18px;
+    height: 24px;
   }
 
   .action-btn img {
-    width: 12px;
-    height: 12px;
+    height: 24px;
+  }
+
+  /* Adjust positioning for mobile screens */
+  .delete-btn {
+    left: 22px; /* Adjusted for mobile container + 2px right */
+    bottom: -9px; /* -12px + 3px (moved up by 3px) */
+  }
+
+  .edit-btn {
+    right: 23px; /* 24px - 1px (moved right by 1px) */
+    bottom: -9px; /* -12px + 3px (moved up by 3px) */
   }
 }
 
-.unit-details {
-  flex: 1;
+/* Modal Styles */
+.unit-details-modal,
+.customization-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: 12px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  width: 90%;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.modal-header h3 {
+  color: #ffffff;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Unit Details Modal */
+.unit-details-content {
+  padding: 1rem;
+}
+
+.unit-avatar {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.unit-avatar img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.unit-stats-detailed {
+  margin-bottom: 1rem;
+}
+
+.unit-stats-detailed .stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.unit-stats-detailed .stat-item:last-child {
+  border-bottom: none;
+}
+
+.unit-stats-detailed .stat-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #cccccc;
+}
+
+.unit-stats-detailed .stat-label img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.unit-stats-detailed .stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.unit-enhancements h4 {
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.enhancement-category {
+  margin-bottom: 1rem;
+}
+
+.enhancement-category h5 {
+  color: #cccccc;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.enhancement-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  color: #cccccc;
+  font-size: 0.8rem;
+}
+
+.enhancement-item img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* Customization Modal */
+.customization-content {
+  padding: 1rem;
+}
+
+.customization-slots {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.customization-slot {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.customization-slot .slot-number {
+  display: block;
+  color: #cccccc;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.customization-options {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.customization-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.customization-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.customization-btn img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .unit-details h5 {
@@ -1185,12 +1444,14 @@
 .empty-slot {
   background: rgba(255, 255, 255, 0.05);
   border: 2px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 1rem;
+  border-radius: 8px;
+  padding: 0.5rem;
   text-align: center;
   color: #cccccc;
   font-style: italic;
-  min-height: 80px;
+  font-size: 0.8rem;
+  width: 100px; /* Match squad-unit-card img size */
+  height: 100px; /* Match squad-unit-card img size */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1297,9 +1558,11 @@
 }
 
 .stat-label img {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
+  margin-right: 0.5rem;
+  vertical-align: middle;
 }
 
 .stat-value {

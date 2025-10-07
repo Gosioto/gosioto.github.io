@@ -8,7 +8,7 @@ import { calculateSquadStats } from '@/utils/tradedamage';
 export default function SquadBuilder() {
   const [budget, setBudget] = useState(1000);
   const [squad, setSquad] = useState<Squad>({
-    units: [],
+    units: [null, null, null, null], // 4 slots for mercenaries (positions 2-5)
     transport: null
   });
   const [filters, setFilters] = useState({
@@ -17,31 +17,38 @@ export default function SquadBuilder() {
     rarity: 'all'
   });
 
-  const filteredUnits = useMemo(() => {
-    return units.filter(unit => {
-      const typeMatch = filters.type === 'all' || unit.type === filters.type;
-      const categoryMatch = filters.category === 'all' || unit.category === filters.category;
-      const rarityMatch = filters.rarity === 'all' || unit.rarity === filters.rarity;
-      return typeMatch && categoryMatch && rarityMatch;
-    });
-  }, [filters]);
+  const filteredUnits = units.filter(unit => {
+    if (filters.type !== 'all' && unit.type !== filters.type) return false;
+    if (filters.category !== 'all' && unit.category !== filters.category) return false;
+    return true;
+  });
 
   const addUnitToSquad = (unit: Unit) => {
     if (unit.category === 'transport') {
       if (!squad.transport) {
         setSquad(prev => ({ ...prev, transport: { unit, scrolls: [], badges: [] } }));
       }
-    } else if (squad.units.length < 4) {
-      const newSquadUnit: SquadUnit = { unit, scrolls: [], badges: [] };
-      setSquad(prev => ({ ...prev, units: [...prev.units, newSquadUnit] }));
+    } else {
+      // Find first empty slot (positions 2-5)
+      setSquad(prev => {
+        const emptySlotIndex = prev.units.findIndex(squadUnit => squadUnit === null);
+        if (emptySlotIndex !== -1) {
+          const newSquadUnit: SquadUnit = { unit, scrolls: [], badges: [] };
+          const newUnits = [...prev.units];
+          newUnits[emptySlotIndex] = newSquadUnit;
+          return { ...prev, units: newUnits };
+        }
+        return prev;
+      });
     }
   };
 
   const removeUnitFromSquad = (index: number) => {
-    setSquad(prev => ({
-      ...prev,
-      units: prev.units.filter((_, i) => i !== index)
-    }));
+    setSquad(prev => {
+      const newUnits = [...prev.units];
+      newUnits[index] = null; // Set to null instead of removing
+      return { ...prev, units: newUnits };
+    });
   };
 
   const removeTransport = () => {
@@ -130,36 +137,48 @@ export default function SquadBuilder() {
                 <option value="mercenary">Наемники</option>
                 <option value="transport">Транспорт</option>
               </select>
-              <select 
-                value={filters.rarity} 
-                onChange={(e) => setFilters(prev => ({ ...prev, rarity: e.target.value }))}
-              >
-                <option value="all">Вся редкость</option>
-                <option value="common">Обычный</option>
-                <option value="uncommon">Необычный</option>
-                <option value="rare">Редкий</option>
-                <option value="epic">Эпический</option>
-                <option value="legendary">Легендарный</option>
-              </select>
             </div>
           </div>
           <div className="units-grid">
             {filteredUnits.map(unit => (
-              <div key={unit.id} className={`unit-card ${unit.rarity}`} onClick={() => addUnitToSquad(unit)}>
+              <div key={unit.id} className="unit-card" onClick={() => addUnitToSquad(unit)}>
                 <img src={unit.icon} alt={unit.name} className="unit-icon" />
                 <div className="unit-info">
                   <h4>{unit.name}</h4>
-                  <p className="unit-type">{unit.type === 'melee' ? 'Ближний бой' : 'Дальний бой'}</p>
-                  <p className="unit-rarity">{unit.rarity}</p>
                   <div className="unit-stats">
-                    <span>❤️ {unit.health}</span>
-                    <span>⚔️ {unit.damage}</span>
-                    <span>⚡ {unit.attackSpeed}</span>
+                    <div className="stat-row">
+                      <span className="stat-label">Уникальность:</span>
+                      <div className="stat-bar">
+                        <div 
+                          className="stat-fill" 
+                          style={{ width: `${unit.uniqueness}%` }}
+                        ></div>
+                      </div>
+                      <span className="stat-value">{unit.uniqueness}</span>
+                    </div>
+                    <div className="stat-row">
+                      <span className="stat-label">Мощь:</span>
+                      <div className="stat-bar">
+                        <div 
+                          className="stat-fill" 
+                          style={{ width: `${unit.power}%` }}
+                        ></div>
+                      </div>
+                      <span className="stat-value">{unit.power}</span>
+                    </div>
+                    <div className="unit-specialty">
+                      <span className="specialty-label">Специализация:</span>
+                      <span className="specialty-value">{unit.specialty}</span>
+                    </div>
+                    <div className="unit-enhancement">
+                      <span className="enhancement-label">Усиление:</span>
+                      <span className="enhancement-value">{unit.enhancement}</span>
+                    </div>
                   </div>
-                  <p className="unit-cost">
+                  <div className="unit-cost">
                     <img src="/TradeDamage/ui/Мешок с деньгами.png" alt="Стоимость" style={{width: '16px', height: '16px', marginRight: '4px', verticalAlign: 'middle'}} />
                     {unit.cost}
-                  </p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -197,7 +216,7 @@ export default function SquadBuilder() {
                 {squad.units[index] ? (
                   <div className="squad-unit-container">
                     <div className="squad-unit-card">
-                      <img src={squad.units[index].unit.icon} alt={squad.units[index].unit.name} />
+                      <img src={squad.units[index]!.unit.icon} alt={squad.units[index]!.unit.name} />
                     </div>
                     <div className="unit-actions">
                       <button 

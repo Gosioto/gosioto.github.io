@@ -6,7 +6,6 @@ export interface Unit {
   icon: string;
   type: 'melee' | 'ranged';
   category: 'mercenary' | 'transport';
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   level: number;
   maxLevel: number;
   health: number;
@@ -18,6 +17,11 @@ export interface Unit {
   skill1: string;
   skill2: string;
   description: string;
+  // Новые характеристики
+  uniqueness: number; // Уникальность (0-100)
+  power: number; // Мощь уникальности (0-100)
+  specialty: string; // Ключевая особенность (танк/урон/криты/кровотечение/яд/оглушение)
+  enhancement: string; // Как усилить наемника
 }
 
 export interface Scroll {
@@ -65,7 +69,7 @@ export interface SquadUnit {
 }
 
 export interface Squad {
-  units: SquadUnit[];
+  units: (SquadUnit | null)[];
   transport: SquadUnit | null;
 }
 

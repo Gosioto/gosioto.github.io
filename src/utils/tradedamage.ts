@@ -118,7 +118,7 @@ export const calculateUnitDamage = (unit: SquadUnit): number => {
 
 // Calculate squad statistics
 export const calculateSquadStats = (squad: Squad): SquadStats => {
-  const allUnits = [...squad.units];
+  const allUnits = squad.units.filter(unit => unit !== null) as SquadUnit[];
   if (squad.transport) {
     allUnits.push(squad.transport);
   }
