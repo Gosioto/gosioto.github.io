@@ -23,6 +23,8 @@ export const units: Unit[] = [
     uniqueness: 75,
     power: 85,
     specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Урон в секунду',
     enhancement: 'Увеличить шанс крита и урон крита'
   },
   // Кротовух
@@ -45,8 +47,10 @@ export const units: Unit[] = [
     description: 'Подземный боец с уникальными способностями',
     uniqueness: 90,
     power: 70,
-    specialty: 'танк',
-    enhancement: 'Увеличить здоровье и защиту'
+    specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    enhancement: 'Увеличить базовый урон и скорость атаки'
   },
   // Ветеран
   {
@@ -69,6 +73,8 @@ export const units: Unit[] = [
     uniqueness: 60,
     power: 70,
     specialty: 'оглушение',
+    role: 'Танк',
+    damageType: 'Оглушение',
     enhancement: 'Увеличить шанс оглушения и защиту'
   },
   // Крутила
@@ -93,6 +99,8 @@ export const units: Unit[] = [
     uniqueness: 70,
     power: 75,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
     enhancement: 'Увеличить базовый урон'
   },
   // Пасечник
@@ -117,6 +125,8 @@ export const units: Unit[] = [
     uniqueness: 80,
     power: 65,
     specialty: 'яд',
+    role: 'DPS',
+    damageType: 'Урон в секунду',
     enhancement: 'Увеличить урон от яда'
   },
   // Драчун
@@ -141,6 +151,8 @@ export const units: Unit[] = [
     uniqueness: 65,
     power: 80,
     specialty: 'оглушение',
+    role: 'Контроль',
+    damageType: 'Оглушение',
     enhancement: 'Увеличить шанс оглушения'
   },
   // Дровосеркер
@@ -237,6 +249,8 @@ export const units: Unit[] = [
     uniqueness: 70,
     power: 75,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
     enhancement: 'Увеличить базовый урон'
   },
   // Стражник-Арбалетчик
@@ -260,8 +274,10 @@ export const units: Unit[] = [
     description: 'Защитник с арбалетом',
     uniqueness: 70,
     power: 75,
-    specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
+    specialty: 'кровотечение',
+    role: 'DPS',
+    damageType: 'Урон в секунду',
+    enhancement: 'Увеличить урон от кровотечения'
   },
   // Стражник-Защитник
   {
@@ -284,8 +300,10 @@ export const units: Unit[] = [
     description: 'Тяжелый защитник',
     uniqueness: 70,
     power: 75,
-    specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
+    specialty: 'танк',
+    role: 'Танк',
+    damageType: 'Перехват',
+    enhancement: 'Увеличить здоровье и перехват'
   },
   // Стражник-Копейщик
   {
@@ -309,6 +327,8 @@ export const units: Unit[] = [
     uniqueness: 70,
     power: 75,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
     enhancement: 'Увеличить базовый урон'
   },
   // Айвен Бобачад
@@ -333,6 +353,8 @@ export const units: Unit[] = [
     uniqueness: 70,
     power: 75,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
     enhancement: 'Увеличить базовый урон'
   },
   // Охотник на призраков
@@ -356,8 +378,10 @@ export const units: Unit[] = [
     description: 'Специалист по нежити',
     uniqueness: 70,
     power: 75,
-    specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    enhancement: 'Увеличить шанс крита и урон крита'
   },
   // Барбар
   {
@@ -381,6 +405,8 @@ export const units: Unit[] = [
     uniqueness: 70,
     power: 75,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
     enhancement: 'Увеличить базовый урон'
   },
   // Гаврюша
@@ -404,8 +430,10 @@ export const units: Unit[] = [
     description: 'Мощный берсеркер',
     uniqueness: 70,
     power: 75,
-    specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
+    specialty: 'оглушение',
+    role: 'Танк',
+    damageType: 'Оглушение',
+    enhancement: 'Увеличить оглушение и здоровье'
   },
   // Джиой Бродяга
   {
@@ -428,8 +456,10 @@ export const units: Unit[] = [
     description: 'Опытный защитник',
     uniqueness: 70,
     power: 75,
-    specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
+    specialty: 'танк',
+    role: 'Танк',
+    damageType: 'Перехват',
+    enhancement: 'Увеличить перехват и здоровье'
   },
   // Громкий Рёв
   {
@@ -452,8 +482,10 @@ export const units: Unit[] = [
     description: 'Мощный медведь',
     uniqueness: 70,
     power: 75,
-    specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
+    specialty: 'танк',
+    role: 'Танк',
+    damageType: 'Перехват',
+    enhancement: 'Увеличить здоровье и защиту'
   },
   // Данкан Сандерс
   {
@@ -477,6 +509,8 @@ export const units: Unit[] = [
     uniqueness: 70,
     power: 75,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
     enhancement: 'Увеличить базовый урон'
   },
   // Белый Ужас
@@ -500,8 +534,10 @@ export const units: Unit[] = [
     description: 'Белый волк',
     uniqueness: 70,
     power: 75,
-    specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
+    specialty: 'танк',
+    role: 'Танк',
+    damageType: 'Перехват',
+    enhancement: 'Увеличить здоровье и защиту'
   },
   // Копатель Гимли
   {
@@ -837,6 +873,8 @@ export const units: Unit[] = [
     uniqueness: 70,
     power: 75,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
     enhancement: 'Увеличить базовый урон'
   },
   // Гробовщик
@@ -861,6 +899,8 @@ export const units: Unit[] = [
     uniqueness: 70,
     power: 75,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
     enhancement: 'Увеличить базовый урон'
   },
   // Аколит
