@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Unit, SquadUnit, Squad, Scroll, Badge, Food } from '@/types/tradedamage';
 import { units, scrolls, badges, food } from '@/data/tradedamage';
 import { calculateSquadStats, calculateUnitDPS, calculateUnitHealth, calculateUnitDamage } from '@/utils/tradedamage';
+import EnhancedUnitCard from './EnhancedUnitCard';
 
 export default function DPSCalculator() {
   const [squad, setSquad] = useState<Squad>({
@@ -118,50 +119,11 @@ export default function DPSCalculator() {
           
           <div className="units-grid">
             {filteredUnits.map((unit) => (
-              <div 
-                key={unit.id} 
-                className="unit-card"
-                onClick={() => addUnitToSquad(unit)}
-              >
-                <img src={unit.icon} alt={unit.name} className="unit-icon" />
-                <div className="unit-info">
-                  <h4>{unit.name}</h4>
-                  <div className="unit-stats">
-                    <div className="stat-row">
-                      <span className="stat-label">Уникальность:</span>
-                      <div className="stat-bar">
-                        <div 
-                          className="stat-fill" 
-                          style={{ width: `${unit.uniqueness}%` }}
-                        ></div>
-                      </div>
-                      <span className="stat-value">{unit.uniqueness}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span className="stat-label">Мощь:</span>
-                      <div className="stat-bar">
-                        <div 
-                          className="stat-fill" 
-                          style={{ width: `${unit.power}%` }}
-                        ></div>
-                      </div>
-                      <span className="stat-value">{unit.power}</span>
-                    </div>
-                    <div className="unit-specialty">
-                      <span className="specialty-label">Специализация:</span>
-                      <span className="specialty-value">{unit.specialty}</span>
-                    </div>
-                    <div className="unit-enhancement">
-                      <span className="enhancement-label">Усиление:</span>
-                      <span className="enhancement-value">{unit.enhancement}</span>
-                    </div>
-                  </div>
-                  <div className="unit-cost">
-                    <img src="/TradeDamage/ui/Мешок с деньгами.png" alt="Стоимость" style={{width: '16px', height: '16px', marginRight: '4px', verticalAlign: 'middle'}} />
-                    {unit.cost}
-                  </div>
-                </div>
-              </div>
+              <EnhancedUnitCard
+                key={unit.id}
+                unit={unit}
+                onClick={addUnitToSquad}
+              />
             ))}
           </div>
         </div>
