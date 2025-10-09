@@ -4,28 +4,29 @@ import { Unit, Scroll, Badge, Food } from '@/types/tradedamage';
 export const units: Unit[] = [
   // Снайпер
   {
-    id: 'sniper',
-    name: 'Снайпер',
-    icon: '/TradeDamage/ui/3_Снайпер.png',
-    type: 'ranged',
-    category: 'mercenary',
-    level: 8,
-    maxLevel: 8,
-    health: 93,
-    damage: 34,
-    attackSpeed: 0.50,
-    critChance: 20,
-    critDamage: 2.0,
-    cost: 200,
-    skill1: 'Время на подготовку',
-    skill2: 'Бандит',
-    description: 'Точный стрелок с высоким шансом критического удара',
-    uniqueness: 75,
-    power: 85,
-    specialty: 'криты',
-    role: 'DPS',
-    damageType: 'Урон в секунду',
-    enhancement: 'Увеличить шанс крита и урон крита'
+    id: 'sniper', // Уникальный идентификатор наемника
+    name: 'Снайпер', // Название наемника
+    icon: '/TradeDamage/ui/3_Снайпер.png', // Путь к иконке наемника
+    type: 'ranged', // Тип боя: 'melee' (ближний) или 'ranged' (дальний)
+    category: 'mercenary', // Категория: 'mercenary' (наемник) или 'transport' (транспорт)
+    level: 6, /* Редкий */ // Текущий уровень наемника (определяет редкость)
+    maxLevel: 8, // Максимальный уровень наемника
+    health: 93, // Здоровье наемника
+    damage: 34, // Базовый урон за удар
+    attackSpeed: 0.50, // Скорость атаки (секунды между ударами)
+    critChance: 20, // Шанс критического удара (%)
+    critDamage: 2.0, // Множитель критического урона (x2.0)
+    cost: 200, // Стоимость найма наемника
+    skill1: 'Время на подготовку', // Первая способность
+    skill2: 'Бандит', // Вторая способность
+    description: 'Стрелок с высокой скорострельностью и шансом критического удара', // Описание наемника
+    uniqueness: 70, // Уникальность наемника (0-100)
+    power: 85, // Мощь уникальности (0-100)
+    specialty: 'криты', // Ключевая особенность (танк/урон/криты/кровотечение/яд/оглушение)
+    role: 'DPS', // Роль в команде (DPS/Танк/Поддержка/Контроль)
+    damageType: 'Урон в секунду', // Тип урона (Разовый/Урон в секунду/Кровотечение/Яд/Крит)
+    rating: 75, // Рейтинг наемника (чем выше редкость, тем больше рейтинг)
+    enhancement: 'Увеличить шанс крита и урон крита' // Рекомендация по усилению
   },
   // Кротовух
   {
@@ -34,7 +35,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/3_Кротовух.png',
     type: 'melee',
     category: 'mercenary',
-    level: 8,
+    level: 6,
     maxLevel: 8,
     health: 187,
     damage: 30,
@@ -59,7 +60,7 @@ export const units: Unit[] = [
     icon: '/TradeDamage/ui/3_Ветеран.png',
     type: 'melee',
     category: 'mercenary',
-    level: 8,
+    level: 6,
     maxLevel: 8,
     health: 297,
     damage: 25,
@@ -101,6 +102,7 @@ export const units: Unit[] = [
     specialty: 'урон',
     role: 'DPS',
     damageType: 'Разовый урон',
+    rating: 70, // Редкий уровень 6
     enhancement: 'Увеличить базовый урон'
   },
   // Пасечник
@@ -127,6 +129,7 @@ export const units: Unit[] = [
     specialty: 'яд',
     role: 'DPS',
     damageType: 'Урон в секунду',
+    rating: 80, // Эпический уровень 8
     enhancement: 'Увеличить урон от яда'
   },
   // Драчун
@@ -153,6 +156,7 @@ export const units: Unit[] = [
     specialty: 'оглушение',
     role: 'Контроль',
     damageType: 'Оглушение',
+    rating: 65, // Необычный уровень 8
     enhancement: 'Увеличить шанс оглушения'
   },
   // Дровосеркер
@@ -235,8 +239,8 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 12,
-    maxLevel: 12,
+    level: 4, /* Необычный */
+    maxLevel: 4,
     health: 252,
     damage: 29,
     attackSpeed: 0.50,
@@ -251,6 +255,7 @@ export const units: Unit[] = [
     specialty: 'урон',
     role: 'DPS',
     damageType: 'Разовый урон',
+    rating: 60, // Необычный уровень 4
     enhancement: 'Увеличить базовый урон'
   },
   // Стражник-Арбалетчик
@@ -287,8 +292,8 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 12,
-    maxLevel: 12,
+    level: 4, /* Необычный */
+    maxLevel: 4,
     health: 399,
     damage: 42,
     attackSpeed: 0.25,
@@ -303,6 +308,7 @@ export const units: Unit[] = [
     specialty: 'танк',
     role: 'Танк',
     damageType: 'Перехват',
+    rating: 60, // Необычный уровень 4
     enhancement: 'Увеличить здоровье и перехват'
   },
   // Стражник-Копейщик
@@ -313,8 +319,8 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 12,
-    maxLevel: 12,
+    level: 4, /* Необычный */
+    maxLevel: 4,
     health: 252,
     damage: 31,
     attackSpeed: 0.50,
@@ -329,7 +335,86 @@ export const units: Unit[] = [
     specialty: 'урон',
     role: 'DPS',
     damageType: 'Разовый урон',
+    rating: 60, // Необычный уровень 4
     enhancement: 'Увеличить базовый урон'
+  },
+  // Барвар
+  {
+    id: 'barvar',
+    name: 'Барвар',
+    icon: '/TradeDamage/ui/1_Барвар.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 10, /* Легендарный */
+    maxLevel: 10,
+    health: 450,
+    damage: 85,
+    attackSpeed: 0.40,
+    critChance: 15,
+    critDamage: 2.5,
+    cost: 500,
+    skill1: 'Берсерк',
+    skill2: 'Воин',
+    description: 'Свирепый берсерк с высоким уроном',
+    uniqueness: 95,
+    power: 90,
+    specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
+    enhancement: 'Увеличить урон и скорость атаки'
+  },
+  // Белый Ужас
+  {
+    id: 'white_terror',
+    name: 'Белый Ужас',
+    icon: '/TradeDamage/ui/1_Белый_Ужас.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 10, /* Легендарный */
+    maxLevel: 10,
+    health: 600,
+    damage: 45,
+    attackSpeed: 0.30,
+    critChance: 5,
+    critDamage: 1.5,
+    cost: 500,
+    skill1: 'Перехват',
+    skill2: 'Зверь',
+    description: 'Мощный танк с перехватом',
+    uniqueness: 95,
+    power: 85,
+    specialty: 'танк',
+    role: 'Танк',
+    damageType: 'Перехват',
+    rating: 95, // Легендарный уровень 10
+    enhancement: 'Увеличить здоровье и перехват'
+  },
+  // Большеног
+  {
+    id: 'big_foot',
+    name: 'Большеног',
+    icon: '/TradeDamage/ui/1_Большеног.png',
+    type: 'ranged',
+    category: 'mercenary',
+    level: 10, /* Легендарный */
+    maxLevel: 10,
+    health: 380,
+    damage: 75,
+    attackSpeed: 0.35,
+    critChance: 25,
+    critDamage: 2.8,
+    cost: 500,
+    skill1: 'Дальний выстрел',
+    skill2: 'Зверь',
+    description: 'Легендарный стрелок с высоким критом',
+    uniqueness: 95,
+    power: 95,
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    rating: 95, // Легендарный уровень 10
+    enhancement: 'Увеличить шанс крита и урон крита'
   },
   // Айвен Бобачад
   {
@@ -339,7 +424,7 @@ export const units: Unit[] = [
     type: 'ranged',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 342,
     damage: 38,
@@ -350,12 +435,91 @@ export const units: Unit[] = [
     skill1: 'Сквозные отверстия',
     skill2: 'Наставник',
     description: 'Легендарный лучник',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
     role: 'DPS',
     damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
+  },
+  // Аколит
+  {
+    id: 'acolyte',
+    name: 'Аколит',
+    icon: '/TradeDamage/ui/2_Аколит.png',
+    type: 'ranged',
+    category: 'mercenary',
+    level: 8, /* Эпический */
+    maxLevel: 8,
+    health: 180,
+    damage: 45,
+    attackSpeed: 0.45,
+    critChance: 18,
+    critDamage: 2.2,
+    cost: 350,
+    skill1: 'Священный выстрел',
+    skill2: 'Священник',
+    description: 'Священный стрелок с магическим уроном',
+    uniqueness: 80,
+    power: 75,
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    rating: 80, // Эпический уровень 8
+    enhancement: 'Увеличить шанс крита и магический урон'
+  },
+  // Бычара
+  {
+    id: 'bull_ox',
+    name: 'Бычара',
+    icon: '/TradeDamage/ui/2_Бычара.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 8, /* Эпический */
+    maxLevel: 8,
+    health: 420,
+    damage: 55,
+    attackSpeed: 0.35,
+    critChance: 8,
+    critDamage: 1.8,
+    cost: 350,
+    skill1: 'Таран',
+    skill2: 'Зверь',
+    description: 'Мощный бык-танк с тараном',
+    uniqueness: 80,
+    power: 80,
+    specialty: 'танк',
+    role: 'Танк',
+    damageType: 'Перехват',
+    rating: 80, // Эпический уровень 8
+    enhancement: 'Увеличить здоровье и перехват'
+  },
+  // Гробовщик
+  {
+    id: 'gravedigger',
+    name: 'Гробовщик',
+    icon: '/TradeDamage/ui/2_Гробовщик.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 8, /* Эпический */
+    maxLevel: 8,
+    health: 200,
+    damage: 65,
+    attackSpeed: 0.40,
+    critChance: 20,
+    critDamage: 2.5,
+    cost: 350,
+    skill1: 'Погребальный удар',
+    skill2: 'Некромант',
+    description: 'Мрачный боец с высоким критом',
+    uniqueness: 80,
+    power: 85,
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    rating: 80, // Эпический уровень 8
+    enhancement: 'Увеличить шанс крита и урон крита'
   },
   // Охотник на призраков
   {
@@ -365,7 +529,7 @@ export const units: Unit[] = [
     type: 'ranged',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 228,
     damage: 9,
@@ -376,38 +540,143 @@ export const units: Unit[] = [
     skill1: 'Автоарбалет',
     skill2: 'Серебряные стрелы',
     description: 'Специалист по нежити',
+    uniqueness: 95,
+    power: 90,
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    rating: 95, // Легендарный уровень 10
+    enhancement: 'Увеличить шанс крита и урон крита'
+  },
+  // Бычок
+  {
+    id: 'little_bull',
+    name: 'Бычок',
+    icon: '/TradeDamage/ui/3_Бычок.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 6, /* Редкий */
+    maxLevel: 6,
+    health: 280,
+    damage: 35,
+    attackSpeed: 0.45,
+    critChance: 10,
+    critDamage: 2.0,
+    cost: 250,
+    skill1: 'Таран',
+    skill2: 'Зверь',
+    description: 'Молодой бык с тараном',
+    uniqueness: 70,
+    power: 65,
+    specialty: 'танк',
+    role: 'Танк',
+    damageType: 'Перехват',
+    rating: 70, // Редкий уровень 6
+    enhancement: 'Увеличить здоровье и перехват'
+  },
+  // Волчара
+  {
+    id: 'wolf_warrior',
+    name: 'Волчара',
+    icon: '/TradeDamage/ui/3_Волчара.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 6, /* Редкий */
+    maxLevel: 6,
+    health: 220,
+    damage: 45,
+    attackSpeed: 0.40,
+    critChance: 15,
+    critDamage: 2.2,
+    cost: 250,
+    skill1: 'Волчий укус',
+    skill2: 'Зверь',
+    description: 'Боец-волк с высоким критом',
     uniqueness: 70,
     power: 75,
     specialty: 'криты',
     role: 'DPS',
     damageType: 'Крит',
+    rating: 70, // Редкий уровень 6
     enhancement: 'Увеличить шанс крита и урон крита'
   },
-  // Барбар
+  // Кабанище
   {
-    id: 'barbar',
-    name: 'Барбар',
-    icon: '/TradeDamage/ui/1_Барвар.png',
+    id: 'wild_boar',
+    name: 'Кабанище',
+    icon: '/TradeDamage/ui/3_Кабанище.png',
     type: 'melee',
     category: 'mercenary',
-
-    level: 10,
-    maxLevel: 10,
-    health: 285,
-    damage: 38,
-    attackSpeed: 0.50,
-    critChance: 15,
-    critDamage: 2.5,
+    level: 6, /* Редкий */
+    maxLevel: 6,
+    health: 320,
+    damage: 40,
+    attackSpeed: 0.35,
+    critChance: 8,
+    critDamage: 1.8,
     cost: 250,
-    skill1: 'Выживальщик',
-    skill2: 'Гурман',
-    description: 'Дикий воин',
+    skill1: 'Таран',
+    skill2: 'Зверь',
+    description: 'Дикий кабан-танк',
     uniqueness: 70,
-    power: 75,
-    specialty: 'урон',
+    power: 70,
+    specialty: 'танк',
+    role: 'Танк',
+    damageType: 'Перехват',
+    rating: 70, // Редкий уровень 6
+    enhancement: 'Увеличить здоровье и перехват'
+  },
+  // Волчонок
+  {
+    id: 'wolf_cub',
+    name: 'Волчонок',
+    icon: '/TradeDamage/ui/4_Волчонок.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 4, /* Необычный */
+    maxLevel: 4,
+    health: 150,
+    damage: 25,
+    attackSpeed: 0.50,
+    critChance: 12,
+    critDamage: 2.0,
+    cost: 150,
+    skill1: 'Волчий укус',
+    skill2: 'Зверь',
+    description: 'Молодой волк с критом',
+    uniqueness: 60,
+    power: 55,
+    specialty: 'криты',
     role: 'DPS',
-    damageType: 'Разовый урон',
-    enhancement: 'Увеличить базовый урон'
+    damageType: 'Крит',
+    rating: 60, // Необычный уровень 4
+    enhancement: 'Увеличить шанс крита и урон крита'
+  },
+  // Плутовка
+  {
+    id: 'rogue_girl',
+    name: 'Плутовка',
+    icon: '/TradeDamage/ui/4_Плутовка.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 4, /* Необычный */
+    maxLevel: 4,
+    health: 110,
+    damage: 35,
+    attackSpeed: 0.40,
+    critChance: 20,
+    critDamage: 2.5,
+    cost: 150,
+    skill1: 'Скрытый удар',
+    skill2: 'Вор',
+    description: 'Ловкая плутовка с высоким критом',
+    uniqueness: 60,
+    power: 70,
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    rating: 60, // Необычный уровень 4
+    enhancement: 'Увеличить шанс крита и урон крита'
   },
   // Гаврюша
   {
@@ -417,7 +686,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 475,
     damage: 45,
@@ -428,12 +697,143 @@ export const units: Unit[] = [
     skill1: 'Долби, долби!',
     skill2: 'Бандит',
     description: 'Мощный берсеркер',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'оглушение',
     role: 'Танк',
     damageType: 'Оглушение',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить оглушение и здоровье'
+  },
+  // Бандит с топором
+  {
+    id: 'bandit_with_axe',
+    name: 'Бандит с топором',
+    icon: '/TradeDamage/ui/Бандит_с_топором.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 2, /* Обычный */
+    maxLevel: 2,
+    health: 100,
+    damage: 20,
+    attackSpeed: 0.60,
+    critChance: 8,
+    critDamage: 1.8,
+    cost: 80,
+    skill1: 'Топор',
+    skill2: 'Бандит',
+    description: 'Обычный бандит с топором',
+    uniqueness: 50,
+    power: 45,
+    specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 50, // Обычный уровень 2
+    enhancement: 'Увеличить базовый урон'
+  },
+  // Довосек
+  {
+    id: 'woodcutter',
+    name: 'Довосек',
+    icon: '/TradeDamage/ui/Довосек.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 2, /* Обычный */
+    maxLevel: 2,
+    health: 120,
+    damage: 18,
+    attackSpeed: 0.65,
+    critChance: 5,
+    critDamage: 1.5,
+    cost: 80,
+    skill1: 'Топор',
+    skill2: 'Работник',
+    description: 'Обычный дровосек',
+    uniqueness: 50,
+    power: 40,
+    specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 50, // Обычный уровень 2
+    enhancement: 'Увеличить базовый урон'
+  },
+  // Кабан
+  {
+    id: 'boar',
+    name: 'Кабан',
+    icon: '/TradeDamage/ui/Кабан.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 2, /* Обычный */
+    maxLevel: 2,
+    health: 140,
+    damage: 15,
+    attackSpeed: 0.70,
+    critChance: 3,
+    critDamage: 1.3,
+    cost: 80,
+    skill1: 'Таран',
+    skill2: 'Зверь',
+    description: 'Обычный дикий кабан',
+    uniqueness: 50,
+    power: 35,
+    specialty: 'танк',
+    role: 'Танк',
+    damageType: 'Перехват',
+    rating: 50, // Обычный уровень 2
+    enhancement: 'Увеличить здоровье и перехват'
+  },
+  // Крестьянин с вилами
+  {
+    id: 'peasant_with_pitchfork',
+    name: 'Крестьянин с вилами',
+    icon: '/TradeDamage/ui/Крестьянин_с_вилами.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 2, /* Обычный */
+    maxLevel: 2,
+    health: 90,
+    damage: 22,
+    attackSpeed: 0.55,
+    critChance: 10,
+    critDamage: 2.0,
+    cost: 80,
+    skill1: 'Вилы',
+    skill2: 'Крестьянин',
+    description: 'Обычный крестьянин с вилами',
+    uniqueness: 50,
+    power: 50,
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    rating: 50, // Обычный уровень 2
+    enhancement: 'Увеличить шанс крита и урон крита'
+  },
+  // Крестьянин с курочкой
+  {
+    id: 'peasant_with_chicken',
+    name: 'Крестьянин с курочкой',
+    icon: '/TradeDamage/ui/Крестьянин_с_курочкой.png',
+    type: 'ranged',
+    category: 'mercenary',
+    level: 2, /* Обычный */
+    maxLevel: 2,
+    health: 85,
+    damage: 18,
+    attackSpeed: 0.50,
+    critChance: 12,
+    critDamage: 2.2,
+    cost: 80,
+    skill1: 'Курица',
+    skill2: 'Крестьянин',
+    description: 'Обычный крестьянин с курочкой',
+    uniqueness: 50,
+    power: 55,
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    rating: 50, // Обычный уровень 2
+    enhancement: 'Увеличить шанс крита и урон крита'
   },
   // Джиой Бродяга
   {
@@ -443,7 +843,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 532,
     damage: 38,
@@ -454,12 +854,65 @@ export const units: Unit[] = [
     skill1: 'Героический перехват',
     skill2: 'Стражник',
     description: 'Опытный защитник',
-    uniqueness: 70,
+    uniqueness: 95,
+    power: 90,
+    specialty: 'танк',
+    role: 'Танк',
+    damageType: 'Перехват',
+    rating: 95, // Легендарный уровень 10
+    enhancement: 'Увеличить перехват и здоровье'
+  },
+  // Инквизитор
+  {
+    id: 'inquisitor',
+    name: 'Инквизитор',
+    icon: '/TradeDamage/ui/2_Инквизитор.png',
+    type: 'ranged',
+    category: 'mercenary',
+    level: 8, /* Эпический */
+    maxLevel: 8,
+    health: 200,
+    damage: 50,
+    attackSpeed: 0.40,
+    critChance: 22,
+    critDamage: 2.3,
+    cost: 350,
+    skill1: 'Священный выстрел',
+    skill2: 'Инквизитор',
+    description: 'Священный инквизитор с высоким критом',
+    uniqueness: 80,
+    power: 85,
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    rating: 80, // Эпический уровень 8
+    enhancement: 'Увеличить шанс крита и магический урон'
+  },
+  // Медвежонок
+  {
+    id: 'bear_cub',
+    name: 'Медвежонок',
+    icon: '/TradeDamage/ui/2_Медвежонок.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 8, /* Эпический */
+    maxLevel: 8,
+    health: 300,
+    damage: 40,
+    attackSpeed: 0.45,
+    critChance: 10,
+    critDamage: 2.0,
+    cost: 350,
+    skill1: 'Медвежий удар',
+    skill2: 'Зверь',
+    description: 'Молодой медведь-танк',
+    uniqueness: 80,
     power: 75,
     specialty: 'танк',
     role: 'Танк',
     damageType: 'Перехват',
-    enhancement: 'Увеличить перехват и здоровье'
+    rating: 80, // Эпический уровень 8
+    enhancement: 'Увеличить здоровье и перехват'
   },
   // Громкий Рёв
   {
@@ -469,7 +922,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 665,
     damage: 47,
@@ -480,11 +933,12 @@ export const units: Unit[] = [
     skill1: 'Разрывающая лапа',
     skill2: 'Зверь',
     description: 'Мощный медведь',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'танк',
     role: 'Танк',
     damageType: 'Перехват',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить здоровье и защиту'
   },
   // Данкан Сандерс
@@ -495,7 +949,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 285,
     damage: 39,
@@ -506,38 +960,91 @@ export const units: Unit[] = [
     skill1: 'Кураган',
     skill2: 'Снова человек',
     description: 'Шотландский воин',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
     role: 'DPS',
     damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
   },
-  // Белый Ужас
+  // Миротворец
   {
-    id: 'white_terror',
-    name: 'Белый Ужас',
-    icon: '/TradeDamage/ui/1_Белый_Ужас.png',
+    id: 'peacemaker',
+    name: 'Миротворец',
+    icon: '/TradeDamage/ui/2_Миротворец.png',
+    type: 'ranged',
+    category: 'mercenary',
+    level: 8, /* Эпический */
+    maxLevel: 8,
+    health: 220,
+    damage: 45,
+    attackSpeed: 0.40,
+    critChance: 20,
+    critDamage: 2.2,
+    cost: 350,
+    skill1: 'Мирный выстрел',
+    skill2: 'Дипломат',
+    description: 'Дипломат-стрелок с критом',
+    uniqueness: 80,
+    power: 80,
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    rating: 80, // Эпический уровень 8
+    enhancement: 'Увеличить шанс крита и урон крита'
+  },
+  // Младший большеног
+  {
+    id: 'junior_bigfoot',
+    name: 'Младший большеног',
+    icon: '/TradeDamage/ui/2_Младший_большеног.png',
     type: 'melee',
     category: 'mercenary',
-
-    level: 10,
-    maxLevel: 10,
-    health: 418,
-    damage: 38,
-    attackSpeed: 0.50,
+    level: 8, /* Эпический */
+    maxLevel: 8,
+    health: 350,
+    damage: 50,
+    attackSpeed: 0.40,
     critChance: 15,
     critDamage: 2.0,
-    cost: 300,
-    skill1: 'Разрывание',
+    cost: 350,
+    skill1: 'Медвежий удар',
     skill2: 'Зверь',
-    description: 'Белый волк',
-    uniqueness: 70,
+    description: 'Молодой большеног-танк',
+    uniqueness: 80,
     power: 75,
     specialty: 'танк',
     role: 'Танк',
     damageType: 'Перехват',
-    enhancement: 'Увеличить здоровье и защиту'
+    rating: 80, // Эпический уровень 8
+    enhancement: 'Увеличить здоровье и перехват'
+  },
+  // Палач
+  {
+    id: 'executioner',
+    name: 'Палач',
+    icon: '/TradeDamage/ui/2_Палач.png',
+    type: 'melee',
+    category: 'mercenary',
+    level: 8, /* Эпический */
+    maxLevel: 8,
+    health: 200,
+    damage: 60,
+    attackSpeed: 0.35,
+    critChance: 25,
+    critDamage: 2.5,
+    cost: 350,
+    skill1: 'Казнь',
+    skill2: 'Палач',
+    description: 'Жестокий палач с высоким критом',
+    uniqueness: 80,
+    power: 90,
+    specialty: 'криты',
+    role: 'DPS',
+    damageType: 'Крит',
+    rating: 80, // Эпический уровень 8
+    enhancement: 'Увеличить шанс крита и урон крита'
   },
   // Копатель Гимли
   {
@@ -547,7 +1054,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 380,
     damage: 34,
@@ -558,9 +1065,12 @@ export const units: Unit[] = [
     skill1: 'Раскол',
     skill2: 'Ночное зрение',
     description: 'Гном-шахтер',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
   },
   // Заэль Удручающий
@@ -571,7 +1081,7 @@ export const units: Unit[] = [
     type: 'ranged',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 266,
     damage: 34,
@@ -582,9 +1092,12 @@ export const units: Unit[] = [
     skill1: 'Угнетающее присутствие',
     skill2: 'Избранный',
     description: 'Темный маг',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
   },
   // Исма Смертельная
@@ -595,7 +1108,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 190,
     damage: 39,
@@ -606,9 +1119,12 @@ export const units: Unit[] = [
     skill1: 'Удар милосердия',
     skill2: 'Избранный',
     description: 'Убийца',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
   },
   // Бордо Голодный
@@ -619,7 +1135,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 456,
     damage: 38,
@@ -630,9 +1146,12 @@ export const units: Unit[] = [
     skill1: 'Перехват',
     skill2: 'Избранный',
     description: 'Голодный кабан',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
   },
   // Нейробард Фофан
@@ -643,7 +1162,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 285,
     damage: 28,
@@ -654,9 +1173,12 @@ export const units: Unit[] = [
     skill1: 'Мощный аккорд',
     skill2: 'Простолюдин',
     description: 'Музыкант-воин',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
   },
   // Вася Землекоп
@@ -667,7 +1189,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 304,
     damage: 34,
@@ -678,33 +1200,12 @@ export const units: Unit[] = [
     skill1: 'Лопатный мастер',
     skill2: 'Простолюдин',
     description: 'Землекоп с лопатой',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
-  },
-  // Большеног
-  {
-    id: 'bignog',
-    name: 'Большеног',
-    icon: '/TradeDamage/ui/1_Большеног.png',
-    type: 'ranged',
-    category: 'mercenary',
-
-    level: 10,
-    maxLevel: 10,
-    health: 570,
-    damage: 38,
-    attackSpeed: 0.38,
-    critChance: 10,
-    critDamage: 2.0,
-    cost: 350,
-    skill1: 'Метеорит',
-    skill2: 'Зверь',
-    description: 'Большеногий йети',
-    uniqueness: 70,
-    power: 75,
-    specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
   },
   // Младший Большеног
@@ -715,7 +1216,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 8,
+    level: 8, /* Эпический */
     maxLevel: 8,
     health: 238,
     damage: 28,
@@ -726,9 +1227,12 @@ export const units: Unit[] = [
     skill1: 'Настырный охотник',
     skill2: 'Зверь',
     description: 'Молодой йети',
-    uniqueness: 70,
+    uniqueness: 80,
     power: 75,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 80, // Эпический уровень 8
     enhancement: 'Увеличить базовый урон'
   },
   // Отец-Редзеркер
@@ -739,7 +1243,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 342,
     damage: 41,
@@ -750,9 +1254,12 @@ export const units: Unit[] = [
     skill1: 'Два топора',
     skill2: 'Зверство',
     description: 'Красный берсеркер',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
   },
   // Редзеркер-Метатель
@@ -763,7 +1270,7 @@ export const units: Unit[] = [
     type: 'ranged',
     category: 'mercenary',
 
-    level: 8,
+    level: 8, /* Эпический */
     maxLevel: 8,
     health: 204,
     damage: 34,
@@ -774,9 +1281,12 @@ export const units: Unit[] = [
     skill1: 'Протыкание',
     skill2: 'Перехват',
     description: 'Красный метатель копий',
-    uniqueness: 70,
+    uniqueness: 80,
     power: 75,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 80, // Эпический уровень 8
     enhancement: 'Увеличить базовый урон'
   },
   // Форж Разрушающий
@@ -787,7 +1297,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 380,
     damage: 49,
@@ -798,9 +1308,12 @@ export const units: Unit[] = [
     skill1: 'Азарт битвы',
     skill2: 'Избранный',
     description: 'Кузнец-воин',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
   },
   // Сенирон Сойфист
@@ -811,7 +1324,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 342,
     damage: 38,
@@ -822,33 +1335,12 @@ export const units: Unit[] = [
     skill1: 'Медитация',
     skill2: 'Дисциплина',
     description: 'Монах-воин',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
-  },
-  // Кабанище
-  {
-    id: 'wild_boar',
-    name: 'Кабанище',
-    icon: '/TradeDamage/ui/3_Кабанище.png',
-    type: 'melee',
-    category: 'mercenary',
-
-    level: 8,
-    maxLevel: 8,
-    health: 289,
-    damage: 25,
-    attackSpeed: 0.50,
-    critChance: 5,
-    critDamage: 2.0,
-    cost: 180,
-    skill1: 'Упорство',
-    skill2: 'Зверь',
-    description: 'Дикий кабан',
-    uniqueness: 70,
-    power: 75,
-    specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 95, // Легендарный уровень 10
     enhancement: 'Увеличить базовый урон'
   },
   // Святохранский Арбалетчик
@@ -859,7 +1351,7 @@ export const units: Unit[] = [
     type: 'ranged',
     category: 'mercenary',
 
-    level: 8,
+    level: 8, /* Эпический */
     maxLevel: 8,
     health: 212,
     damage: 30,
@@ -870,133 +1362,12 @@ export const units: Unit[] = [
     skill1: 'Протыкание',
     skill2: 'Серебряные стрелы',
     description: 'Святой арбалетчик',
-    uniqueness: 70,
+    uniqueness: 80,
     power: 75,
     specialty: 'урон',
     role: 'DPS',
     damageType: 'Разовый урон',
-    enhancement: 'Увеличить базовый урон'
-  },
-  // Гробовщик
-  {
-    id: 'gravedigger',
-    name: 'Гробовщик',
-    icon: '/TradeDamage/ui/2_Гробовщик.png',
-    type: 'melee',
-    category: 'mercenary',
-
-    level: 8,
-    maxLevel: 8,
-    health: 238,
-    damage: 34,
-    attackSpeed: 0.50,
-    critChance: 16,
-    critDamage: 2.5,
-    cost: 190,
-    skill1: 'Добивание',
-    skill2: 'Мародёр',
-    description: 'Могильщик',
-    uniqueness: 70,
-    power: 75,
-    specialty: 'урон',
-    role: 'DPS',
-    damageType: 'Разовый урон',
-    enhancement: 'Увеличить базовый урон'
-  },
-  // Аколит
-  {
-    id: 'acolyte',
-    name: 'Аколит',
-    icon: '/TradeDamage/ui/2_Аколит.png',
-    type: 'ranged',
-    category: 'mercenary',
-
-    level: 8,
-    maxLevel: 8,
-    health: 204,
-    damage: 25,
-    attackSpeed: 0.62,
-    critChance: 15,
-    critDamage: 1.5,
-    cost: 160,
-    skill1: 'Молитва о Суперскорости',
-    skill2: 'Молитва о Силе мышц',
-    description: 'Святой служитель',
-    uniqueness: 70,
-    power: 75,
-    specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
-  },
-  // Палач
-  {
-    id: 'executioner',
-    name: 'Палач',
-    icon: '/TradeDamage/ui/2_Палач.png',
-    type: 'melee',
-    category: 'mercenary',
-
-    level: 8,
-    maxLevel: 8,
-    health: 425,
-    damage: 42,
-    attackSpeed: 0.25,
-    critChance: 15,
-    critDamage: 2.0,
-    cost: 250,
-    skill1: 'Топор с зазубринами',
-    skill2: 'Казнь',
-    description: 'Палач с топором',
-    uniqueness: 70,
-    power: 75,
-    specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
-  },
-  // Миротворец
-  {
-    id: 'peacemaker',
-    name: 'Миротворец',
-    icon: '/TradeDamage/ui/2_Миротворец.png',
-    type: 'melee',
-    category: 'mercenary',
-
-    level: 8,
-    maxLevel: 8,
-    health: 340,
-    damage: 34,
-    attackSpeed: 0.38,
-    critChance: 5,
-    critDamage: 3.0,
-    cost: 220,
-    skill1: 'Покровительство',
-    skill2: 'Добивание',
-    description: 'Рыцарь-миротворец',
-    uniqueness: 70,
-    power: 75,
-    specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
-  },
-  // Инквизитор
-  {
-    id: 'inquisitor',
-    name: 'Инквизитор',
-    icon: '/TradeDamage/ui/2_Инквизитор.png',
-    type: 'melee',
-    category: 'mercenary',
-
-    level: 8,
-    maxLevel: 8,
-    health: 306,
-    damage: 30,
-    attackSpeed: 0.45,
-    critChance: 20,
-    critDamage: 2.0,
-    cost: 200,
-    skill1: 'Еретик!',
-    skill2: 'Казнь',
-    description: 'Святой инквизитор',
-    uniqueness: 70,
-    power: 75,
-    specialty: 'урон',
+    rating: 80, // Эпический уровень 8
     enhancement: 'Увеличить базовый урон'
   },
   // Овца-Защитник
@@ -1007,7 +1378,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'mercenary',
 
-    level: 8,
+    level: 8, /* Эпический */
     maxLevel: 8,
     health: 204,
     damage: 35,
@@ -1018,33 +1389,12 @@ export const units: Unit[] = [
     skill1: 'Перехват',
     skill2: 'Зверь',
     description: 'Овца в доспехах',
-    uniqueness: 70,
+    uniqueness: 80,
     power: 75,
     specialty: 'урон',
-    enhancement: 'Увеличить базовый урон'
-  },
-  // Крестьянин с курочкой
-  {
-    id: 'peasant_with_chicken',
-    name: 'Крестьянин с курочкой',
-    icon: '/TradeDamage/ui/Крестьянин_с_курочкой.png',
-    type: 'ranged',
-    category: 'mercenary',
-
-    level: 12,
-    maxLevel: 12,
-    health: 84,
-    damage: 21,
-    attackSpeed: 0.62,
-    critChance: 20,
-    critDamage: 2.0,
-    cost: 80,
-    skill1: 'Неожиданный приём',
-    skill2: 'Простолюдин',
-    description: 'Простой крестьянин',
-    uniqueness: 70,
-    power: 75,
-    specialty: 'урон',
+    role: 'DPS',
+    damageType: 'Разовый урон',
+    rating: 80, // Эпический уровень 8
     enhancement: 'Увеличить базовый урон'
   },
   // Транспортные наемники (позиция №1)
@@ -1056,7 +1406,7 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'transport',
 
-    level: 10,
+    level: 10, /* Легендарный */
     maxLevel: 10,
     health: 475,
     damage: 30,
@@ -1067,9 +1417,10 @@ export const units: Unit[] = [
     skill1: 'Апперкот',
     skill2: 'Зверь',
     description: 'Мощный транспортный йети',
-    uniqueness: 70,
-    power: 75,
+    uniqueness: 95,
+    power: 90,
     specialty: 'урон',
+    rating: 95,
     enhancement: 'Увеличить базовый урон'
   },
   // Грузовой Медведь
@@ -1152,8 +1503,8 @@ export const units: Unit[] = [
     type: 'melee',
     category: 'transport',
 
-    level: 12,
-    maxLevel: 12,
+    level: 2, /* Обычный */
+    maxLevel: 2,
     health: 315,
     damage: 21,
     attackSpeed: 0.38,
@@ -1166,6 +1517,7 @@ export const units: Unit[] = [
     uniqueness: 70,
     power: 75,
     specialty: 'урон',
+    rating: 50, // Обычный уровень 2
     enhancement: 'Увеличить базовый урон'
   },
   // Праведная лошадь

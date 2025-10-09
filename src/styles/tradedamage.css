@@ -3,6 +3,9 @@
 .tradedamage-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  background-attachment: fixed; /* Фиксированный фон при скроллинге */
+  background-size: cover;
+  background-repeat: no-repeat;
   color: #ffffff;
   font-family: 'Inter', sans-serif;
 }
@@ -635,12 +638,14 @@
 
 .units-panel,
 .squad-panel {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.9));
+  border: 2px solid rgba(255, 107, 53, 0.3);
   border-radius: 16px;
   padding: 1.5rem;
   overflow: visible; /* Изменено с overflow-y: auto на visible для hover-панелей */
   position: relative;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .units-panel::-webkit-scrollbar,
@@ -1104,14 +1109,14 @@
 
 /* Specific positioning for different button types */
 .delete-btn {
-  left: 20px; /* 28px + 2px (moved right by 2px) */
-  bottom: -14px; /* -17px + 3px (moved up by 3px) */
+  left: 15px; /* 28px + 2px (moved right by 2px) -НЕ МЕНЯТЬ, работоспособность полностью реализованна кнопок delete и edit*/
+  bottom: -14px; /* -17px + 3px (moved up by 3px) -НЕ МЕНЯТЬ, работоспособность полностью реализованна кнопок delete и edit*/
   transform: translateY(0);
 }
 
 .edit-btn {
-  right: 21px; /* 34px - 1px (moved right by 1px) */
-  bottom: -14px; /* -17px + 3px (moved up by 3px) */
+  right: 15px; /* 34px - 1px (moved right by 1px) -НЕ МЕНЯТЬ, работоспособность полностью реализованна кнопок delete и edit*/
+  bottom: -14px; /* -17px + 3px (moved up by 3px) -НЕ МЕНЯТЬ, работоспособность полностью реализованна кнопок delete и edit*/
   transform: translateY(0);
 }
 
@@ -2194,13 +2199,14 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 0.5rem; /* Уменьшено с 0.75rem */
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible; /* Изменено с hidden на visible для hover-панели */
-  min-height: 200px;
+  min-height: 120px; /* Уменьшено с 140px */
   display: flex;
   flex-direction: column;
+  margin-bottom: 0.5rem; /* Уменьшен margin */
 }
 
 .enhanced-unit-card::before {
@@ -2272,8 +2278,8 @@
 }
 
 .unit-icon {
-  width: 90px; /* Увеличено на 40% с 64px */
-  height: 90px; /* Увеличено на 40% с 64px */
+  width: 108px; /* Увеличено на 20% с 90px */
+  height: 108px; /* Увеличено на 20% с 90px */
   object-fit: contain;
   transition: transform 0.3s ease;
 }
@@ -2624,8 +2630,8 @@
   }
   
   .unit-icon {
-    width: 78px; /* Увеличено на 40% с 56px */
-    height: 78px; /* Увеличено на 40% с 56px */
+    width: 94px; /* Увеличено на 20% с 78px */
+    height: 94px; /* Увеличено на 20% с 78px */
   }
   
   .unit-name {
@@ -2635,13 +2641,13 @@
 
 @media (max-width: 1000px) {
   .enhanced-unit-card {
-    min-height: 160px;
-    padding: 0.7rem;
+    min-height: 140px; /* Уменьшено с 160px */
+    padding: 0.5rem; /* Уменьшено с 0.7rem */
   }
   
   .unit-icon {
-    width: 67px; /* Увеличено на 40% с 48px */
-    height: 67px; /* Увеличено на 40% с 48px */
+    width: 80px; /* Увеличено на 20% с 67px */
+    height: 80px; /* Увеличено на 20% с 67px */
   }
   
   .unit-name {
@@ -2660,8 +2666,8 @@
   }
   
   .unit-icon {
-    width: 56px; /* Увеличено на 40% с 40px */
-    height: 56px; /* Увеличено на 40% с 40px */
+    width: 67px; /* Увеличено на 20% с 56px */
+    height: 67px; /* Увеличено на 20% с 56px */
   }
   
   .unit-name {
@@ -2680,8 +2686,8 @@
   }
   
   .unit-icon {
-    width: 50px; /* Увеличено на 40% с 36px */
-    height: 50px; /* Увеличено на 40% с 36px */
+    width: 60px; /* Увеличено на 20% с 50px */
+    height: 60px; /* Увеличено на 20% с 50px */
   }
   
   .unit-name {

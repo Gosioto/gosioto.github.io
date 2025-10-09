@@ -26,6 +26,20 @@ export default function DPSCalculator() {
     if (filters.type !== 'all' && unit.type !== filters.type) return false;
     if (filters.category !== 'all' && unit.category !== filters.category) return false;
     return true;
+  }).sort((a, b) => {
+    // Сортируем по рейтингу (убывание), затем по уровню (убывание), затем по имени
+    const ratingA = a.rating || 0;
+    const ratingB = b.rating || 0;
+    
+    if (ratingA !== ratingB) {
+      return ratingB - ratingA; // Высокий рейтинг сначала
+    }
+    
+    if (a.level !== b.level) {
+      return b.level - a.level; // Высокий уровень сначала
+    }
+    
+    return a.name.localeCompare(b.name); // По алфавиту
   });
 
   const addUnitToSquad = (unit: Unit) => {

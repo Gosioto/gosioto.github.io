@@ -16,11 +16,11 @@ export default function EnhancedUnitCard({ unit, onClick }: EnhancedUnitCardProp
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const getRarityColor = (level: number) => {
-    if (level >= 10) return '#ff6b35'; // Легендарный - оранжевый
+    if (level >= 10) return '#ffd700'; // Легендарный - желто-оранжевый
     if (level >= 8) return '#9f7aea'; // Эпический - фиолетовый
-    if (level >= 6) return '#3182ce'; // Редкий - синий
-    if (level >= 4) return '#38a169'; // Необычный - зеленый
-    return '#718096'; // Обычный - серый
+    if (level >= 6) return '#60a5fa'; // Редкий - сине-голубой
+    if (level >= 4) return '#4ade80'; // Необычный - зеленый
+    return '#d2691e'; // Обычный - коричнево-оранжевый
   };
 
   const getSpecialtyColor = (specialty: string) => {
@@ -60,14 +60,10 @@ export default function EnhancedUnitCard({ unit, onClick }: EnhancedUnitCardProp
     >
       {/* Основная карточка */}
       <div className="card-main">
-        {/* Заголовок с редкостью */}
-        <div className="card-header">
-          <div className="rarity-indicator" />
-          <div className="unit-level">
-            <img src="/TradeDamage/ui/s_gui_mercenaries_merclevel.png" alt="Уровень" className="level-icon" />
-            Lv.{unit.level}
-          </div>
-        </div>
+         {/* Заголовок с редкостью - убран уровень, так как он отображается на иконке */}
+         <div className="card-header">
+           <div className="rarity-indicator" />
+         </div>
 
         {/* Иконка наемника */}
         <div className="unit-icon-container">
@@ -143,10 +139,10 @@ export default function EnhancedUnitCard({ unit, onClick }: EnhancedUnitCardProp
        {/* Hover-панель с детальной информацией */}
        {isInfoHovered && (
         <div className="card-hover-panel">
-          <div className="hover-header">
-            <h4>{unit.name}</h4>
-            <div className="hover-level">Уровень {unit.level}</div>
-          </div>
+           <div className="hover-header">
+             <h4>{unit.name}</h4>
+             {/* Уровень убран - он отображается на иконке */}
+           </div>
 
           {/* Основные характеристики */}
           <div className="stats-section">
@@ -244,14 +240,14 @@ export default function EnhancedUnitCard({ unit, onClick }: EnhancedUnitCardProp
                onClick={handleDetailsClick}
                title="Просмотр характеристик"
              >
-               <img src="/TradeDamage/ui/s_gui_dialog_button_info.png" alt="Информация" className="action-icon" />
+               <img src="/TradeDamage/ui/s_gui_interface_green_checksign.png" alt="Информация" className="action-icon" />
              </button>
              <button 
                className="action-btn edit-btn" 
                onClick={handleEditClick}
                title="Настройка наемника"
              >
-               <img src="/TradeDamage/ui/s_gui_dialog_button_edit.png" alt="Редактировать" className="action-icon" />
+               <img src="/TradeDamage/ui/s_gui_interface_green_checksign.png" alt="Редактировать" className="action-icon" />
              </button>
            </div>
         </div>
