@@ -2303,7 +2303,7 @@ header, footer {
   color: #ffffff;
   position: relative;
 }
-.section-title::after {
+/*.section-title::after {
   content: '';
   position: absolute;
   bottom: -10px;
@@ -2313,7 +2313,7 @@ header, footer {
   height: 3px;
   background: linear-gradient(90deg, #00f5ff, #ff007a);
   border-radius: 3px;
-}
+}*/
 .section-subtitle {
   text-align: center;
   font-size: 1.1rem;

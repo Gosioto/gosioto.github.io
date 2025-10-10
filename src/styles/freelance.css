@@ -705,72 +705,251 @@
   font-weight: 400;
 }
 
-.services-grid {
+/* Старые стили services-grid удалены - заменены на 3D карусель */
+
+/* Убраны старые hover-эффекты: смена цвета на черный, поворот и увеличение карточки */
+
+/* Новый контейнер для услуг с каруселью и навигацией */
+.services-container {
   display: flex;
-  gap: 2rem;
-  overflow-x: auto;
-  padding: 1rem 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--freelance-black) var(--freelance-cream-dark);
+  gap: 3rem;
+  align-items: flex-start;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.services-grid::-webkit-scrollbar {
-  height: 8px;
+/* 3D Карусель контейнер */
+.services-carousel-container {
+  flex: 1;
+  position: relative;
+  perspective: 1000px;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.services-grid::-webkit-scrollbar-track {
-  background: var(--freelance-cream-dark);
-  border-radius: 4px;
+/* Кнопки управления каруселью */
+.carousel-controls {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 10;
 }
 
-.services-grid::-webkit-scrollbar-thumb {
+.carousel-btn {
+  background: var(--freelance-cream);
+  border: 3px solid var(--freelance-black);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  font-size: 1.2rem;
+  color: var(--freelance-black);
+}
+
+.carousel-btn:hover {
   background: var(--freelance-black);
-  border-radius: 4px;
+  color: var(--freelance-cream);
+  transform: scale(1.1);
 }
 
-.services-grid::-webkit-scrollbar-thumb:hover {
-  background: var(--freelance-accent);
+.prev-btn {
+  margin-left: -25px;
 }
 
+.next-btn {
+  margin-right: -25px;
+}
+
+/* Карусель с 3D эффектами */
+.services-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Базовые стили карточек услуг */
 .service-card {
+  position: absolute;
   background: var(--freelance-cream);
   border: 3px solid var(--freelance-black);
   padding: 2.5rem;
-  transition: all 0.3s ease;
-  position: relative;
-  min-width: 350px;
-  flex-shrink: 0;
-}
-
-.service-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--freelance-black);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  width: 400px;
   opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 0;
+  transform: translateX(0) translateZ(0) rotateY(0deg);
+  transform-origin: center center;
 }
 
-.service-card:hover::before {
+/* Активная карточка (по центру) */
+.service-card.active {
   opacity: 1;
+  transform: translateX(0) translateZ(0) rotateY(0deg) scale(1);
+  z-index: 3;
 }
 
-.service-card:hover {
-  transform: translateY(-8px) rotate(1deg);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+/* Предыдущая карточка (слева) */
+.service-card.prev {
+  opacity: 0.7;
+  transform: translateX(-200px) translateZ(-100px) rotateY(15deg) scale(0.8);
+  z-index: 2;
 }
 
-.service-card > * {
-  position: relative;
+/* Следующая карточка (справа) */
+.service-card.next {
+  opacity: 0.7;
+  transform: translateX(200px) translateZ(-100px) rotateY(-15deg) scale(0.8);
+  z-index: 2;
+}
+
+/* Скрытые карточки */
+.service-card:not(.active):not(.prev):not(.next) {
+  opacity: 0;
+  transform: translateX(0) translateZ(-200px) rotateY(0deg) scale(0.6);
   z-index: 1;
 }
 
-.service-card:hover > * {
+/* Hover эффект для активной карточки */
+.service-card.active:hover {
+  transform: translateX(0) translateZ(20px) rotateY(0deg) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Боковая навигация */
+.services-navigation {
+  width: 300px;
+  background: var(--freelance-cream-light);
+  border: 3px solid var(--freelance-black);
+  padding: 2rem;
+  position: sticky;
+  top: 120px;
+}
+
+.navigation-title {
+  font-family: var(--freelance-font-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 2rem 0;
+  color: var(--freelance-black);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.navigation-list-container {
+  height: 320px; /* 4 элемента * 80px */
+  overflow: hidden;
+  position: relative;
+}
+
+.navigation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  will-change: transform;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: transparent;
+  border: 2px solid var(--freelance-black);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.nav-item:hover {
+  background: var(--freelance-black);
+  transform: translateX(5px);
+}
+
+.nav-item.active {
+  background: var(--freelance-accent);
+  color: var(--freelance-black);
+  transform: translateX(5px);
+}
+
+.nav-item.active:hover {
+  background: var(--freelance-accent);
+  color: var(--freelance-black);
+}
+
+.nav-icon {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 2px solid var(--freelance-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.nav-item:hover .nav-icon {
+  background: var(--freelance-accent);
+  border-color: var(--freelance-accent);
+}
+
+.nav-item.active .nav-icon {
+  background: var(--freelance-black);
+  border-color: var(--freelance-black);
+}
+
+.nav-item.active .nav-icon i {
+  color: var(--freelance-accent);
+}
+
+.nav-icon i {
+  color: var(--freelance-black);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover .nav-icon i {
+  color: var(--freelance-black);
+}
+
+.nav-title {
+  font-family: var(--freelance-font-primary);
+  font-weight: 600;
+  color: var(--freelance-black);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover .nav-title {
   color: var(--freelance-cream);
+}
+
+.nav-item.active .nav-title {
+  color: var(--freelance-black);
+  font-weight: 700;
+}
+
+.nav-item.active:hover .nav-title {
+  color: var(--freelance-black);
 }
 
 .service-icon {
@@ -859,15 +1038,46 @@
   background: var(--freelance-cream-light);
   border: 3px solid var(--freelance-black);
   padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.skill-category:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.category-icon {
+  width: 50px;
+  height: 50px;
+  background: var(--freelance-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--freelance-black);
+}
+
+.category-icon i {
+  font-size: 1.5rem;
+  color: var(--freelance-black);
 }
 
 .category-title {
   font-family: var(--freelance-font-primary);
   font-size: 1.75rem;
   font-weight: 700;
-  margin: 0 0 2.5rem 0;
+  margin: 0;
   color: var(--freelance-black);
-  text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -888,6 +1098,29 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.skill-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.skill-icon {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--freelance-cream-dark);
+  border: 2px solid var(--freelance-black);
+}
+
+.skill-icon i {
+  font-size: 1rem;
+  color: var(--freelance-black);
 }
 
 .skill-name {
@@ -899,6 +1132,20 @@
   letter-spacing: 0.5px;
 }
 
+.skill-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.skill-experience {
+  font-family: var(--freelance-font-primary);
+  font-size: 0.8rem;
+  color: var(--freelance-text-muted);
+  font-weight: 500;
+}
+
 .skill-level {
   font-family: var(--freelance-font-primary);
   font-size: 1rem;
@@ -906,35 +1153,32 @@
   font-weight: 600;
 }
 
-.skill-bar {
-  height: 12px;
+/* Убрали стили прогресс-баров */
+
+.skill-indicators {
+  display: flex;
+  justify-content: center;
+}
+
+.indicator-dots {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   background: var(--freelance-cream-dark);
-  border: 2px solid var(--freelance-black);
-  overflow: hidden;
-  position: relative;
+  border: 1px solid var(--freelance-black);
+  transition: all 0.3s ease;
+  opacity: 0.3;
 }
 
-.skill-progress {
-  height: 100%;
-  background: var(--freelance-accent);
-  transition: width 1.5s ease-out;
-  position: relative;
-}
-
-.skill-progress::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-  animation: skillShine 2s infinite;
-}
-
-@keyframes skillShine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+.indicator-dot.active {
+  opacity: 1;
+  transform: scale(1.2);
+  box-shadow: 0 0 8px currentColor;
 }
 
 /* Projects Section */
@@ -1032,14 +1276,277 @@
   color: var(--freelance-black);
   text-decoration: none;
   font-size: 1.5rem;
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Упрощенный hover эффект - только плавное появление */
+.project-card:hover .project-link {
+  opacity: 1;
+}
+
+/* ===== УНИКАЛЬНЫЕ ТЕМЫ ПРОЕКТОВ ===== */
+
+/* SKYT - Техно неоновый стиль */
+.project-card.skyt-theme {
+  background: linear-gradient(135deg, #0c1a2b 0%, #1a2b3a 50%, #0c1a2b 100%);
+  border: 3px solid #4a90e2;
+  box-shadow: 
+    0 0 20px rgba(74, 144, 226, 0.3),
+    inset 0 0 20px rgba(74, 144, 226, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Неоновое свечение для SKYT */
+.project-card.skyt-theme::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  /*background: linear-gradient(45deg, #4a90e2, #6bb6ff, #4a90e2, #6bb6ff);*/
+  background-size: 400% 400%;
+  animation: neonGlow 3s ease-in-out infinite;
+  z-index: -1;
+  border-radius: inherit;
+}
+
+@keyframes neonGlow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.project-card.skyt-theme:hover {
+  transform: translateY(-10px) rotateX(5deg);
+  box-shadow: 
+    0 25px 50px rgba(35, 67, 104, 0.2),
+    0 0 20px rgba(74, 144, 226, 0.3),
+    inset 0 0 20px rgba(25, 59, 97, 0.1);
+}
+
+.project-card.skyt-theme .project-title {
+  color: #4a90e2;
+  text-shadow: 0 0 10px rgba(40, 75, 114, 0.5);
+}
+
+.project-card.skyt-theme .project-description {
+  color: #a8c8f0;
+}
+
+.project-card.skyt-theme .tech-tag {
+  background: rgba(74, 144, 226, 0.2);
+  color: #6bb6ff;
+  border: 1px solid #4a90e2;
+  box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+}
+
+.project-card.skyt-theme .project-link {
+  background: #4a90e2;
+  border-color: #6bb6ff;
+  color: #0c1a2b;
+  box-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
+}
+
+/* SentinelGuard - Минималистичный бело-голубой стиль */
+.project-card.sentinel-theme {
+  background: linear-gradient(135deg, #e8f4f8 0%, #f0f8ff 50%, #e8f4f8 100%);
+  border: 3px solid #0077be;
+  box-shadow: 
+    0 8px 32px rgba(0, 119, 190, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  position: relative;
+}
+
+/* Защитная сетка для SentinelGuard */
+.project-card.sentinel-theme::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(90deg, rgba(0, 119, 190, 0.1) 1px, transparent 1px),
+    linear-gradient(rgba(0, 119, 190, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.3;
   pointer-events: none;
 }
 
-.project-card:hover .project-link {
-  transform: scale(1.2) rotate(10deg);
-  background: var(--freelance-black);
-  color: var(--freelance-accent);
+.project-card.sentinel-theme:hover {
+  transform: translateY(-8px);
+  box-shadow: 
+    0 20px 40px rgba(0, 119, 190, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.project-card.sentinel-theme .project-title {
+  color: #0077be;
+  font-weight: 700;
+}
+
+.project-card.sentinel-theme .project-description {
+  color: #4a6b7a;
+}
+
+.project-card.sentinel-theme .tech-tag {
+  background: rgba(0, 119, 190, 0.1);
+  color: #0077be;
+  border: 1px solid #0077be;
+}
+
+.project-card.sentinel-theme .project-link {
+  background: #0077be;
+  border-color: #0077be;
+  color: #e8f4f8;
+}
+
+/* Пиксельная Экосистема - Пиксельный ретро стиль */
+.project-card.pixel-theme {
+  background: #1a1a1a;
+  border: 3px solid #00ff00;
+  box-shadow: 
+    0 0 0 1px #ff00ff,
+    0 0 0 2px #00ffff,
+    0 8px 16px rgba(0, 255, 0, 0.3);
+  position: relative;
+  image-rendering: pixelated;
+  transition: all 0.1s ease; /* Мгновенные переходы для всех элементов */
+}
+
+/* Пиксельная рамка */
+.project-card.pixel-theme::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: 
+    linear-gradient(90deg, #00ff00 0%, #ff00ff 25%, #00ffff 50%, #ffff00 75%, #00ff00 100%);
+  background-size: 20px 20px;
+  animation: pixelBorder 2s linear infinite;
+  z-index: -1;
+}
+
+@keyframes pixelBorder {
+  0% { background-position: 0 0; }
+  100% { background-position: 20px 20px; }
+}
+
+.project-card.pixel-theme:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 
+    0 0 0 2px #ff00ff,
+    0 0 0 4px #00ffff,
+    0 0 20px #00ff00,
+    0 20px 40px rgba(0, 255, 0, 0.4);
+  transition: all 0.1s ease; /* Убираем задержки - делаем мгновенные переходы */
+}
+
+.project-card.pixel-theme .project-title {
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  text-shadow: 
+    2px 0 0 #ff00ff,
+    -2px 0 0 #00ffff,
+    0 2px 0 #ffff00,
+    0 -2px 0 #ff00ff;
+}
+
+.project-card.pixel-theme .project-description {
+  color: #00ffff;
+  font-family: 'Courier New', monospace;
+}
+
+.project-card.pixel-theme .tech-tag {
+  background: #ff00ff;
+  color: #1a1a1a;
+  border: 2px solid #00ff00;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  box-shadow: 2px 2px 0 #00ffff;
+}
+
+.project-card.pixel-theme .project-link {
+  background: #00ff00;
+  border-color: #ff00ff;
+  color: #1a1a1a;
+  box-shadow: 4px 4px 0 #00ffff;
+}
+
+/* ACHERON - Мифологический темный стиль */
+.project-card.acheron-theme {
+  background: linear-gradient(135deg, #1a0033 0%, #330066 25%, #660099 50%, #330066 75%, #1a0033 100%);
+  border: 3px solid #cc0066;
+  box-shadow: 
+    0 0 30px rgba(204, 0, 102, 0.4),
+    inset 0 0 30px rgba(102, 0, 153, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Мистический туман для ACHERON */
+.project-card.acheron-theme::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(204, 0, 102, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(102, 0, 153, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(153, 0, 204, 0.2) 0%, transparent 50%);
+  animation: mysticFog 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes mysticFog {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+.project-card.acheron-theme:hover {
+  transform: translateY(-12px) rotateZ(1deg);
+  box-shadow: 
+    0 30px 60px rgba(204, 0, 102, 0.5),
+    0 0 40px rgba(102, 0, 153, 0.6),
+    inset 0 0 40px rgba(153, 0, 204, 0.3);
+}
+
+.project-card.acheron-theme .project-title {
+  color: #ff3399;
+  text-shadow: 
+    0 0 10px rgba(255, 51, 153, 0.8),
+    0 0 20px rgba(204, 0, 102, 0.6);
+  font-weight: 800;
+}
+
+.project-card.acheron-theme .project-description {
+  color: #cc99ff;
+  text-shadow: 0 0 5px rgba(204, 153, 255, 0.5);
+}
+
+.project-card.acheron-theme .tech-tag {
+  background: rgba(204, 0, 102, 0.3);
+  color: #ff3399;
+  border: 1px solid #cc0066;
+  box-shadow: 
+    0 0 10px rgba(204, 0, 102, 0.4),
+    inset 0 0 10px rgba(102, 0, 153, 0.2);
+}
+
+.project-card.acheron-theme .project-link {
+  background: linear-gradient(45deg, #cc0066, #9900cc);
+  border-color: #ff3399;
+  color: #ffffff;
+  box-shadow: 
+    0 0 20px rgba(204, 0, 102, 0.6),
+    inset 0 0 20px rgba(255, 51, 153, 0.3);
 }
 
 .project-coming-soon {
@@ -1568,8 +2075,52 @@
     flex-direction: column;
   }
   
-  .services-grid {
-    grid-template-columns: 1fr;
+  /* Адаптивность для новой 3D карусели */
+  .services-container {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .services-carousel-container {
+    height: 400px;
+    order: 2;
+  }
+  
+  .services-navigation {
+    width: 100%;
+    position: static;
+    order: 1;
+  }
+  
+  .navigation-list-container {
+    height: auto;
+    overflow: visible;
+  }
+  
+  .navigation-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    transform: none !important;
+  }
+  
+  .nav-item {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.75rem;
+  }
+  
+  .nav-title {
+    font-size: 0.8rem;
+  }
+  
+  .service-card {
+    width: 300px;
+    padding: 2rem;
+  }
+  
+  .carousel-controls {
+    display: none;
   }
   
   .skills-container {
@@ -1628,9 +2179,9 @@
     padding: 3rem 1rem;
   }
   
-  .section-title {
+  /*.section-title {
     font-size: 2rem;
-  }
+  }*/
   
   .freelance-name {
     font-size: 2rem;

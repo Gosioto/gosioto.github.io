@@ -8,21 +8,24 @@ export default function FreelanceProjects() {
       description: 'Программа для контроля своего времени с интуитивным интерфейсом и подробной статистикой',
       tech: ['JavaScript', 'Vue.js', 'Node.js', 'PostgreSQL'],
       image: '/img/skyt.png',
-      link: '/SKYT/index.html'
+      link: '/SKYT/index.html',
+      theme: 'skyt'
     },
     {
       title: 'SentinelGuard - Сетевой администратор',
       description: 'Администратор сети, разработанный на Python и NMap для мониторинга сетевой безопасности',
       tech: ['Python', 'NMap', 'Network Security', 'Bash'],
       image: '/img/shield-icon.png',
-      link: '/sentinelguard/index.html'
+      link: '/sentinelguard/index.html',
+      theme: 'sentinel'
     },
     {
       title: 'мини игра "пиксельная экосистема"',
       description: 'Полный рефакторинг игры с React на Vanilla JS. Уменьшение размера бандла на 85%',
       tech: ['JavaScript ES6+', 'Canvas 2D API', 'Web Workers', 'CSS Custom Properties'],
       image: '/img/pixel.png',
-      link: '/#pixel-ecosystem-game'
+      link: '/#pixel-ecosystem-game',
+      theme: 'pixel'
     },
     {
       title: 'ACHERON',
@@ -30,7 +33,8 @@ export default function FreelanceProjects() {
       tech: ['React', 'Node.js', 'WebRTC', 'PostgreSQL'],
       image: '/img/ACHERON_logo.png',
       link: '/ACHERON/index.html',
-      comingSoon: true
+      comingSoon: true,
+      theme: 'acheron'
     }
   ];
 
@@ -48,7 +52,7 @@ export default function FreelanceProjects() {
             <a 
               key={index} 
               href={project.link} 
-              className={`project-card ${project.comingSoon ? 'coming-soon' : ''}`}
+              className={`project-card ${project.comingSoon ? 'coming-soon' : ''} ${project.theme}-theme`}
             >
               <div className="project-image">
                 <img src={project.image} alt={project.title} />
