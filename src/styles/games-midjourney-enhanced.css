@@ -2082,6 +2082,12 @@
   transform: translateY(-1px);
 }
 
+.nav-link:focus-visible,
+.games-header-back-btn:focus-visible {
+  outline: 2px solid #00d4ff;
+  outline-offset: 2px;
+}
+
 .nav-link i {
   font-size: 1rem;
 }
@@ -2466,24 +2472,46 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   padding: 1rem;
+  cursor: pointer;
+  animation: achievementsOverlayFade 0.25s ease-out;
+}
+.achievements-modal-overlay:focus {
+  outline: none;
+}
+
+@keyframes achievementsOverlayFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .achievements-modal {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98));
+  border: 1px solid rgba(59, 130, 246, 0.25);
   border-radius: 16px;
   width: 100%;
   max-width: 1000px;
   max-height: 90vh;
   overflow: hidden;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  animation: achievementsModalSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes achievementsModalSlide {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .achievements-header {
@@ -2702,6 +2730,237 @@
   }
 }
 
+/* Screenshots Modal - dark theme (games page) */
+.screenshots-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+  cursor: pointer;
+  animation: screenshotsOverlayFade 0.25s ease-out;
+}
+.screenshots-modal-overlay:focus { outline: none; }
+@keyframes screenshotsOverlayFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.screenshots-modal-content {
+  background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  animation: screenshotsModalSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes screenshotsModalSlide {
+  from { opacity: 0; transform: scale(0.96) translateY(16px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.screenshots-modal-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #252525 0%, #1a1a1a 100%);
+}
+.screenshots-modal-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+  border-radius: 16px 16px 0 0;
+}
+.screenshots-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.screenshots-modal-title i { color: var(--accent-blue); }
+.screenshots-modal-close {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.screenshots-modal-close:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+}
+.screenshots-modal-close:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
+
+.screenshots-modal-body {
+  padding: 1.5rem;
+  max-height: calc(90vh - 80px);
+  overflow-y: auto;
+}
+.screenshots-main { position: relative; margin-bottom: 1.5rem; }
+.screenshots-image-container {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.screenshots-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111;
+}
+.screenshots-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: screenshotsSpin 0.8s linear infinite;
+}
+@keyframes screenshotsSpin { to { transform: rotate(360deg); } }
+.screenshots-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.2s ease;
+}
+.screenshots-main-img.is-loading { opacity: 0; }
+.screenshots-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.screenshots-nav:hover { background: rgba(0, 212, 255, 0.4); }
+.screenshots-nav-prev { left: 0.75rem; }
+.screenshots-nav-next { right: 0.75rem; }
+.screenshots-counter {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+}
+.screenshots-thumbnails { margin-bottom: 1rem; }
+.screenshots-thumbnails-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 0.5rem 0;
+}
+.screenshots-thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+.screenshots-thumbnail {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background: #222;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+.screenshots-thumbnail img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.screenshots-thumbnail:hover { opacity: 1; border-color: rgba(255, 255, 255, 0.3); }
+.screenshots-thumbnail.is-active {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
+}
+.screenshots-thumbnail-check {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 212, 255, 0.25);
+  color: #fff;
+  font-size: 0.9rem;
+}
+.screenshots-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.screenshots-info {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+.screenshots-actions { display: flex; gap: 0.5rem; }
+.screenshots-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.screenshots-btn-download {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+}
+.screenshots-btn-download:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.screenshots-btn-close {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.screenshots-btn-close:hover { background: rgba(255, 255, 255, 0.15); }
+.screenshots-btn:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
 
 /* Current Games Elements Opacity */
 .current-game-card .game-content {

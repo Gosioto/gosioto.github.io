@@ -1,6 +1,7 @@
 /* src/app/globals.css */
 /* ====== ГЛОБАЛЬНО ====== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -86,6 +87,49 @@ nav a:hover::after { transform: scaleX(1); transform-origin: bottom left; }
   gap: 2rem;
 }
 .hero-text { flex: 1; }
+.hero-title-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.hero-title-row h1 { margin-bottom: 0; }
+.hero-freelance-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.25rem;
+  background: transparent;
+  color: #000000;
+  border: 3px solid #000000;
+  text-decoration: none;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.hero-freelance-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+.hero-freelance-btn:hover {
+  color: #f5f5dc;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+.hero-freelance-btn:hover::before { left: 0; }
 .hero h1 { font-size: 3rem; margin-bottom: 1rem; }
 .hero-sub {
   font-size: 1.2rem;
@@ -137,6 +181,19 @@ nav a:hover::after { transform: scaleX(1); transform-origin: bottom left; }
   background: #f8f9fa;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.15);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #495057;
+  border: 2px solid #dee2e6;
+}
+
+.btn-outline:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+  color: #212529;
+  transform: translateY(-2px);
 }
 
 .text-white {
@@ -565,6 +622,7 @@ footer {
 /* ====== МОБИЛЬНАЯ АДАПТАЦИЯ ====== */
 @media (max-width: 768px) {
   .hero-container, .about-content { flex-direction: column; text-align: center; }
+  .hero-title-row { justify-content: center; }
   .latest-project, .case-card { grid-template-columns: 1fr; }
   .case-demo, .case-image { order: -1; min-height: 300px; }
   nav { flex-direction: column; width: 100%; }

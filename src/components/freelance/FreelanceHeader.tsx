@@ -20,6 +20,7 @@ export default function FreelanceHeader() {
 
         {/* Desktop Navigation */}
         <nav className="freelance-header-nav">
+          <a href="/" className="nav-link">Главная</a>
           <a href="#services" className="nav-link">Что умею</a>
           <a href="#skills" className="nav-link">Технологии</a>
           <a href="#projects" className="nav-link">Портфолио</a>
@@ -40,6 +41,7 @@ export default function FreelanceHeader() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="freelance-header-mobile-menu">
+            <a href="/" className="mobile-nav-link">Главная</a>
             <a href="#services" className="mobile-nav-link">Что умею</a>
             <a href="#skills" className="mobile-nav-link">Технологии</a>
             <a href="#projects" className="mobile-nav-link">Портфолио</a>

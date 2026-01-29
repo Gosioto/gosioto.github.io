@@ -167,13 +167,22 @@ export default function AchievementsModal({ isOpen, onClose }: AchievementsModal
   if (!isOpen) return null;
 
   return (
-    <div className="achievements-modal-overlay">
-      <div className="achievements-modal">
+    <div
+      className="achievements-modal-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="achievements-modal-title"
+    >
+      <div
+        className="achievements-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="achievements-header">
-          <h2 className="achievements-title">
+          <h2 id="achievements-modal-title" className="achievements-title">
             <i className="fas fa-trophy"></i>
-            Достижения и челенджи
+            Достижения и челленджи
           </h2>
           <button 
             className="achievements-close-btn"

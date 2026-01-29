@@ -7,6 +7,7 @@ import AchievementsModal from './AchievementsModal';
 import GameStatsMidjourney from './GameStatsMidjourney';
 import GamesHeader from './GamesHeader';
 import GamesHideBar from './GamesHideBar';
+import GameModalButtons from './GameModalButtons';
 import ScreenshotsGallery from './ScreenshotsGallery';
 import { AnimationUtils } from '@/utils/animations';
 
@@ -203,13 +204,17 @@ export default function GamesPageMidjourney({ children, onBackToHobbies }: Games
               <div className="hero-stat-label">Достижений Steam</div>
             </div>
           </div>
+          <a href="#stats" className="games-hero-scroll-hint" aria-label="К статистике">
+            <span className="games-hero-scroll-text">Листай вниз</span>
+            <i className="fas fa-chevron-down games-hero-scroll-icon"></i>
+          </a>
         </div>
       </section>
 
       {/* Main Content */}
       <main className="games-main">
         {/* Stats Section */}
-        <section className="games-section">
+        <section className="games-section" id="stats">
           <div className="games-section-header games-scroll-reveal">
             <h2 className="games-section-title">Статистика</h2>
             <p className="games-section-subtitle">
@@ -221,7 +226,7 @@ export default function GamesPageMidjourney({ children, onBackToHobbies }: Games
         </section>
 
         {/* Top Games Section */}
-        <section className="games-section">
+        <section className="games-section" id="top-games">
           <div className="games-section-header games-scroll-reveal">
             <h2 className="games-section-title">Топ-5 любимых игр</h2>
             <p className="games-section-subtitle">
@@ -239,7 +244,7 @@ export default function GamesPageMidjourney({ children, onBackToHobbies }: Games
         </section>
 
         {/* Current Games Section */}
-        <section className="games-section">
+        <section className="games-section" id="current">
           <div className="games-section-header games-scroll-reveal">
             <h2 className="games-section-title">Сейчас играю</h2>
             <p className="games-section-subtitle">
@@ -259,7 +264,7 @@ export default function GamesPageMidjourney({ children, onBackToHobbies }: Games
         </section>
 
         {/* Steam Games Section */}
-        <section className="games-section">
+        <section className="games-section" id="steam">
           <div className="games-section-header games-scroll-reveal">
             <h2 className="games-section-title">Коллекция Steam</h2>
             <p className="games-section-subtitle">
@@ -311,6 +316,9 @@ export default function GamesPageMidjourney({ children, onBackToHobbies }: Games
         isMenuOpen={isMenuOpen}
         onCloseMenu={() => setIsMenuOpen(false)}
       />
+
+      {/* Floating dropdown menu */}
+      <GameModalButtons />
     </div>
   );
 }

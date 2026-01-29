@@ -19,8 +19,7 @@ const SkillsPreview = () => {
     setTimeout(() => setShowReadyButton(true), 1600);
   };
 
-  // Явно указываем ID навыков в нужном порядке
-  const targetSkillIds = ['js', 'typescript', 'react', 'vue', 'angular', 'git', 'docker'];
+  const targetSkillIds = ['js', 'typescript', 'rust', 'react', 'vue', 'angular', 'git', 'docker'];
   
   // Находим нужные навыки в данных
   const previewSkills = skillsData
@@ -46,22 +45,23 @@ const SkillsPreview = () => {
         </p>
         
         <div className="skills-grid">
-          {/* JavaScript и TypeScript - в центрированном контейнере */}
-          <div className="skills-row-container">
-            {previewSkills.filter(skill => ['js', 'typescript'].includes(skill.id)).map(skill => (
-              <SkillCard 
-                key={skill.id} 
-                skill={skill} 
-                category={skill.category} 
-              />
-            ))}
+          {/* JavaScript + TypeScript + Rust */}
+          <div className="skills-row-container skills-row-uniform skills-row-with-plus">
+            {previewSkills
+              .filter(skill => ['js', 'typescript', 'rust'].includes(skill.id))
+              .map((skill, index) => (
+                <span key={skill.id} className="skill-with-plus">
+                  {index > 0 && <span className="skill-plus" aria-hidden>+</span>}
+                  <SkillCard skill={skill} category={skill.category} />
+                </span>
+              ))}
           </div>
           
           {/* Разделитель для фреймворков */}
           <div className="frameworks-divider">Фреймворки</div>
           
-          {/* Фреймворки - в центрированном контейнере */}
-          <div className="skills-row-container">
+          {/* Фреймворки - такие же размеры карточек */}
+          <div className="skills-row-container skills-row-uniform">
             {previewSkills.filter(skill => ['react', 'vue', 'angular'].includes(skill.id)).map(skill => (
               <SkillCard 
                 key={skill.id} 

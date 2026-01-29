@@ -28,6 +28,15 @@ export default function FreelanceProjects() {
       theme: 'pixel'
     },
     {
+      title: 'Ruin XXI',
+      description: 'Веб-игра в жанре стратегии/RPG: почта, чат, друзья, профиль. Проект в разработке — лендинг и базовая инфраструктура на месте.',
+      tech: ['JavaScript', 'TypeScript', 'Node.js', 'Чат', 'Профили'],
+      image: '/img/game.png',
+      link: 'https://ruinxxi.ru/',
+      comingSoon: true,
+      theme: 'ruinxxi'
+    },
+    {
       title: 'ACHERON',
       description: 'Личный стартап - современная платформа для стриминга контента с лендингом. Первый релиз планируется на ноябрь-декабрь 2025',
       tech: ['React', 'Node.js', 'WebRTC', 'PostgreSQL'],
@@ -51,8 +60,9 @@ export default function FreelanceProjects() {
           {featuredProjects.map((project, index) => (
             <a 
               key={index} 
-              href={project.link} 
+              href={project.link}
               className={`project-card ${project.comingSoon ? 'coming-soon' : ''} ${project.theme}-theme`}
+              {...(project.link.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
             >
               <div className="project-image">
                 <img src={project.image} alt={project.title} />

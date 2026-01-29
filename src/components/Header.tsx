@@ -20,6 +20,7 @@ const Header = () => {
   const isProjectsActive = pathname === '/projects' || pathname.startsWith('/projects/');
   const isHobbiesActive = pathname === '/hobbies' || pathname.startsWith('/hobbies/');
   const isContactActive = pathname === '/contact' || pathname.startsWith('/contact/');
+  const isFreelanceActive = pathname === '/freelance' || pathname.startsWith('/freelance/');
 
   return (
     <header>
@@ -34,6 +35,7 @@ const Header = () => {
           <a href="/projects" className={isProjectsActive ? 'active' : ''}>Проекты</a>
           <a href="/hobbies" className={isHobbiesActive ? 'active' : ''}>Хобби</a>
           <a href="/contact" className={isContactActive ? 'active' : ''}>Контакты</a>
+          <a href="/freelance" className={isFreelanceActive ? 'active' : ''}>Freelance</a>
         </nav>
       </div>
     </header>

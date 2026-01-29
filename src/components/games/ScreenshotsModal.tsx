@@ -74,97 +74,95 @@ export default function ScreenshotsModal({ gameName, isOpen, onClose, screenshot
     setIsLoading(false);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !screenshots.length) return null;
 
   return (
-    <div className="screenshots-modal fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="screenshots-modal-content bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+    <div
+      className="screenshots-modal-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Скриншоты: ${gameName}`}
+    >
+      <div
+        className="screenshots-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="screenshots-modal-header bg-gradient-to-r from-blue-500 to-purple-500 text-white p-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+        <div className="screenshots-modal-header">
+          <h2 className="screenshots-modal-title">
             <i className="fas fa-images"></i>
-            {gameName} - Скриншоты
+            {gameName} — Скриншоты
           </h2>
           <button
+            type="button"
             onClick={onClose}
-            className="screenshots-modal-close w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center"
+            className="screenshots-modal-close"
+            aria-label="Закрыть"
           >
             <i className="fas fa-times"></i>
           </button>
         </div>
 
         {/* Main Content */}
-        <div className="screenshots-modal-body p-6">
-          {/* Image Display */}
-          <div className="screenshots-main relative mb-4">
-            <div className="screenshots-image-container relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
+        <div className="screenshots-modal-body">
+          <div className="screenshots-main">
+            <div className="screenshots-image-container">
               {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                <div className="screenshots-loading">
+                  <div className="screenshots-spinner"></div>
                 </div>
               )}
               <img
                 src={screenshots[currentIndex]}
                 alt={`${gameName} скриншот ${currentIndex + 1}`}
-                className={`w-full h-full object-cover transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+                className={`screenshots-main-img ${isLoading ? 'is-loading' : ''}`}
                 onLoad={handleImageLoad}
                 loading="lazy"
               />
-              
-              {/* Navigation Arrows */}
               {currentIndex > 0 && (
                 <button
-                  onClick={goToPrevious}
-                  className="screenshots-nav screenshots-nav-prev absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors"
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
+                  className="screenshots-nav screenshots-nav-prev"
+                  aria-label="Предыдущий"
                 >
                   <i className="fas fa-chevron-left"></i>
                 </button>
               )}
-              
               {currentIndex < screenshots.length - 1 && (
                 <button
-                  onClick={goToNext}
-                  className="screenshots-nav screenshots-nav-next absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors"
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); goToNext(); }}
+                  className="screenshots-nav screenshots-nav-next"
+                  aria-label="Следующий"
                 >
                   <i className="fas fa-chevron-right"></i>
                 </button>
               )}
             </div>
-            
-            {/* Image Counter */}
-            <div className="screenshots-counter absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+            <div className="screenshots-counter">
               {currentIndex + 1} / {screenshots.length}
             </div>
           </div>
 
-          {/* Thumbnail Navigation */}
           {screenshots.length > 1 && (
             <div className="screenshots-thumbnails">
-              <h3 className="text-sm font-semibold text-gray-600 mb-3">Выберите скриншот:</h3>
-              <div className="screenshots-thumbnail-grid grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+              <h3 className="screenshots-thumbnails-title">Выберите скриншот:</h3>
+              <div className="screenshots-thumbnail-grid">
                 {screenshots.map((screenshot, index) => (
                   <button
                     key={index}
+                    type="button"
                     onClick={() => {
                       setIsLoading(true);
                       setCurrentIndex(index);
                     }}
-                    className={`screenshots-thumbnail relative aspect-video rounded-lg overflow-hidden transition-all ${
-                      currentIndex === index
-                        ? 'ring-2 ring-blue-500 scale-105'
-                        : 'hover:scale-105 opacity-70 hover:opacity-100'
-                    }`}
+                    className={`screenshots-thumbnail ${currentIndex === index ? 'is-active' : ''}`}
                   >
-                    <img
-                      src={screenshot}
-                      alt={`Миниатюра ${index + 1}`}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
+                    <img src={screenshot} alt={`Миниатюра ${index + 1}`} loading="lazy" />
                     {currentIndex === index && (
-                      <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
-                        <i className="fas fa-check text-white text-sm"></i>
-                      </div>
+                      <span className="screenshots-thumbnail-check"><i className="fas fa-check"></i></span>
                     )}
                   </button>
                 ))}
@@ -172,28 +170,22 @@ export default function ScreenshotsModal({ gameName, isOpen, onClose, screenshot
             </div>
           )}
 
-          {/* Controls */}
-          <div className="screenshots-controls flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-            <div className="screenshots-info text-sm text-gray-600">
-              <p>Используйте стрелки ← → для навигации или кликните на миниатюры</p>
-            </div>
-            <div className="screenshots-actions flex gap-2">
+          <div className="screenshots-controls">
+            <p className="screenshots-info">Стрелки ← → или клик по миниатюрам</p>
+            <div className="screenshots-actions">
               <button
+                type="button"
                 onClick={() => {
                   const link = document.createElement('a');
                   link.href = screenshots[currentIndex];
                   link.download = `${gameName}_screenshot_${currentIndex + 1}.jpg`;
                   link.click();
                 }}
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                className="screenshots-btn screenshots-btn-download"
               >
-                <i className="fas fa-download"></i>
-                Скачать
+                <i className="fas fa-download"></i> Скачать
               </button>
-              <button
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
-              >
+              <button type="button" onClick={onClose} className="screenshots-btn screenshots-btn-close">
                 Закрыть
               </button>
             </div>

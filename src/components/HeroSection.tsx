@@ -15,7 +15,10 @@ export default function HeroSection() {
           height={200}
         />
         <div className="hero-text">
-          <h1>Привет! Я Иван, веб-разработчик.</h1>
+          <div className="hero-title-row">
+            <h1>Привет! Я Иван, веб-разработчик.</h1>
+            <Link href="/freelance" className="hero-freelance-btn">Freelance</Link>
+          </div>
           <p className="hero-sub">
             Создаю современные, адаптивные и удобные веб-приложения с фокусом на производительность и пользовательский опыт.
           </p>

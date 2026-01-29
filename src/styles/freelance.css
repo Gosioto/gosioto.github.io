@@ -1585,6 +1585,47 @@
     inset 0 0 20px rgba(255, 51, 153, 0.3);
 }
 
+/* Ruin XXI - веб-игра стратегия/RPG */
+.project-card.ruinxxi-theme {
+  background: linear-gradient(135deg, #1c1917 0%, #292524 50%, #1c1917 100%);
+  border: 3px solid #a16207;
+  box-shadow: 0 4px 20px rgba(161, 98, 7, 0.25);
+}
+
+.project-card.ruinxxi-theme::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.project-card.ruinxxi-theme:hover {
+  box-shadow: 0 12px 32px rgba(161, 98, 7, 0.35);
+}
+
+.project-card.ruinxxi-theme .project-title {
+  color: #eab308;
+}
+
+.project-card.ruinxxi-theme .project-description {
+  color: var(--freelance-text-muted);
+}
+
+.project-card.ruinxxi-theme .tech-tag {
+  background: rgba(234, 179, 8, 0.15);
+  color: #ca8a04;
+  border: 1px solid #a16207;
+}
+
+.project-card.ruinxxi-theme .project-link,
+.project-card.ruinxxi-theme .project-coming-soon i {
+  color: #eab308;
+}
+
 .project-coming-soon {
   display: flex;
   flex-direction: column;

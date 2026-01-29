@@ -1496,6 +1496,58 @@
   width: 100%;
 }
 
+.skills-row-with-plus {
+  align-items: center;
+}
+
+/* Одинаковые квадратные карточки в обоих рядах (языки и фреймворки) */
+.skills-row-uniform .skill-card {
+  width: 140px;
+  height: 140px;
+  min-width: 140px;
+  min-height: 140px;
+  max-width: 140px;
+  padding: 1rem;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.skills-row-uniform .skill-card i {
+  font-size: 2.25rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.skills-row-uniform .skill-card h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.skills-row-uniform .skill-card .skill-percentage {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.skills-row-uniform .skill-card .skill-progress {
+  width: 100%;
+  margin-top: auto;
+}
+
+.skill-with-plus {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.skill-plus {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #6c757d;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.skills-grid .skill-card[data-skill="rust"] i { color: #dea584; }
+
 /* Карточки навыков */
 .skills-grid .skill-card {
   background: #fff;
@@ -1597,6 +1649,29 @@
     flex-direction: column;
     align-items: center;
   }
+
+  .skills-row-with-plus {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .skills-row-uniform .skill-card {
+    width: 120px;
+    height: 120px;
+    min-width: 120px;
+    min-height: 120px;
+    max-width: 120px;
+    padding: 0.75rem;
+  }
+
+  .skills-row-uniform .skill-card i {
+    font-size: 1.9rem !important;
+  }
+
+  .skills-row-uniform .skill-card h3 {
+    font-size: 0.85rem;
+  }
   
   .skills-grid .skill-card {
     max-width: 250px;
@@ -1612,6 +1687,32 @@
 }
 
 @media (max-width: 576px) {
+  .skills-row-uniform .skill-card {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    min-height: 100px;
+    max-width: 100px;
+    padding: 0.5rem;
+  }
+
+  .skills-row-uniform .skill-card i {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .skills-row-uniform .skill-card h3 {
+    font-size: 0.75rem;
+  }
+
+  .skills-row-uniform .skill-card .skill-percentage {
+    font-size: 0.8rem;
+  }
+
+  .skill-plus {
+    font-size: 1.2rem;
+  }
+
   .skills-grid .skill-card {
     max-width: 220px;
     padding: 1.2rem;

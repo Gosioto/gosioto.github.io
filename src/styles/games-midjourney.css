@@ -167,6 +167,37 @@ body {
   letter-spacing: 0.1em;
 }
 
+/* Hero scroll hint */
+.games-hero-scroll-hint {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transition: var(--transition);
+  position: relative;
+  z-index: 3;
+}
+.games-hero-scroll-hint:hover {
+  color: var(--accent-blue);
+}
+.games-hero-scroll-text {
+  opacity: 0.9;
+}
+.games-hero-scroll-icon {
+  font-size: 1.25rem;
+  animation: games-hero-chevron-bounce 2s ease-in-out infinite;
+}
+@keyframes games-hero-chevron-bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(6px); opacity: 0.7; }
+}
+
 /* Navigation */
 .games-nav {
   position: fixed;
@@ -246,6 +277,11 @@ body {
   background: var(--primary-bg);
 }
 
+/* Anchor scroll offset so fixed header doesn't hide section titles */
+.games-section[id] {
+  scroll-margin-top: 100px;
+}
+
 .games-section {
   padding: 6rem 0;
   max-width: 1200px;
@@ -264,6 +300,19 @@ body {
   font-weight: 700;
   margin-bottom: 1rem;
   color: var(--text-primary);
+  position: relative;
+  display: inline-block;
+}
+.games-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
 }
 
 .games-section-subtitle {
@@ -271,6 +320,17 @@ body {
   color: var(--text-secondary);
   max-width: 600px;
   margin: 0 auto;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.games-section-header.games-scroll-reveal .games-section-subtitle {
+  opacity: 0;
+  transform: translateY(12px);
+  transition-delay: 0s;
+}
+.games-section-header.games-scroll-reveal.revealed .games-section-subtitle {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.15s;
 }
 
 /* Stats Grid */
@@ -1410,4 +1470,17 @@ body {
 /* Ensure classic .games-card (non-grid overrides) keeps 16:9 if used */
 .games-card:not(.games-card-show-all) {
   aspect-ratio: 16 / 9;
+}
+
+/* Focus visible for keyboard navigation */
+.games-page-midjourney .top-game-card:focus-visible,
+.games-page-midjourney .current-game-card:focus-visible,
+.games-page-midjourney .games-card:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 4px;
+}
+.games-page-midjourney .games-card-btn:focus-visible,
+.games-page-midjourney .games-hero-scroll-hint:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
 }

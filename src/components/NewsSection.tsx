@@ -6,6 +6,11 @@ import { useGradientAnimation } from '@/hooks/useGradientAnimation';
 
 const newsData = [
   {
+    date: '2025-01-28',
+    version: 'v4.1',
+    text: 'Добавлен новый проект: Web Game #1 (ruinxxi.ru). Небольшое обновление визуала: кнопка Freelance на главной, систематизация раздела «Навыки», переключение главная ↔ Freelance.'
+  },
+  {
     date: '2025-08-13',
     version: 'v3.4',
     text: 'Добавлен блок "новости", и кнопку играющую в догонялки - которую никто не нажмет) - на каждую из страниц, парсинг JS новостей.'
