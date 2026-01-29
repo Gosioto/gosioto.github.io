@@ -24,8 +24,8 @@ export default function FreelanceSkills() {
         { name: 'Node.js', level: 90, color: '#339933', icon: 'fab fa-node-js', experience: '2+ лет' },
         { name: 'Python', level: 85, color: '#3776ab', icon: 'fab fa-python', experience: '5+ лет' },
         { name: 'PostgreSQL', level: 88, color: '#336791', icon: 'fas fa-database', experience: '2+ лет' },
-        { name: 'MongoDB', level: 82, color: '#47a248', icon: 'fas fa-leaf', experience: '3+ лет' },
-        { name: 'Redis', level: 78, color: '#dc382d', icon: 'fas fa-memory', experience: '2+ лет' }
+        { name: 'Rust', level: 74, color: '#dea584', icon: 'fas fa-gears', experience: '1+ лет' },
+        { name: 'MongoDB', level: 69, color: '#47a248', icon: 'fas fa-leaf', experience: '3+ лет' }
       ]
     },
     {
@@ -49,12 +49,12 @@ export default function FreelanceSkills() {
         
         <div className="section-header">
           <h2 className="section-title">Технические навыки</h2>
-          <p className="section-subtitle">Технологии, с которыми я работаю</p>
+          <p className="section-subtitle">Технологии и инструменты, с которыми работаю ежедневно</p>
         </div>
 
         <div className="skills-container">
           {skillCategories.map((category, categoryIndex) => (
-            <div key={categoryIndex} className="skill-category">
+            <div key={categoryIndex} className={`skill-category ${category.title === 'Tools & Others' ? 'skill-category--tools' : ''}`.trim()}>
               <div className="category-header">
                 <div className="category-icon">
                   <i className={category.icon}></i>

@@ -12,15 +12,17 @@ export default function FreelanceHero() {
   });
 
   useEffect(() => {
-    const updateTimeAndStatus = () => {
-      setCurrentTime(getMoscowTime());
-      setResponseStatus(getResponseStatus());
-    };
+    const tick = () => setCurrentTime(getMoscowTime());
+    tick();
+    const t = setInterval(tick, 1000);
+    return () => clearInterval(t);
+  }, []);
 
-    updateTimeAndStatus();
-    const interval = setInterval(updateTimeAndStatus, 1000);
-
-    return () => clearInterval(interval);
+  useEffect(() => {
+    const updateStatus = () => setResponseStatus(getResponseStatus());
+    updateStatus();
+    const t = setInterval(updateStatus, 60000);
+    return () => clearInterval(t);
   }, []);
   return (
     <section className="freelance-hero" id="hero">

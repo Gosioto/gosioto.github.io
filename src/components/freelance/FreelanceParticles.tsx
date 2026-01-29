@@ -25,6 +25,7 @@ export default function FreelanceParticles() {
   const animationRef = useRef<number>();
   const scrollYRef = useRef(0);
   const mouseRef = useRef({ x: 0, y: 0, active: false });
+  const frameRef = useRef(0);
 
   // Цветовая палитра для частиц
   const colorPalette = [
@@ -83,29 +84,21 @@ export default function FreelanceParticles() {
       baseX: baseX,
       baseY: baseY,
       color: colorPalette[Math.floor(Math.random() * colorPalette.length)],
-      connectionRadius: Math.random() * 100 + 50,
+      connectionRadius: Math.random() * 50 + 40,
       pulsePhase: Math.random() * Math.PI * 2,
       pulseSpeed: Math.random() * 0.02 + 0.01
     });
 
-    // Создаем частицы в фиксированных позициях по всей странице
     const createFixedParticles = () => {
       const particles: Particle[] = [];
-      const particleCount = 80;
-      
+      const particleCount = 45;
+      const sectionHeight = canvas.height / 4;
       for (let i = 0; i < particleCount; i++) {
-        let baseX, baseY;
-        
-        // Распределяем частицы по всей высоте страницы
-        const sectionHeight = canvas.height / 4;
         const section = i % 4;
-        
-        baseX = Math.random() * canvas.width;
-        baseY = (section * sectionHeight) + Math.random() * sectionHeight;
-        
+        const baseX = Math.random() * canvas.width;
+        const baseY = section * sectionHeight + Math.random() * sectionHeight;
         particles.push(createParticle(baseX, baseY));
       }
-      
       return particles;
     };
 
@@ -160,12 +153,12 @@ export default function FreelanceParticles() {
       }
     };
 
-    // Анимация
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Рисуем соединения
-      drawConnections(ctx, particlesRef.current);
+      frameRef.current += 1;
+      if (frameRef.current % 2 === 0) {
+        drawConnections(ctx, particlesRef.current);
+      }
 
       particlesRef.current.forEach((particle, index) => {
         // Пульсация размера

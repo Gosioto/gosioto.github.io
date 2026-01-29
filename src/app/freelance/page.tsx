@@ -12,11 +12,9 @@ import FreelanceFooter from '@/components/freelance/FreelanceFooter';
 import FreelanceCursor from '@/components/freelance/FreelanceCursor';
 import '@/styles/freelance.css';
 import FreelanceParticles from '@/components/freelance/FreelanceParticles';
-import LiveCodeSection from '@/components/freelance/LiveCodeSection';
 
 export default function FreelancePage() {
   const [isLoaded, setIsLoaded] = useState(false);
-
   useEffect(() => {
     setIsLoaded(true);
   }, []);
