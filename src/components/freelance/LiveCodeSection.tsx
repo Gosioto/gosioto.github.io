@@ -15,18 +15,19 @@ type CodeFile = {
 export default function LiveCodeSection() {
   // --- CONFIG ---
   const maxLines = 15;
-  const baseDelay = 18; // base ms per character
-  const jitter = 30; // random jitter added/subtracted from base
-  const punctuationDelay = 120;
-  const spaceDelay = 40;
+  const baseDelay = 24; // base ms per character
+  const jitter = 40; // random jitter added/subtracted from base
+  const punctuationDelay = 140;
+  const spaceDelay = 50;
   const linePauseShort = 40;
   const linePauseLong = 120;
   const filePause = 1400;
-  const typoChance = 0.08; // chance to simulate a small typo
-  const typoMaxDelete = 4; // max chars to delete on typo
+  const typoChance = 0.18; // chance to simulate a small typo
+  const typoMaxDelete = 5; // max chars to delete on typo
 
   // --- FILES ---
   const codeFiles: CodeFile[] = [
+    // JavaScript
     { name: 'developer.js', icon: '', language: 'javascript', content: [
       "const developer = {",
       "  name: 'Gosloto',",
@@ -43,6 +44,7 @@ export default function LiveCodeSection() {
       "});"
     ]},
 
+    // TypeScript React component
     { name: 'ProjectCard.tsx', icon: '', language: 'typescript', content: [
       "// React Component Example",
       "const ProjectCard = ({ title, description, tech }) => {",
@@ -60,6 +62,7 @@ export default function LiveCodeSection() {
       "};"
     ], dependencies: ['types.ts'] },
 
+    // TypeScript types
     { name: 'types.ts', icon: '', language: 'typescript', content: [
       "// TypeScript Interface",
       "interface User {",
@@ -76,10 +79,74 @@ export default function LiveCodeSection() {
       "  description: string;",
       "  technologies: string[];",
       "  status: 'active' | 'completed' | 'pending';",
-      "}"
+      "}",
     ]},
 
-    // ... keep other files as before (truncated here for brevity) ...
+    // Python
+    { name: 'app.py', icon: '', language: 'python', content: [
+      "# Simple FastAPI example",
+      "from fastapi import FastAPI",
+      "",
+      "app = FastAPI(title=\"Gosloto Freelance API\")",
+      "",
+      "@app.get(\"/health\")",
+      "async def health_check():",
+      "    return {\"status\": \"ok\", \"service\": \"freelance-portfolio\"}",
+      "",
+      "@app.get(\"/projects\")",
+      "async def list_projects(limit: int = 5):",
+      "    return [{\"id\": i, \"title\": f\"Project #{i}\"} for i in range(1, limit + 1)]",
+    ]},
+
+    // Rust
+    { name: 'backend.rs', icon: '', language: 'rust', content: [
+      "// Tiny Axum example in Rust",
+      "use axum::{routing::get, Router};",
+      "",
+      "async fn health() -> &'static str {",
+      "    \"OK from Rust backend\"",
+      "}",
+      "",
+      "pub fn app() -> Router {",
+      "    Router::new().route(\"/health\", get(health))",
+      "}",
+    ]},
+
+    // CSS
+    { name: 'layout.css', icon: '', language: 'css', content: [
+      "/* Minimal layout snippet */",
+      ":root {",
+      "  --accent: #00ff88;",
+      "}",
+      "",
+      ".hero-gradient {",
+      "  background: radial-gradient(circle at 0 0, var(--accent), transparent 60%);",
+      "  border: 3px solid #000;",
+      "}",
+    ]},
+
+    // Docker
+    { name: 'docker-compose.yml', icon: '', language: 'dockerfile', content: [
+      "# Dev stack for portfolio",
+      "version: '3.9'",
+      "services:",
+      "  web:",
+      "    image: node:20-alpine",
+      "    working_dir: /app",
+      "    volumes:",
+      "      - ./:/app",
+      "    command: [\"npm\", \"run\", \"dev\"]",
+    ]},
+
+    // JSON
+    { name: 'config.json', icon: '', language: 'json', content: [
+      "{",
+      "  \"portfolioOwner\": \"Gosloto\",",
+      "  \"availableForHire\": true,",
+      "  \"primaryStack\": [\"Next.js\", \"TypeScript\", \"Rust\"],",
+      "  \"responseTimeMinutes\": 5",
+      "}",
+    ]},
   ];
 
   // If you want to include all original files, paste them into the array above.

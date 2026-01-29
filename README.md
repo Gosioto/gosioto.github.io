@@ -1,7 +1,7 @@
 # 🚀 Gosloto – Личный сайт-визитка Ивана
 
 **[Перейти на сайт](https://gosioto.github.io)**  
-**[Скачать резюме](https://gosioto.github.io/cv.pdf)** *(скоро)*
+**[Скачать резюме](https://gosioto.github.io/cv.pdf)** **(не самое актуальное)**
 
 ---
 

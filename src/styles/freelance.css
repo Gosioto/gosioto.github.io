@@ -681,6 +681,7 @@
 .freelance-services-content {
   margin: 0 auto;
   padding: 0 2rem;
+  max-width: 1200px;
 }
 
 .section-header {
@@ -712,6 +713,7 @@
   padding: 1rem 0;
   scrollbar-width: thin;
   scrollbar-color: var(--freelance-black) var(--freelance-cream-dark);
+  scroll-snap-type: x mandatory;
 }
 
 .services-grid::-webkit-scrollbar {
@@ -740,6 +742,7 @@
   position: relative;
   min-width: 350px;
   flex-shrink: 0;
+  scroll-snap-align: start;
 }
 
 .service-card::before {
@@ -1567,9 +1570,15 @@
   .freelance-quick-actions {
     flex-direction: column;
   }
-  
+
   .services-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    overflow-x: visible;
+    padding: 0;
+  }
+
+  .service-card {
+    min-width: 100%;
   }
   
   .skills-container {

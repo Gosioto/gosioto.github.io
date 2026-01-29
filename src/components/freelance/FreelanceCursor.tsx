@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useLayoutEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 
 export default function FreelanceCursor() {
   const [cursorPosition, setCursorPosition] = useState({ x: 100, y: 100 });
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
   const [isButton, setIsButton] = useState(false);
-  const [isButtonText, setIsButtonText] = useState(false);
   const [isAvatar, setIsAvatar] = useState(false);
   const [isAnimatingToButton, setIsAnimatingToButton] = useState(false);
   
@@ -15,40 +14,22 @@ export default function FreelanceCursor() {
   const animationFrameId = useRef<number | null>(null);
   const lastUpdateTime = useRef(0);
   const pendingPosition = useRef({ x: 100, y: 100 });
-  const lastElementCheckTime = useRef(0);
-  const lastTouchElementCheckTime = useRef(0);
 
   // Инициализация курсора
-  useLayoutEffect(() => {
-    
-    // Оптимизированный обработчик движения мыши с throttling
+  useEffect(() => {
+    // Обработчик движения мыши с throttling
     const handleMouseMove = (e: MouseEvent) => {
-      // Сохраняем позицию для следующего обновления
       pendingPosition.current = { x: e.clientX, y: e.clientY };
       
-      // Оптимизированная проверка элементов - максимум 30 раз в секунду (33ms)
       const now = performance.now();
-      if (now - lastElementCheckTime.current >= 33) {
-        lastElementCheckTime.current = now;
-        
-        // Проверяем элемент под курсором
-        const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement;
-        if (target) {
-          // Используем ту же логику, что и для mouseover
-          handleMouseOver({ target } as unknown as MouseEvent);
-        }
-      }
-      
-      // Throttling для позиции: обновляем максимум 60 раз в секунду (16ms)
+      // Throttling для позиции: обновляем максимум ~60 раз в секунду (16ms)
       if (now - lastUpdateTime.current >= 16) {
         lastUpdateTime.current = now;
         
-        // Отменяем предыдущий кадр если он еще не выполнился
         if (animationFrameId.current) {
           cancelAnimationFrame(animationFrameId.current);
         }
         
-        // Используем requestAnimationFrame для плавного обновления
         animationFrameId.current = requestAnimationFrame(() => {
           setCursorPosition(pendingPosition.current);
           animationFrameId.current = null;
@@ -56,49 +37,8 @@ export default function FreelanceCursor() {
       }
     };
 
-    // Обработчик касаний для мобильных устройств
-    const handleTouchMove = (e: TouchEvent) => {
-      // НЕ предотвращаем скролл - позволяем пользователю скроллить
-      
-      if (e.touches.length > 0) {
-        const touch = e.touches[0];
-        // Сохраняем позицию для следующего обновления
-        pendingPosition.current = { x: touch.clientX, y: touch.clientY };
-        
-        // Оптимизированная проверка элементов для touch - максимум 60 раз в секунду (16ms)
-        const now = performance.now();
-        if (now - lastTouchElementCheckTime.current >= 16) {
-          lastTouchElementCheckTime.current = now;
-          
-          // Проверяем элемент под пальцем
-          const target = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
-          if (target) {
-            // Используем ту же логику, что и для mouseover
-            handleMouseOver({ target } as unknown as MouseEvent);
-          }
-        }
-        
-        // Throttling для позиции: обновляем максимум 60 раз в секунду (16ms)
-        if (now - lastUpdateTime.current >= 16) {
-          lastUpdateTime.current = now;
-          
-          // Отменяем предыдущий кадр если он еще не выполнился
-          if (animationFrameId.current) {
-            cancelAnimationFrame(animationFrameId.current);
-          }
-          
-          // Используем requestAnimationFrame для плавного обновления
-          animationFrameId.current = requestAnimationFrame(() => {
-            setCursorPosition(pendingPosition.current);
-            animationFrameId.current = null;
-          });
-        }
-      }
-    };
-    
-
-      // Оптимизированный обработчик hover (без throttling для мгновенного отклика)
-      const handleMouseOver = (e: MouseEvent) => {
+    // Обработчик hover (без throttling для мгновенного отклика)
+    const handleMouseOver = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
         
       
@@ -167,17 +107,7 @@ export default function FreelanceCursor() {
       
       // Проверяем, находится ли курсор над кнопкой (по всей площади)
       const isOverButton = isButtonElement || isInsideButton;
-      
-      // Проверяем, является ли элемент текстом внутри кнопки
-      // Текст внутри кнопки - это когда элемент внутри кнопки, но сам элемент не является кнопкой
-      // И это именно текстовые элементы (не иконки, не изображения)
-      const isButtonTextElement = isInsideButton && !isButtonElement && (
-        target.tagName === 'SPAN' || 
-        target.tagName === 'P' || 
-        target.nodeType === Node.TEXT_NODE ||
-        (target.tagName === 'DIV' && target.textContent && target.textContent.trim().length > 0)
-      );
-      
+
       // Проверяем, является ли элемент аватаром
       const isAvatarElement = target.classList.contains('profile-avatar') || 
                              target.closest('.profile-avatar');
@@ -191,17 +121,15 @@ export default function FreelanceCursor() {
                          hasPointerCursor || hasClickHandler || hasRoleButton || 
                          hasTabIndex || isFormElement;
       
-      // Приоритет состояний: аватар > кнопка (включая текст внутри) > обычный hover
+      // Приоритет состояний: аватар > кнопка > обычный hover
       if (isAvatarElement) {
         setIsAvatar(true);
         setIsButton(false);
-        setIsButtonText(false);
         setIsHovering(false);
       } else if (isOverButton) {
         // Если курсор над кнопкой (по всей площади) - показываем кнопку CLICK
         setIsAvatar(false);
         setIsButton(true);
-        setIsButtonText(false);
         setIsHovering(false);
         
         // Запускаем анимацию трансформации в кнопку
@@ -215,7 +143,6 @@ export default function FreelanceCursor() {
       } else {
         setIsAvatar(false);
         setIsButton(false);
-        setIsButtonText(false);
         setIsHovering(isClickable);
       }
     };
@@ -223,11 +150,10 @@ export default function FreelanceCursor() {
     const handleMouseOut = () => {
       setIsHovering(false);
       setIsButton(false);
-      setIsButtonText(false);
       setIsAvatar(false);
     };
     
-    // Обработчик касаний для определения элементов
+    // Обработчик касаний для определения элементов и начальной позиции
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length > 0) {
         const touch = e.touches[0];
@@ -244,12 +170,33 @@ export default function FreelanceCursor() {
       }
     };
 
+    // Обработчик касаний для обновления позиции (без elementFromPoint)
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        pendingPosition.current = { x: touch.clientX, y: touch.clientY };
+
+        const now = performance.now();
+        if (now - lastUpdateTime.current >= 16) {
+          lastUpdateTime.current = now;
+
+          if (animationFrameId.current) {
+            cancelAnimationFrame(animationFrameId.current);
+          }
+
+          animationFrameId.current = requestAnimationFrame(() => {
+            setCursorPosition(pendingPosition.current);
+            animationFrameId.current = null;
+          });
+        }
+      }
+    };
+
     // Обработчик окончания касания
     const handleTouchEnd = () => {
       // Сбрасываем все состояния при окончании касания
       setIsHovering(false);
       setIsButton(false);
-      setIsButtonText(false);
       setIsAvatar(false);
     };
 
@@ -310,6 +257,20 @@ export default function FreelanceCursor() {
     };
   }, []); // Empty dependency array to ensure handlers are added once
 
+  // Состояние клика мышью
+  useEffect(() => {
+    const handleMouseDown = () => setIsClicking(true);
+    const handleMouseUp = () => setIsClicking(false);
+
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
   // Оптимизированные стили курсора с единым центрированием
   const cursorStyles = useMemo(() => {
     // Единая точка центрирования - центр невидимого системного курсора
@@ -337,27 +298,6 @@ export default function FreelanceCursor() {
         letterSpacing: '0.5px',
         // transform управляется CSS
         transition: 'width 0.1s ease-out, height 0.1s ease-out 0.1s',
-        pointerEvents: 'none' as const,
-      };
-    } else if (isButtonText) {
-      // Стили для текста внутри кнопки - показываем круг, центрируем относительно центра курсора
-      const size = 40;
-      
-      return {
-        width: `${size}px`,
-        height: `${size}px`,
-        borderRadius: '50%',
-        left: `${centerX}px`, // Позиционируем по центру курсора
-        top: `${centerY}px`,   // Позиционируем по центру курсора
-        fontSize: 'inherit',
-        fontWeight: 'inherit',
-        display: 'block' as const,
-        alignItems: 'inherit',
-        justifyContent: 'inherit',
-        textTransform: 'inherit' as const,
-        letterSpacing: 'inherit',
-        // transform управляется CSS
-        transition: 'width 0.2s ease-out, height 0.2s ease-out, border-radius 0.2s ease-out',
         pointerEvents: 'none' as const,
       };
     } else if (isAvatar) {
@@ -404,12 +344,17 @@ export default function FreelanceCursor() {
         pointerEvents: 'none' as const,
       };
     }
-  }, [cursorPosition.x, cursorPosition.y, isHovering, isButton, isButtonText, isAvatar]);
+  }, [cursorPosition.x, cursorPosition.y, isHovering, isButton, isAvatar]);
 
   // Оптимизированные классы курсора
-  const cursorClasses = useMemo(() => 
-    `freelance-cursor ${isHovering && !isButton && !isButtonText ? 'hover' : ''} ${isClicking ? 'click' : ''} ${isButton ? 'button' : ''} ${isButtonText ? 'button-text' : ''} ${isAvatar ? 'avatar' : ''} ${isAnimatingToButton ? 'animating-to-button' : ''}`,
-    [isHovering, isClicking, isButton, isButtonText, isAvatar, isAnimatingToButton]
+  const cursorClasses = useMemo(
+    () =>
+      `freelance-cursor ${
+        isHovering && !isButton ? 'hover' : ''
+      } ${isClicking ? 'click' : ''} ${isButton ? 'button' : ''} ${
+        isAvatar ? 'avatar' : ''
+      } ${isAnimatingToButton ? 'animating-to-button' : ''}`,
+    [isHovering, isClicking, isButton, isAvatar, isAnimatingToButton]
   );
   
   return (
@@ -417,7 +362,7 @@ export default function FreelanceCursor() {
       className={cursorClasses}
       style={cursorStyles}
       data-debug="cursor-element"
-      data-states={`button:${isButton},text:${isButtonText},avatar:${isAvatar},hover:${isHovering}`}
+      data-states={`button:${isButton},avatar:${isAvatar},hover:${isHovering}`}
     >
       {isButton && 'CLICK'}
              {isAvatar && (

@@ -23,7 +23,7 @@ export default function FreelanceSkills() {
         { name: 'Python', level: 85, color: '#3776ab' },
         { name: 'PostgreSQL', level: 88, color: '#336791' },
         { name: 'MongoDB', level: 82, color: '#47a248' },
-        { name: 'Redis', level: 78, color: '#dc382d' }
+        { name: 'Rust', level: 55, color: '#dea584' }
       ]
     },
     {
