@@ -9,9 +9,6 @@
   background: var(--bg);
 }
 
-.statusBanner,
-.statusBannerOk,
-.statusBannerWarn,
 .statusBannerError {
   width: 100%;
   max-width: 360px;
@@ -19,27 +16,24 @@
   font-size: 0.8rem;
   line-height: 1.35;
   border-radius: 6px;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(180, 60, 60, 0.45);
   color: var(--text);
-}
-
-.statusBanner {
-  background: var(--surface2);
-}
-
-.statusBannerOk {
-  background: rgba(60, 140, 80, 0.15);
-  border-color: rgba(60, 140, 80, 0.45);
-}
-
-.statusBannerWarn {
-  background: rgba(200, 140, 60, 0.15);
-  border-color: rgba(200, 140, 60, 0.4);
-}
-
-.statusBannerError {
   background: rgba(180, 60, 60, 0.15);
-  border-color: rgba(180, 60, 60, 0.45);
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.apiOk {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3c8c50;
+  box-shadow: 0 0 0 2px rgba(60, 140, 80, 0.25);
+  flex-shrink: 0;
 }
 
 .card {

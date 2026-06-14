@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
-import { login, health } from '../api';
+import { login, health, HealthCheckError } from '../api';
 import { Button, useToast } from '../ui';
 import styles from './Login.module.css';
 
 type HealthState =
   | { kind: 'loading' }
-  | { kind: 'ready'; dbOk: boolean; overallOk: boolean }
+  | { kind: 'ready' }
   | { kind: 'error'; message: string };
 
 export default function Login() {
@@ -23,13 +23,12 @@ export default function Login() {
 
   const checkHealth = useCallback(async () => {
     try {
-      const data = await health();
-      const db = typeof data.database === 'string' ? data.database : 'unknown';
-      const dbOk = db === 'ok';
-      const overallOk = data.status === 'ok' && dbOk;
-      setApiHealth({ kind: 'ready', dbOk, overallOk });
-    } catch {
-      setApiHealth({ kind: 'error', message: 'Нет соединения' });
+      await health();
+      setApiHealth({ kind: 'ready' });
+    } catch (err) {
+      const message =
+        err instanceof HealthCheckError ? err.code : 'Нет соединения';
+      setApiHealth({ kind: 'error', message });
     }
   }, []);
 
@@ -58,33 +57,11 @@ export default function Login() {
 
   return (
     <div className={styles.wrap}>
-      <div
-        className={
-          apiHealth.kind === 'loading'
-            ? styles.statusBanner
-            : apiHealth.kind === 'error'
-              ? styles.statusBannerError
-              : apiHealth.kind === 'ready' && apiHealth.overallOk
-                ? styles.statusBannerOk
-                : styles.statusBannerWarn
-        }
-        role="status"
-      >
-        {apiHealth.kind === 'loading' && <span>API: проверка…</span>}
-        {apiHealth.kind === 'error' && (
-          <span>API: недоступен ({apiHealth.message}). Запустите бэкенд и PostgreSQL.</span>
-        )}
-        {apiHealth.kind === 'ready' && apiHealth.overallOk && (
-          <span>API и база данных: в порядке</span>
-        )}
-        {apiHealth.kind === 'ready' && !apiHealth.overallOk && (
-          <span>
-            {apiHealth.dbOk
-              ? 'Сервис работает с ограничениями (проверьте ответ /health).'
-              : 'База данных недоступна — поднимите PostgreSQL и выполните миграции.'}
-          </span>
-        )}
-      </div>
+      {apiHealth.kind === 'error' && (
+        <div className={styles.statusBannerError} role="status">
+          API: недоступен, ошибка ({apiHealth.message})
+        </div>
+      )}
       <div className={styles.card}>
         {step === 1 ? (
           <form
@@ -95,7 +72,16 @@ export default function Login() {
             }}
           >
             <label className={styles.field}>
-              <span className={styles.fieldLabel}>Логин</span>
+              <span className={styles.labelRow}>
+                <span className={styles.fieldLabel}>Логин</span>
+                {apiHealth.kind === 'ready' && (
+                  <span
+                    className={styles.apiOk}
+                    title="API доступен"
+                    aria-label="API доступен"
+                  />
+                )}
+              </span>
               <input
                 type="text"
                 value={email}

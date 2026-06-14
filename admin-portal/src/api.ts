@@ -123,9 +123,24 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   return res.json();
 }
 
+export class HealthCheckError extends Error {
+  readonly code: string;
+
+  constructor(code: string) {
+    super(code);
+    this.name = 'HealthCheckError';
+    this.code = code;
+  }
+}
+
 export async function health(): Promise<{ status: string; database?: string }> {
-  const res = await fetch(healthUrl());
-  if (!res.ok) throw new Error('API unavailable');
+  let res: Response;
+  try {
+    res = await fetch(healthUrl());
+  } catch {
+    throw new HealthCheckError('Нет соединения');
+  }
+  if (!res.ok) throw new HealthCheckError(String(res.status));
   return res.json();
 }
 
