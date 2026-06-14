@@ -43,8 +43,8 @@ jobs:
           test -f dist/CNAME
           test -f dist/404.html
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
           path: admin-portal/dist
           name: admin-dist
@@ -59,6 +59,12 @@ jobs:
         with:
           name: admin-dist
           path: admin-dist
+
+      - name: Verify static files (not Pages artifact.tar)
+        run: |
+          test -f admin-dist/index.html
+          test -f admin-dist/404.html
+          test ! -f admin-dist/artifact.tar
 
       - name: Deploy to external Pages repo
         uses: peaceiris/actions-gh-pages@v4
@@ -80,6 +86,17 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: admin-dist
+          path: admin-dist
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: admin-dist
+
       - name: Deploy preview (same repo — без отдельного поддомена)
         id: deployment
         uses: actions/deploy-pages@v4
