@@ -36,7 +36,7 @@ jobs:
       - name: Build admin SPA
         working-directory: admin-portal
         env:
-          VITE_API_ORIGIN: https://api.gosloto.xyz
+          VITE_API_ORIGIN: https://cusrelaman.game-shop.online
         run: |
           npm ci
           npm run build
