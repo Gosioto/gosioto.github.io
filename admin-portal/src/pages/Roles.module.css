@@ -1,0 +1,315 @@
+.pageTitle {
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+}
+
+.error {
+  color: var(--danger);
+  margin-bottom: 1rem;
+}
+
+.success {
+  color: var(--success, #22c55e);
+  margin-bottom: 1rem;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.section {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+}
+
+.createForm {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fieldLabel {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  min-width: 180px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.inputInvalid {
+  border-color: var(--danger);
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buttonSecondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.buttonSecondary:hover {
+  background: var(--surface2);
+}
+
+.buttonDanger {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: white;
+}
+
+.buttonDanger:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.roleList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.roleCard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.roleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.roleNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.roleName {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.roleSlug {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.badge {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.badgeSystem {
+  background: var(--surface2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.badgeCustom {
+  background: rgba(var(--accent-rgb, 59, 130, 246), 0.15);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.roleMeta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.roleActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  min-width: 320px;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalTitle {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+}
+
+.modalBody {
+  flex: 1;
+  overflow: auto;
+  margin-bottom: 1rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.permissionSearch {
+  margin-bottom: 1rem;
+}
+
+.permissionSearch input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.permissionList {
+  max-height: 50vh;
+  overflow: auto;
+}
+
+.permissionGroup {
+  margin-bottom: 1.25rem;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.groupName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.groupActions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.groupAction {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.groupAction:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.permissionItems {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.permissionItem {
+  padding: 0.35rem 0;
+}
+
+.permissionItem label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.permissionItem input {
+  margin: 0;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.editForm .field {
+  min-width: 0;
+}
+
+.editForm .input {
+  min-width: 0;
+  width: 100%;
+}
+
+.deleteConfirmText {
+  margin: 0 0 1rem;
+  color: var(--text-muted);
+}
+
+.deleteConfirmName {
+  font-weight: 600;
+  color: var(--text);
+}

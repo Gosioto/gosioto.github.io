@@ -1,0 +1,25 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.wrapCompact {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.iconMuted {
+  display: inline-flex;
+  color: var(--danger, #ef4444);
+  opacity: 0.95;
+}
+
+.iconOn {
+  display: inline-flex;
+  color: var(--success, #22c55e);
+  opacity: 0.9;
+}

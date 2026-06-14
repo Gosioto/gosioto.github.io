@@ -86,4 +86,9 @@ npm run lint
 
 ## Репозиторий
 
-`https://github.com/Gosioto/Gosloto-site.git`
+`https://github.com/Gosioto/gosioto.github.io`
+
+### Ветка `admin_branch`
+
+Админ-панель GOSLOTO (React) для **admin.gosloto.xyz**.  
+Инструкция: [ADMIN-DEPLOY.md](ADMIN-DEPLOY.md)

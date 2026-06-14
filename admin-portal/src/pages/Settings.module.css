@@ -1,0 +1,103 @@
+.pageTitle {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+}
+
+.error {
+  color: var(--danger);
+  margin-bottom: 1rem;
+}
+
+.success {
+  color: var(--success, #22c55e);
+  margin-bottom: 1rem;
+}
+
+.section {
+  margin-top: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+.sectionDesc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.nameForm {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.nameForm .input {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.avatarBlock {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.avatarBlock .avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatarActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.fileInput {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buttonDanger:hover:not(:disabled) {
+  background: var(--danger);
+  border-color: var(--danger);
+}

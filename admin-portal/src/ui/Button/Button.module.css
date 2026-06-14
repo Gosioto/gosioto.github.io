@@ -1,0 +1,56 @@
+.primary {
+  background: var(--accent, #00d4aa);
+  color: #0a0b0f;
+  border: none;
+  border-radius: var(--ui-radius, 12px);
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 212, 170, 0.25);
+}
+
+.primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--ui-radius, 12px);
+  padding: 12px 20px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.ghost:hover:not(:disabled) {
+  border-color: var(--ui-border-hover);
+  color: var(--text);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.spring {
+  animation: spring 0.3s ease-out;
+}
+
+@keyframes spring {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

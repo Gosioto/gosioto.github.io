@@ -1,0 +1,537 @@
+/* ========== Полигонный минимализм: переменные ========== */
+.wrap {
+  --bg: #0c0d10;
+  --surface: #14161c;
+  --surface2: #1a1d26;
+  --border: #2a2e3a;
+  --text: #e6e8ec;
+  --textMuted: #7a7f8c;
+  --accent: #00d4ff;
+  --accentDim: #00a8cc;
+  --fontDisplay: 'Syne', system-ui, sans-serif;
+  --fontMono: 'JetBrains Mono', monospace;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--fontDisplay);
+}
+
+/* ========== Header ========== */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: rgba(12, 13, 16, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.link {
+  color: var(--textMuted);
+  font-size: 0.9rem;
+  font-family: var(--fontMono);
+}
+
+.link:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.cta {
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.cta:hover {
+  background: var(--accentDim);
+  color: var(--bg);
+  text-decoration: none;
+}
+
+.muted {
+  color: var(--textMuted);
+  font-size: 0.85rem;
+  font-family: var(--fontMono);
+}
+
+/* ========== Hero + полигоны ========== */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 1.5rem 4rem;
+  overflow: hidden;
+}
+
+.heroBg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.polygon {
+  position: absolute;
+  border: 1px solid var(--border);
+  opacity: 0.4;
+  animation: polygonFloat 14s ease-in-out infinite;
+}
+
+.polygon[data-polygon="1"] {
+  width: 280px;
+  height: 280px;
+  top: 10%;
+  left: 5%;
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  animation-delay: 0s;
+}
+
+.polygon[data-polygon="2"] {
+  width: 180px;
+  height: 180px;
+  bottom: 20%;
+  right: 10%;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  animation-delay: -4s;
+}
+
+.polygon[data-polygon="3"] {
+  width: 120px;
+  height: 120px;
+  top: 50%;
+  right: 25%;
+  clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+  animation-delay: -8s;
+}
+
+@keyframes polygonFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.35; }
+  33% { transform: translate(15px, -20px) rotate(5deg); opacity: 0.5; }
+  66% { transform: translate(-10px, 15px) rotate(-3deg); opacity: 0.4; }
+}
+
+.title {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 1rem;
+  font-size: clamp(2.5rem, 10vw, 5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.titleLine {
+  display: block;
+  animation: titleReveal 1s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.titleLine:nth-child(1) { animation-delay: 0.15s; }
+.titleLine:nth-child(2) {
+  color: var(--accent);
+  animation-delay: 0.35s;
+}
+
+@keyframes titleReveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.2em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.subtitle {
+  position: relative;
+  z-index: 1;
+  max-width: 32ch;
+  margin: 0 0 1.5rem;
+  font-size: 1.05rem;
+  color: var(--textMuted);
+  text-align: center;
+  animation: titleReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.5s backwards;
+}
+
+.badge {
+  position: relative;
+  z-index: 1;
+  font-family: var(--fontMono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  margin: 0 0 1rem;
+  animation: titleReveal 0.6s 0.7s backwards;
+}
+
+.badgeError {
+  position: relative;
+  z-index: 1;
+  font-family: var(--fontMono);
+  font-size: 0.8rem;
+  color: #ff6b6b;
+  margin: 0 0 1rem;
+  animation: titleReveal 0.6s 0.7s backwards;
+}
+
+.actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 1rem;
+  animation: titleReveal 0.7s 0.85s backwards;
+}
+
+.button {
+  padding: 0.9rem 1.75rem;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 0.95rem;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.35);
+  color: var(--bg);
+  text-decoration: none;
+}
+
+.buttonSecondary {
+  padding: 0.9rem 1.75rem;
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--border);
+  font-weight: 700;
+  font-size: 0.95rem;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.buttonSecondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ========== Секции: общее + видимость ========== */
+.section {
+  padding: 5rem 2rem;
+  opacity: 0;
+  transform: translateY(48px);
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sectionDark {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.sectionInner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  margin: 0 0 2.5rem;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--text);
+}
+
+.sectionTitle::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 3px;
+  margin: 0.75rem auto 0;
+  background: var(--accent);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+}
+
+.section.visible .sectionTitle::after {
+  transform: scaleX(1);
+}
+
+/* ========== Манифест (стиль Пентагона) ========== */
+.manifestGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.manifestCard {
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.manifestCard:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+}
+
+.section.visible .manifestCard {
+  animation: cardReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.section.visible .manifestCard:nth-child(1) { animation-delay: 0.1s; }
+.section.visible .manifestCard:nth-child(2) { animation-delay: 0.25s; }
+.section.visible .manifestCard:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.manifestLabel {
+  display: block;
+  font-family: var(--fontMono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.manifestValue {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--textMuted);
+}
+
+.manifestValue strong {
+  color: var(--text);
+}
+
+.manifestFootnote {
+  text-align: center;
+  font-family: var(--fontMono);
+  font-size: 0.85rem;
+  color: var(--textMuted);
+  margin: 0;
+}
+
+/* ========== Поле + название (формат Пентагона) ========== */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fieldLabel {
+  font-family: var(--fontMono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--textMuted);
+}
+
+.fieldValue {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem 2rem;
+}
+
+/* ========== Навыки — полигоны ========== */
+.skillsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.skillPolygon {
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  opacity: 0;
+  transform: scale(0.85);
+}
+
+.section.visible .skillPolygon {
+  animation: skillReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.skillPolygon:hover {
+  border-color: var(--accent);
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.15);
+}
+
+.skillLabel {
+  font-family: var(--fontMono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--textMuted);
+}
+
+.skillValue {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+@keyframes skillReveal {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========== Проекты ========== */
+.projectsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.projectCard {
+  padding: 1.5rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.projectCard:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+}
+
+/* ========== Блок авторизации ========== */
+.authDesc {
+  text-align: center;
+  color: var(--textMuted);
+  font-size: 0.95rem;
+  margin: 0 0 2rem;
+}
+
+.authLinks {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.authCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 2rem 3rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.authCard:hover {
+  border-color: var(--accent);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(0, 212, 255, 0.12);
+  text-decoration: none;
+  color: inherit;
+}
+
+.authCardLabel {
+  font-family: var(--fontMono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--textMuted);
+}
+
+.authCardValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* ========== Footer ========== */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.footerLogo {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .hero { padding: 5rem 1rem 3rem; }
+  .section { padding: 3.5rem 1rem; }
+  .fieldsGrid { grid-template-columns: 1fr 1fr; }
+  .skillsGrid { grid-template-columns: repeat(2, 1fr); }
+  .footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+}

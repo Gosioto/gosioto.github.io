@@ -1,0 +1,331 @@
+.usersPage {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 0.25rem 2rem;
+}
+
+.pageTitle {
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+}
+
+.error {
+  color: var(--danger);
+  margin-bottom: 1rem;
+}
+
+.success {
+  color: var(--success, #22c55e);
+  margin-bottom: 1rem;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.section {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+}
+
+.userList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.userCard {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+@media (min-width: 720px) {
+  .userCard {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+  }
+}
+
+.userCardMain {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.userCardActions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 720px) {
+  .userCardActions {
+    align-items: flex-end;
+    max-width: min(100%, 420px);
+  }
+}
+
+.userAvatarWrap {
+  flex-shrink: 0;
+}
+
+.userAvatarWrap .userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatarActions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.buttonSmall {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.buttonSmall:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.buttonSmall.buttonDanger:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.userEmail {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.userName {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.userMeta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.roleLabel {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.roleSelect {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  min-width: 180px;
+  font-size: 0.9rem;
+}
+
+.roleSelect:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--surface2);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buttonDanger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.buttonDanger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.loadingHint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+/* Create user form */
+.createSection {
+  margin-bottom: 2rem;
+}
+
+.createForm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+@media (max-width: 479px) {
+  .createForm {
+    grid-template-columns: 1fr;
+  }
+}
+
+.createForm .buttonPrimary {
+  justify-self: start;
+}
+
+@media (min-width: 640px) {
+  .createForm .buttonPrimary {
+    justify-self: stretch;
+    grid-column: 1 / -1;
+    max-width: 200px;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fieldLabel {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  min-width: 160px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.buttonPrimary {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.buttonPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Modals */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  min-width: 320px;
+  max-width: 90vw;
+}
+
+.modalTitle {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modalForm .field {
+  min-width: 0;
+}
+
+.modalForm .input {
+  width: 100%;
+  min-width: 0;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

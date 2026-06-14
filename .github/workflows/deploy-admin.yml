@@ -1,0 +1,85 @@
+# Admin SPA (GOSLOTO) → GitHub Pages на поддомене admin.gosloto.xyz
+#
+# Важно: у одного репозитория GitHub Pages — один кастомный домен.
+# main → gosloto.xyz (deploy.yml), admin → admin.gosloto.xyz (этот workflow).
+# Деплой идёт во второй репозиторий Gosioto/gosloto-admin (см. ADMIN-DEPLOY.md).
+
+name: Deploy admin (admin.gosloto.xyz)
+
+on:
+  push:
+    branches: [admin_branch]
+    paths:
+      - 'admin-portal/**'
+      - '.github/workflows/deploy-admin.yml'
+      - 'ADMIN-DEPLOY.md'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-admin-gosloto
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: admin-portal/package-lock.json
+
+      - name: Build admin SPA
+        working-directory: admin-portal
+        env:
+          VITE_API_ORIGIN: https://api.gosloto.xyz
+        run: |
+          npm ci
+          npm run build
+          test -f dist/CNAME
+          test -f dist/404.html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: admin-portal/dist
+          name: admin-dist
+
+  deploy-external:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ vars.ADMIN_PAGES_REPO != '' }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: admin-dist
+          path: admin-dist
+
+      - name: Deploy to external Pages repo
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.ADMIN_DEPLOY_TOKEN }}
+          external_repository: ${{ vars.ADMIN_PAGES_REPO }}
+          publish_branch: main
+          publish_dir: admin-dist
+          cname: admin.gosloto.xyz
+
+  deploy-same-repo-preview:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ vars.ADMIN_PAGES_REPO == '' }}
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy preview (same repo — без отдельного поддомена)
+        id: deployment
+        uses: actions/deploy-pages@v4

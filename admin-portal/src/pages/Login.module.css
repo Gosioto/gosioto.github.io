@@ -1,0 +1,136 @@
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+  background: var(--bg);
+}
+
+.statusBanner,
+.statusBannerOk,
+.statusBannerWarn,
+.statusBannerError {
+  width: 100%;
+  max-width: 360px;
+  padding: 0.65rem 1rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.statusBanner {
+  background: var(--surface2);
+}
+
+.statusBannerOk {
+  background: rgba(60, 140, 80, 0.15);
+  border-color: rgba(60, 140, 80, 0.45);
+}
+
+.statusBannerWarn {
+  background: rgba(200, 140, 60, 0.15);
+  border-color: rgba(200, 140, 60, 0.4);
+}
+
+.statusBannerError {
+  background: rgba(180, 60, 60, 0.15);
+  border-color: rgba(180, 60, 60, 0.45);
+}
+
+.card {
+  width: 100%;
+  max-width: 360px;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fieldLabel {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.input {
+  padding: 0.7rem 0.9rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.button {
+  padding: 0.75rem 1rem;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.back {
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  font-family: inherit;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  cursor: pointer;
+}
+
+.back:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}

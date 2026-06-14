@@ -1,0 +1,103 @@
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(120%);
+  animation: slideUp 0.45s cubic-bezier(0.68, -0.55, 0.265, 1.35) forwards;
+  min-width: 280px;
+  max-width: min(420px, 92vw);
+  border-radius: var(--ui-radius-lg, 18px);
+  background: var(--ui-surface, #1a1a1e);
+  border: 1px solid var(--ui-border);
+  padding: 16px 40px 16px 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  z-index: 10000;
+  overflow: hidden;
+}
+
+.success {
+  border-color: rgba(0, 212, 170, 0.35);
+}
+
+.error {
+  border-color: rgba(255, 107, 107, 0.45);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-weight: 600;
+  color: var(--ui-text);
+  font-size: 15px;
+}
+
+.message {
+  font-size: 13px;
+  color: var(--ui-text-muted);
+}
+
+.close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--ui-text-faint);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.close:hover {
+  color: var(--ui-text);
+}
+
+.progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--ui-border);
+  animation: shrink 4s linear forwards;
+}
+
+.success .progress {
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+
+.error .progress {
+  background: linear-gradient(90deg, var(--danger, #ff6b6b), transparent);
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+:global(.toast-stack) {
+  pointer-events: none;
+}
+
+:global(.toast-stack) .toast {
+  pointer-events: auto;
+}
+
+:global(.toast-stack) .toast:not(:last-child) {
+  display: none;
+}
