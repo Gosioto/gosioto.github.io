@@ -6,6 +6,7 @@ https://github.com/Gosioto/gosloto-admin.git
 
 # http://localhost:5173
 
-## Учётные данные (dev)
+Учётные данные (dev) - локально
 
 - `admin@localhost` / `AdminPass123` — только локально после `seed-users.ps1`
+
