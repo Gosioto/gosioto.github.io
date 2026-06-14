@@ -6,3 +6,19 @@ seo-audit-report-g0sl0t0.github.io-2025-08-03.xlsx
 /.next/static
 /out
 /src/test-task
+
+# Environment (admin-portal/.env.production tracked intentionally for CI)
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+dist/
+coverage/
+*.tsbuildinfo
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

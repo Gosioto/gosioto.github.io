@@ -1,21 +1,32 @@
 .usersPage {
-  max-width: 960px;
+  width: 100%;
   margin: 0 auto;
   padding: 0 0.25rem 2rem;
 }
 
+.pageTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
 .pageTitle {
-  margin: 0 0 1.5rem;
+  margin: 0;
   font-size: 1.5rem;
+}
+
+.addBtn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.75rem !important;
+  min-width: 2.5rem;
 }
 
 .error {
   color: var(--danger);
-  margin-bottom: 1rem;
-}
-
-.success {
-  color: var(--success, #22c55e);
   margin-bottom: 1rem;
 }
 
@@ -32,10 +43,56 @@
   margin: 0 0 1rem;
 }
 
-.userList {
+.tableWrap {
+  display: block;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface2);
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tableUserCell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.tableActionsCell {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  min-width: 120px;
+}
+
+.mobileCards {
+  display: none;
 }
 
 .userCard {
@@ -47,15 +104,6 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-}
-
-@media (min-width: 720px) {
-  .userCard {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1.25rem;
-  }
 }
 
 .userCardMain {
@@ -75,55 +123,83 @@
   flex-shrink: 0;
 }
 
-@media (min-width: 720px) {
-  .userCardActions {
-    align-items: flex-end;
-    max-width: min(100%, 420px);
-  }
-}
-
-.userAvatarWrap {
+.avatarContainer {
+  position: relative;
   flex-shrink: 0;
 }
 
-.userAvatarWrap .userAvatar {
-  width: 40px;
-  height: 40px;
+.avatarClick {
+  display: block;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  line-height: 0;
+}
+
+.avatarClick:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.userAvatar {
   border-radius: 50%;
   object-fit: cover;
 }
 
-.avatarActions {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-}
-
-.buttonSmall {
-  padding: 0.35rem 0.6rem;
-  font-size: 0.8rem;
-  border-radius: 4px;
-  border: 1px solid var(--border);
+.avatarOverlayBtn {
+  position: absolute;
+  bottom: -2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
   background: var(--surface2);
   color: var(--text);
   cursor: pointer;
+  z-index: 1;
+  transition: background 0.15s, color 0.15s;
 }
 
-.buttonSmall:hover {
+.avatarOverlayBtn:hover:not(:disabled) {
   background: var(--accent);
-  color: white;
-  border-color: var(--accent);
+  color: #0a0b0f;
 }
 
-.buttonSmall.buttonDanger:hover {
+.avatarOverlayBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.avatarOverlayReplace {
+  left: -2px;
+}
+
+.avatarOverlayDelete {
+  right: -2px;
+  color: var(--danger);
+}
+
+.avatarOverlayDelete:hover:not(:disabled) {
   background: var(--danger);
-  border-color: var(--danger);
+  color: #fff;
+}
+
+.buttonCompact {
+  padding: 0.35rem 0.75rem !important;
+  font-size: 0.8125rem !important;
 }
 
 .userInfo {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  min-width: 0;
 }
 
 .userEmail {
@@ -131,9 +207,34 @@
   font-size: 1rem;
 }
 
+.userNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
 .userName {
   font-size: 0.9rem;
   color: var(--text-muted);
+}
+
+.nameEditBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nameEditBtn:hover {
+  color: var(--accent);
+  background: var(--surface2);
 }
 
 .userMeta {
@@ -147,46 +248,46 @@
 }
 
 .roleSelect {
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  min-width: 180px;
-  font-size: 0.9rem;
+  min-width: 160px;
 }
 
-.roleSelect:focus {
-  outline: none;
-  border-color: var(--accent);
+.roleControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.button {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+.roleTrashBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
   border: 1px solid var(--border);
+  border-radius: 6px;
   background: transparent;
-  color: var(--text);
+  color: var(--danger);
   cursor: pointer;
-  font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
-.button:hover:not(:disabled) {
-  background: var(--surface2);
+.roleTrashBtn:hover:not(:disabled) {
+  background: rgba(220, 53, 69, 0.12);
+  border-color: var(--danger);
 }
 
-.button:disabled {
-  opacity: 0.6;
+.roleTrashBtn:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-.buttonDanger {
-  border-color: var(--danger);
-  color: var(--danger);
-}
-
-.buttonDanger:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.1);
+.userActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .loadingHint {
@@ -201,36 +302,6 @@
   background: var(--surface);
   border: 1px dashed var(--border);
   border-radius: var(--radius);
-}
-
-/* Create user form */
-.createSection {
-  margin-bottom: 2rem;
-}
-
-.createForm {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  align-items: end;
-}
-
-@media (max-width: 479px) {
-  .createForm {
-    grid-template-columns: 1fr;
-  }
-}
-
-.createForm .buttonPrimary {
-  justify-self: start;
-}
-
-@media (min-width: 640px) {
-  .createForm .buttonPrimary {
-    justify-self: stretch;
-    grid-column: 1 / -1;
-    max-width: 200px;
-  }
 }
 
 .field {
@@ -258,25 +329,6 @@
   border-color: var(--accent);
 }
 
-.buttonPrimary {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: white;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.buttonPrimary:hover:not(:disabled) {
-  filter: brightness(1.05);
-}
-
-.buttonPrimary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .cardActions {
   display: flex;
   align-items: center;
@@ -284,7 +336,6 @@
   flex-wrap: wrap;
 }
 
-/* Modals */
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -328,4 +379,17 @@
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .tableWrap {
+    display: none;
+  }
+
+  .mobileCards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
 }

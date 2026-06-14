@@ -1,0 +1,17 @@
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg);
+}
+
+.main {
+  flex: 1;
+  padding: 2rem;
+  overflow: auto;
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding-bottom: 72px;
+  }
+}

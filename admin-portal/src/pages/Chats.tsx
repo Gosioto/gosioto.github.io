@@ -1,60 +1,62 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { getChats, createChat, getChatAvailableUsers, type Chat, type ChatAvailableUser } from '../api';
+import { CHAT_UNREAD_EVENT, useChatUnread } from '../context/ChatUnreadContext';
+import { formatDisplayName } from '../utils/displayName';
 import Avatar from '../components/Avatar';
+import ChatAvatar from '../components/ChatAvatar';
 import UserSettingsModal from '../components/UserSettingsModal';
+import { Badge, Button, UserSearchCombobox, IconUsers } from '../ui';
 import styles from './Chats.module.css';
+
+const POLL_MS = 20_000;
 
 export default function Chats() {
   const navigate = useNavigate();
   const { user: me } = useAuth();
+  const { refresh: refreshUnread } = useChatUnread();
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [modal, setModal] = useState<'personal' | 'group' | null>(null);
+  const [newChatOpen, setNewChatOpen] = useState(false);
   const [users, setUsers] = useState<ChatAvailableUser[]>([]);
   const [selectedUserId, setSelectedUserId] = useState('');
-  const [groupName, setGroupName] = useState('');
-  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
   const [creating, setCreating] = useState(false);
   const [userSettingsUser, setUserSettingsUser] = useState<{ id: string; name: string | null; email: string } | null>(null);
 
-  useEffect(() => {
-    getChats()
-      .then(setChats)
-      .catch(() => setError('Не удалось загрузить чаты'))
-      .finally(() => setLoading(false));
+  const loadChats = useCallback(async () => {
+    try {
+      const list = await getChats();
+      setChats(list);
+    } catch {
+      setError('Не удалось загрузить чаты');
+    }
   }, []);
 
   useEffect(() => {
-    if (modal === 'personal' || modal === 'group') {
+    loadChats().finally(() => setLoading(false));
+    const intervalId = window.setInterval(() => void loadChats(), POLL_MS);
+    const onUnread = () => void loadChats();
+    window.addEventListener(CHAT_UNREAD_EVENT, onUnread);
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener(CHAT_UNREAD_EVENT, onUnread);
+    };
+  }, [loadChats]);
+
+  useEffect(() => {
+    if (newChatOpen) {
       getChatAvailableUsers()
         .then(setUsers)
         .catch(() => {});
     }
-  }, [modal]);
+  }, [newChatOpen]);
 
-  function openPersonal() {
-    setModal('personal');
+  function openNewChat() {
+    setNewChatOpen(true);
     setSelectedUserId('');
     setError('');
-  }
-
-  function openGroup() {
-    setModal('group');
-    setGroupName('');
-    setSelectedUserIds(new Set());
-    setError('');
-  }
-
-  function toggleGroupUser(id: string) {
-    setSelectedUserIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
   }
 
   function handleCreatePersonal(e: React.FormEvent) {
@@ -68,26 +70,8 @@ export default function Chats() {
     createChat({ type: 'personal', user_id: selectedUserId })
       .then((chat) => {
         setChats((prev) => [chat, ...prev]);
-        setModal(null);
-        navigate(`/dashboard/chats/${chat.id}`);
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'))
-      .finally(() => setCreating(false));
-  }
-
-  function handleCreateGroup(e: React.FormEvent) {
-    e.preventDefault();
-    const name = groupName.trim() || 'Без названия';
-    setCreating(true);
-    setError('');
-    createChat({
-      type: 'group',
-      name,
-      participant_ids: Array.from(selectedUserIds),
-    })
-      .then((chat) => {
-        setChats((prev) => [chat, ...prev]);
-        setModal(null);
+        setNewChatOpen(false);
+        void refreshUnread();
         navigate(`/dashboard/chats/${chat.id}`);
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'))
@@ -97,7 +81,7 @@ export default function Chats() {
   function chatDisplayName(chat: Chat): string {
     if (chat.type === 'group' && chat.name) return chat.name;
     const other = chat.participants.find((p) => p.user_id !== me?.id);
-    return other ? other.email : 'Чат';
+    return other ? formatDisplayName(other.name, other.email) : 'Чат';
   }
 
   function otherParticipant(chat: Chat) {
@@ -106,7 +90,7 @@ export default function Chats() {
 
   function formatLastMessage(preview: Chat['last_message']): string {
     if (!preview) return '';
-    const name = preview.sender_name || preview.sender_email;
+    const name = formatDisplayName(preview.sender_name, preview.sender_email);
     const maxMsgLen = 25;
     const msg = preview.content_preview.length > maxMsgLen
       ? preview.content_preview.slice(0, maxMsgLen - 3) + '...'
@@ -114,32 +98,36 @@ export default function Chats() {
     return `${name}: ${msg}`;
   }
 
+  const comboboxUsers = users.filter((u) => u.id !== me?.id);
+
   if (loading) return <p style={{ color: 'var(--text-muted)' }}>Загрузка…</p>;
 
   return (
     <>
       <h1 className={styles.pageTitle}>Чатик*с</h1>
-      {error && <p className={styles.error}>{error}</p>}
+      {error && !newChatOpen && <p className={styles.error}>{error}</p>}
 
       <div className={styles.toolbar}>
-        <button type="button" className={styles.button} onClick={openPersonal}>
+        <Button type="button" onClick={openNewChat}>
           Личный чат
-        </button>
-        <button type="button" className={`${styles.button} ${styles.buttonSecondary}`} onClick={openGroup}>
-          Групповой чат
-        </button>
+        </Button>
       </div>
 
       {chats.length === 0 ? (
         <div className={styles.empty}>
-          Нет чатов. Создайте личный или групповой чат.
+          Нет чатов. Создайте личный чат через поиск пользователя.
         </div>
       ) : (
         <div className={styles.chatList}>
           {chats.map((chat) => {
             const other = otherParticipant(chat);
+            const unread = chat.unread_count ?? 0;
             return (
-              <Link key={chat.id} to={`/dashboard/chats/${chat.id}`} className={styles.chatItem}>
+              <Link
+                key={chat.id}
+                to={`/dashboard/chats/${chat.id}`}
+                className={`${styles.chatItem} ${unread > 0 ? styles.chatItemUnread : ''}`}
+              >
                 <div
                   className={styles.chatItemAvatar}
                   role="button"
@@ -164,6 +152,13 @@ export default function Chats() {
                     <Avatar
                       userId={other.user_id}
                       fallbackLetter={other.name?.[0] || other.email[0]}
+                      size={44}
+                      className={styles.avatar}
+                    />
+                  ) : chat.has_avatar ? (
+                    <ChatAvatar
+                      chatId={chat.id}
+                      fallbackLetter={chatDisplayName(chat)[0]}
                       size={44}
                       className={styles.avatar}
                     />
@@ -199,7 +194,13 @@ export default function Chats() {
                   )}
                 </div>
                 <div className={styles.chatItemBody}>
-                  <div className={styles.chatName}>{chatDisplayName(chat)}</div>
+                  <div className={styles.chatNameRow}>
+                    {chat.type === 'group' ? (
+                      <IconUsers size={16} className={styles.chatGroupIcon} aria-hidden />
+                    ) : null}
+                    <span className={styles.chatName}>{chatDisplayName(chat)}</span>
+                    <Badge count={unread} />
+                  </div>
                   {chat.type === 'group' && (
                     <div className={styles.chatMeta}>
                       Группа · {chat.participants.length} участн.
@@ -217,33 +218,28 @@ export default function Chats() {
         </div>
       )}
 
-      {modal === 'personal' && (
-        <div className={styles.modalOverlay} onClick={() => setModal(null)}>
+      {newChatOpen && (
+        <div className={styles.modalOverlay} onClick={() => setNewChatOpen(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h2 className={styles.modalTitle}>Новый личный чат</h2>
+            {error && <p className={styles.error}>{error}</p>}
             <form onSubmit={handleCreatePersonal}>
               <div className={styles.field}>
                 <label className={styles.fieldLabel}>Пользователь</label>
-                <select
-                  className={styles.input}
+                <UserSearchCombobox
+                  users={comboboxUsers}
                   value={selectedUserId}
-                  onChange={(e) => setSelectedUserId(e.target.value)}
-                >
-                  <option value="">— Выберите —</option>
-                  {users.filter((u) => u.id !== me?.id).map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.email} {u.name ? `(${u.name})` : ''}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setSelectedUserId}
+                  disabled={creating}
+                />
               </div>
               <div className={styles.modalActions}>
-                <button type="submit" className={styles.button} disabled={creating}>
+                <Button type="submit" disabled={creating}>
                   Создать
-                </button>
-                <button type="button" className={styles.buttonSecondary} onClick={() => setModal(null)}>
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setNewChatOpen(false)}>
                   Отмена
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -257,49 +253,6 @@ export default function Chats() {
           userEmail={userSettingsUser.email}
           onClose={() => setUserSettingsUser(null)}
         />
-      )}
-
-      {modal === 'group' && (
-        <div className={styles.modalOverlay} onClick={() => setModal(null)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2 className={styles.modalTitle}>Новый групповой чат</h2>
-            <form onSubmit={handleCreateGroup}>
-              <div className={styles.field}>
-                <label className={styles.fieldLabel}>Название группы</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
-                  placeholder="Без названия"
-                />
-              </div>
-              <div className={styles.field}>
-                <span className={styles.sectionTitle}>Добавить участников</span>
-                <div className={styles.userList}>
-                  {users.filter((u) => u.id !== me?.id).map((u) => (
-                    <label key={u.id} className={styles.userOption}>
-                      <input
-                        type="checkbox"
-                        checked={selectedUserIds.has(u.id)}
-                        onChange={() => toggleGroupUser(u.id)}
-                      />
-                      {u.email} {u.name ? `(${u.name})` : ''}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div className={styles.modalActions}>
-                <button type="submit" className={styles.button} disabled={creating}>
-                  Создать
-                </button>
-                <button type="button" className={styles.buttonSecondary} onClick={() => setModal(null)}>
-                  Отмена
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
       )}
     </>
   );

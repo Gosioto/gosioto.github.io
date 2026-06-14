@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { dispatchAvatarUpdated } from '../avatarEvents';
 import {
   getUsers,
@@ -14,28 +14,24 @@ import {
 } from '../api';
 import { useAuth } from '../auth';
 import Avatar from '../components/Avatar';
-import { PasswordStrength } from '../ui';
+import AvatarLightbox from '../components/AvatarLightbox';
+import AvatarCropper from '../ui/AvatarCropper/AvatarCropper';
+import { PasswordStrength, Button, Select, useToast, IconPlus, IconEdit, IconTrash, IconUpload } from '../ui';
 import styles from './Users.module.css';
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
-    reader.readAsDataURL(file);
-  });
-}
+const POLL_MS = 30_000;
 
 export default function Users() {
   const { user: me } = useAuth();
+  const { showToast } = useToast();
   const canWriteUsers = Boolean(me?.permissions?.includes('users.write'));
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [roles, setRoles] = useState<RoleFull[]>([]);
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState<string | null>(null);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [createEmail, setCreateEmail] = useState('');
   const [createName, setCreateName] = useState('');
   const [createPassword, setCreatePassword] = useState('');
@@ -51,24 +47,62 @@ export default function Users() {
   const [savingPassword, setSavingPassword] = useState(false);
 
   const [avatarViewUserId, setAvatarViewUserId] = useState<string | null>(null);
+  const [cropFile, setCropFile] = useState<File | null>(null);
+  const [cropUserId, setCropUserId] = useState<string | null>(null);
   const avatarReplaceUserIdRef = useRef<string | null>(null);
   const avatarFileRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    Promise.all([getUsers(), getRoles()])
-      .then(([u, r]) => {
-        setUsers(u);
-        setRoles(r);
-      })
-      .catch(() => setError('Не удалось загрузить данные'))
-      .finally(() => setLoading(false));
+  const blockedRole = useMemo(() => roles.find((r) => r.slug === 'blocked'), [roles]);
+
+  const roleOptions = useMemo(
+    () => [
+      { value: '', label: '— Без роли —' },
+      ...roles.map((r) => ({ value: r.id, label: r.name })),
+    ],
+    [roles],
+  );
+
+  const refreshLists = useCallback(async () => {
+    try {
+      const [u, r] = await Promise.all([getUsers(), getRoles()]);
+      setUsers(u);
+      setRoles(r);
+    } catch {
+      // ignore background refresh errors
+    }
   }, []);
 
+  const loadInitial = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [u, r] = await Promise.all([getUsers(), getRoles()]);
+      setUsers(u);
+      setRoles(r);
+    } catch {
+      setError('Не удалось загрузить данные');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadInitial();
+    const id = window.setInterval(() => void refreshLists(), POLL_MS);
+    return () => window.clearInterval(id);
+  }, [loadInitial, refreshLists]);
+
   const showSuccess = (msg: string) => {
-    setSuccess(msg);
+    showToast('Готово', msg, 'success');
     setError('');
-    setTimeout(() => setSuccess(''), 3000);
   };
+
+  function openCreateModal() {
+    setCreateEmail('');
+    setCreateName('');
+    setCreatePassword('');
+    setError('');
+    setCreateModalOpen(true);
+  }
 
   function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -84,12 +118,13 @@ export default function Users() {
     }
     setCreating(true);
     createUser({ email, name: createName.trim() || undefined, password: createPassword })
-      .then((user) => {
-        setUsers((prev) => [user, ...prev]);
+      .then(async () => {
+        setCreateModalOpen(false);
         setCreateEmail('');
         setCreateName('');
         setCreatePassword('');
         showSuccess('Пользователь создан');
+        await refreshLists();
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка создания'))
       .finally(() => setCreating(false));
@@ -107,10 +142,10 @@ export default function Users() {
     setSavingName(true);
     setError('');
     updateUser(editNameUserId, { name: editNameValue.trim() || undefined })
-      .then((updated) => {
-        setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+      .then(async () => {
         setEditNameUserId(null);
         showSuccess('Имя обновлено');
+        await refreshLists();
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'))
       .finally(() => setSavingName(false));
@@ -137,12 +172,12 @@ export default function Users() {
     setSavingPassword(true);
     setError('');
     updateUser(resetPasswordUserId, { new_password: resetPasswordNew })
-      .then((updated) => {
-        setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
+      .then(async () => {
         setResetPasswordUserId(null);
         setResetPasswordNew('');
         setResetPasswordConfirm('');
         showSuccess('Пароль изменён');
+        await refreshLists();
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'))
       .finally(() => setSavingPassword(false));
@@ -153,18 +188,36 @@ export default function Users() {
     setError('');
     const promise = roleId ? assignUserRole(userId, roleId) : removeUserRole(userId);
     promise
-      .then(() => {
+      .then(async () => {
         setUsers((prev) =>
           prev.map((u) => {
             if (u.id !== userId) return u;
-            const role = roleId ? roles.find((r) => r.id === roleId) ?? null : null;
-            return { ...u, role };
-          })
+            if (!roleId) return { ...u, role: null };
+            const role = roles.find((r) => r.id === roleId);
+            return role
+              ? {
+                  ...u,
+                  role: {
+                    id: role.id,
+                    name: role.name,
+                    slug: role.slug,
+                    is_system: role.is_system,
+                    permission_codes: role.permission_codes,
+                  },
+                }
+              : u;
+          }),
         );
         showSuccess(roleId ? 'Роль назначена' : 'Роль снята');
+        await refreshLists();
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'))
       .finally(() => setAssigning(null));
+  }
+
+  function handleBlockUser(userId: string) {
+    if (!blockedRole) return;
+    handleAssign(userId, blockedRole.id);
   }
 
   function handleAvatarFileChange(userId: string, e: React.ChangeEvent<HTMLInputElement>) {
@@ -173,211 +226,311 @@ export default function Users() {
       setError('Выберите изображение');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      setError('Размер файла не более 2 МБ');
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Размер файла не более 4 МБ');
       return;
     }
     setError('');
-    fileToBase64(file)
-      .then((base64) => updateUserAvatar(userId, base64))
-      .then(() => {
-        setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, has_avatar: true } : u)));
-        avatarReplaceUserIdRef.current = null;
+    setCropUserId(userId);
+    setCropFile(file);
+    avatarReplaceUserIdRef.current = null;
+    if (avatarFileRef.current) avatarFileRef.current.value = '';
+  }
+
+  function uploadCroppedAvatar(dataUrl: string) {
+    const userId = cropUserId;
+    setCropFile(null);
+    setCropUserId(null);
+    if (!userId) return;
+    setError('');
+    updateUserAvatar(userId, dataUrl)
+      .then(async () => {
         dispatchAvatarUpdated(userId);
         showSuccess('Аватар обновлён');
+        await refreshLists();
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
-    if (avatarFileRef.current) avatarFileRef.current.value = '';
   }
 
   function handleDeleteUserAvatar(userId: string) {
     if (!confirm('Удалить аватар этого пользователя?')) return;
     setError('');
     deleteUserAvatar(userId)
-      .then(() => {
-        setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, has_avatar: false } : u)));
+      .then(async () => {
         setAvatarViewUserId(null);
         dispatchAvatarUpdated(userId);
         showSuccess('Аватар удалён');
+        await refreshLists();
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
+  }
+
+  function triggerAvatarReplace(userId: string) {
+    avatarReplaceUserIdRef.current = userId;
+    avatarFileRef.current?.click();
+  }
+
+  function renderUserAvatar(user: UserWithRole, size: number) {
+    const fallback = user.name?.[0] || user.email[0];
+    return (
+      <div className={styles.avatarContainer} style={{ width: size, height: size }}>
+        <button
+          type="button"
+          className={styles.avatarClick}
+          onClick={() => setAvatarViewUserId(user.id)}
+          title="Просмотр аватара"
+        >
+          <Avatar
+            userId={user.id}
+            fallbackLetter={fallback}
+            size={size}
+            className={styles.userAvatar}
+          />
+        </button>
+        {canWriteUsers && (
+          <>
+            <button
+              type="button"
+              className={`${styles.avatarOverlayBtn} ${styles.avatarOverlayReplace}`}
+              onClick={() => triggerAvatarReplace(user.id)}
+              title="Заменить аватар"
+            >
+              <IconUpload size={12} />
+            </button>
+            {user.has_avatar && (
+              <button
+                type="button"
+                className={`${styles.avatarOverlayBtn} ${styles.avatarOverlayDelete}`}
+                onClick={() => handleDeleteUserAvatar(user.id)}
+                title="Удалить аватар"
+              >
+                <IconTrash size={12} />
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+
+  function renderUserName(user: UserWithRole) {
+    return (
+      <div className={styles.userNameRow}>
+        {user.name ? <span className={styles.userName}>{user.name}</span> : null}
+        {canWriteUsers && (
+          <button
+            type="button"
+            className={styles.nameEditBtn}
+            onClick={() => openEditName(user)}
+            title="Изменить имя"
+          >
+            <IconEdit size={14} />
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  function renderRoleControls(user: UserWithRole) {
+    return (
+      <div className={styles.roleControls}>
+        <Select
+          value={user.role?.id ?? ''}
+          onChange={(e) => handleAssign(user.id, e.target.value || null)}
+          disabled={assigning === user.id}
+          className={styles.roleSelect}
+          options={roleOptions}
+        />
+        {blockedRole && (
+          <button
+            type="button"
+            className={styles.roleTrashBtn}
+            onClick={() => handleBlockUser(user.id)}
+            disabled={assigning === user.id || user.role?.id === blockedRole.id}
+            title="Заблокировать"
+          >
+            <IconTrash size={16} />
+          </button>
+        )}
+        {assigning === user.id && <span className={styles.loadingHint}>…</span>}
+      </div>
+    );
+  }
+
+  function renderUserActions(user: UserWithRole) {
+    if (!canWriteUsers) return null;
+    return (
+      <div className={styles.userActions}>
+        <Button
+          type="button"
+          variant="ghost"
+          className={styles.buttonCompact}
+          onClick={() => openResetPassword(user)}
+          title="Сбросить пароль"
+        >
+          Пароль
+        </Button>
+      </div>
+    );
   }
 
   if (loading) return <p className={styles.muted}>Загрузка…</p>;
 
   const userEditName = editNameUserId ? users.find((u) => u.id === editNameUserId) : null;
   const userResetPassword = resetPasswordUserId ? users.find((u) => u.id === resetPasswordUserId) : null;
+  const avatarViewUser = avatarViewUserId ? users.find((u) => u.id === avatarViewUserId) : null;
 
   return (
     <div className={styles.usersPage}>
-      <h1 className={styles.pageTitle}>Пользователи</h1>
+      <div className={styles.pageTitleRow}>
+        <h1 className={styles.pageTitle}>Пользователи</h1>
+        {canWriteUsers && (
+          <Button
+            type="button"
+            variant="primary"
+            className={styles.addBtn}
+            onClick={openCreateModal}
+            title="Создать пользователя"
+          >
+            <IconPlus size={20} />
+          </Button>
+        )}
+      </div>
       {error && <p className={styles.error}>{error}</p>}
-      {success && <p className={styles.success}>{success}</p>}
-
-      <section className={`${styles.section} ${styles.createSection}`}>
-        <h2 className={styles.sectionTitle}>Создать пользователя</h2>
-        <form onSubmit={handleCreate} className={styles.createForm} aria-label="Создание пользователя">
-          <div className={styles.field}>
-            <label className={styles.fieldLabel}>Email</label>
-            <input
-              type="email"
-              value={createEmail}
-              onChange={(e) => setCreateEmail(e.target.value)}
-              placeholder="user@example.com"
-              className={styles.input}
-            />
-          </div>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel}>Имя</label>
-            <input
-              type="text"
-              value={createName}
-              onChange={(e) => setCreateName(e.target.value)}
-              placeholder="Необязательно"
-              className={styles.input}
-            />
-          </div>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel}>Пароль</label>
-            <input
-              type="password"
-              value={createPassword}
-              onChange={(e) => setCreatePassword(e.target.value)}
-              placeholder="Не менее 6 символов"
-              className={styles.input}
-            />
-            <PasswordStrength password={createPassword} />
-          </div>
-          <button type="submit" className={styles.buttonPrimary} disabled={creating}>
-            Создать
-          </button>
-        </form>
-      </section>
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Список пользователей</h2>
         {users.length === 0 ? (
           <div className={styles.empty}>Пользователей пока нет</div>
         ) : (
-          <div className={styles.userList}>
-            {users.map((user) => (
-              <div key={user.id} className={styles.userCard}>
-                <div className={styles.userCardMain}>
-                  <div className={styles.userAvatarWrap}>
-                    <Avatar
-                      userId={user.id}
-                      fallbackLetter={user.name?.[0] || user.email[0]}
-                      size={40}
-                      className={styles.userAvatar}
-                    />
+          <>
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Пользователь</th>
+                    <th>Роль</th>
+                    <th>Действия</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id}>
+                      <td>
+                        <div className={styles.tableUserCell}>
+                          {renderUserAvatar(user, 40)}
+                          <div className={styles.userInfo}>
+                            <span className={styles.userEmail}>{user.email}</span>
+                            {renderUserName(user)}
+                          </div>
+                        </div>
+                      </td>
+                      <td>{renderRoleControls(user)}</td>
+                      <td>
+                        <div className={styles.tableActionsCell}>{renderUserActions(user)}</div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.mobileCards}>
+              {users.map((user) => (
+                <div key={user.id} className={styles.userCard}>
+                  <div className={styles.userCardMain}>
+                    {renderUserAvatar(user, 40)}
+                    <div className={styles.userInfo}>
+                      <span className={styles.userEmail}>{user.email}</span>
+                      {renderUserName(user)}
+                      <div className={styles.userMeta}>
+                        {user.role ? `Роль: ${user.role.name}` : 'Роль не назначена'}
+                      </div>
+                    </div>
                   </div>
-                  <div className={styles.userInfo}>
-                    <span className={styles.userEmail}>{user.email}</span>
-                    {user.name ? <span className={styles.userName}>{user.name}</span> : null}
-                    <div className={styles.userMeta}>
-                      {user.role ? `Роль: ${user.role.name}` : 'Роль не назначена'}
+                  <div className={styles.userCardActions}>
+                    <div className={styles.cardActions}>
+                      <span className={styles.roleLabel}>Роль:</span>
+                      {renderRoleControls(user)}
+                      {renderUserActions(user)}
                     </div>
                   </div>
                 </div>
-                <div className={styles.userCardActions}>
-                  {canWriteUsers && (
-                    <div className={styles.avatarActions}>
-                      <button
-                        type="button"
-                        className={styles.buttonSmall}
-                        onClick={() => setAvatarViewUserId(avatarViewUserId === user.id ? null : user.id)}
-                        title="Просмотр аватара"
-                      >
-                        Просмотр
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.buttonSmall}
-                        onClick={() => {
-                          avatarReplaceUserIdRef.current = user.id;
-                          avatarFileRef.current?.click();
-                        }}
-                        title="Заменить аватар"
-                      >
-                        Заменить
-                      </button>
-                      {user.has_avatar && (
-                        <button
-                          type="button"
-                          className={`${styles.buttonSmall} ${styles.buttonDanger}`}
-                          onClick={() => handleDeleteUserAvatar(user.id)}
-                          title="Удалить аватар"
-                        >
-                          Удалить
-                        </button>
-                      )}
-                      <input
-                        ref={avatarFileRef}
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={(e) => {
-                          const uid = avatarReplaceUserIdRef.current;
-                          if (uid) {
-                            handleAvatarFileChange(uid, e);
-                            avatarReplaceUserIdRef.current = null;
-                          }
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className={styles.cardActions}>
-                    <span className={styles.roleLabel}>Роль:</span>
-                    <select
-                      value={user.role?.id ?? ''}
-                      onChange={(e) => handleAssign(user.id, e.target.value || null)}
-                      disabled={assigning === user.id}
-                      className={styles.roleSelect}
-                    >
-                      <option value="">— Без роли —</option>
-                      {roles.map((r) => (
-                        <option key={r.id} value={r.id}>
-                          {r.name}
-                        </option>
-                      ))}
-                    </select>
-                    {user.role && (
-                      <button
-                        type="button"
-                        className={`${styles.button} ${styles.buttonDanger}`}
-                        onClick={() => handleAssign(user.id, null)}
-                        disabled={assigning === user.id}
-                        title="Снять роль"
-                      >
-                        Снять роль
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      className={styles.button}
-                      onClick={() => openEditName(user)}
-                      title="Изменить имя"
-                    >
-                      Имя
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.button}
-                      onClick={() => openResetPassword(user)}
-                      title="Сбросить пароль"
-                    >
-                      Пароль
-                    </button>
-                  </div>
-                  {assigning === user.id && <span className={styles.loadingHint}>…</span>}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       </section>
 
-      {/* Modal: Edit name */}
+      <input
+        ref={avatarFileRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const uid = avatarReplaceUserIdRef.current;
+          if (uid) {
+            handleAvatarFileChange(uid, e);
+            avatarReplaceUserIdRef.current = null;
+          }
+        }}
+      />
+
+      {createModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => !creating && setCreateModalOpen(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>Создать пользователя</h3>
+            <form onSubmit={handleCreate} className={styles.modalForm}>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Email</label>
+                <input
+                  type="email"
+                  value={createEmail}
+                  onChange={(e) => setCreateEmail(e.target.value)}
+                  placeholder="user@example.com"
+                  className={styles.input}
+                  autoFocus
+                />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Имя</label>
+                <input
+                  type="text"
+                  value={createName}
+                  onChange={(e) => setCreateName(e.target.value)}
+                  placeholder="Необязательно"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Пароль</label>
+                <input
+                  type="password"
+                  value={createPassword}
+                  onChange={(e) => setCreatePassword(e.target.value)}
+                  placeholder="Не менее 6 символов"
+                  className={styles.input}
+                />
+                <PasswordStrength password={createPassword} />
+              </div>
+              <div className={styles.modalActions}>
+                <Button type="submit" variant="primary" disabled={creating}>
+                  Создать
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setCreateModalOpen(false)}
+                  disabled={creating}
+                >
+                  Отмена
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {editNameUserId && userEditName && (
         <div className={styles.modalOverlay} onClick={() => setEditNameUserId(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -394,56 +547,43 @@ export default function Users() {
                   onChange={(e) => setEditNameValue(e.target.value)}
                   placeholder="Имя пользователя"
                   className={styles.input}
+                  autoFocus
                 />
               </div>
               <div className={styles.modalActions}>
-                <button type="submit" className={styles.buttonPrimary} disabled={savingName}>
+                <Button type="submit" variant="primary" disabled={savingName}>
                   Сохранить
-                </button>
-                <button
-                  type="button"
-                  className={styles.button}
-                  onClick={() => setEditNameUserId(null)}
-                  disabled={savingName}
-                >
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setEditNameUserId(null)} disabled={savingName}>
                   Отмена
-                </button>
+                </Button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Modal: View avatar */}
-      {avatarViewUserId && (() => {
-        const u = users.find((x) => x.id === avatarViewUserId);
-        if (!u) return null;
-        return (
-          <div className={styles.modalOverlay} onClick={() => setAvatarViewUserId(null)}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center' }}>
-              <h3 className={styles.modalTitle}>Аватар: {u.email}</h3>
-              <div style={{ margin: '1rem 0' }}>
-                <Avatar
-                  userId={u.id}
-                  fallbackLetter={u.name?.[0] || u.email[0]}
-                  size={160}
-                />
-              </div>
-              <div className={styles.modalActions}>
-                <button
-                  type="button"
-                  className={styles.button}
-                  onClick={() => setAvatarViewUserId(null)}
-                >
-                  Закрыть
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      {avatarViewUser && (
+        <AvatarLightbox
+          userId={avatarViewUser.id}
+          email={avatarViewUser.email}
+          name={avatarViewUser.name}
+          fallbackLetter={avatarViewUser.name?.[0] || avatarViewUser.email[0]}
+          onClose={() => setAvatarViewUserId(null)}
+        />
+      )}
 
-      {/* Modal: Reset password */}
+      {cropFile && (
+        <AvatarCropper
+          file={cropFile}
+          onCancel={() => {
+            setCropFile(null);
+            setCropUserId(null);
+          }}
+          onConfirm={uploadCroppedAvatar}
+        />
+      )}
+
       {resetPasswordUserId && userResetPassword && (
         <div className={styles.modalOverlay} onClick={() => setResetPasswordUserId(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -473,17 +613,12 @@ export default function Users() {
                 />
               </div>
               <div className={styles.modalActions}>
-                <button type="submit" className={styles.buttonPrimary} disabled={savingPassword}>
+                <Button type="submit" variant="primary" disabled={savingPassword}>
                   Сменить пароль
-                </button>
-                <button
-                  type="button"
-                  className={styles.button}
-                  onClick={() => setResetPasswordUserId(null)}
-                  disabled={savingPassword}
-                >
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setResetPasswordUserId(null)} disabled={savingPassword}>
                   Отмена
-                </button>
+                </Button>
               </div>
             </form>
           </div>

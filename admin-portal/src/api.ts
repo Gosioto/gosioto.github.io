@@ -14,6 +14,7 @@ export type User = {
   name: string | null;
   created_at: string;
   has_avatar?: boolean;
+  message_color?: string;
   role?: Role | null;
   permissions?: string[] | null;
 };
@@ -94,7 +95,7 @@ export async function me(): Promise<User> {
   return res.json();
 }
 
-export async function updateMe(data: { name?: string }): Promise<User> {
+export async function updateMe(data: { name?: string; message_color?: string }): Promise<User> {
   const res = await authFetch('/me', {
     method: 'PATCH',
     body: JSON.stringify(data),
@@ -344,11 +345,28 @@ export async function rejectFriendRequest(fromUserId: string, toUserId: string):
   if (!res.ok) throw new Error(await parseApiError(res));
 }
 
-export type Friend = { user_id: string; email: string; name: string | null };
+export type Friend = {
+  user_id: string;
+  email: string;
+  name: string | null;
+  has_avatar: boolean;
+  online: boolean;
+  personal_chat_id?: string | null;
+  peer_blocked_by_me: boolean;
+  peer_blocked_me: boolean;
+  notifications_muted_until?: string | null;
+  muted_until?: string | null;
+};
+
 export async function getFriends(): Promise<Friend[]> {
   const res = await authFetch('/friends');
   if (!res.ok) throw new Error(await parseApiError(res));
   return res.json();
+}
+
+export async function removeFriend(userId: string): Promise<void> {
+  const res = await authFetch(`/friends/${userId}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(await parseApiError(res));
 }
 
 // --- RUscord ---
@@ -359,7 +377,9 @@ export type RuscordServer = {
   owner_id: string | null;
   description: string | null;
   icon_url: string | null;
+  has_icon?: boolean;
   visibility: string;
+  chat_id?: string | null;
 };
 export type RuscordVoiceChannel = { id: string; server_id: string; name: string; sort_order: number };
 export type RuscordGuildChannel = {
@@ -370,6 +390,8 @@ export type RuscordGuildChannel = {
   sort_order: number;
   channel_type: string;
   topic: string | null;
+  unread_count?: number;
+  chat_topic_id?: string | null;
 };
 export type RuscordInvite = {
   code: string;
@@ -386,6 +408,7 @@ export type RuscordGuildMessage = {
   author_id: string;
   author_email: string;
   author_name: string | null;
+  author_message_color?: string;
   content: string;
   created_at: string;
 };
@@ -447,6 +470,46 @@ export async function ruscordCreateServer(name: string): Promise<RuscordServer> 
   const res = await authFetch('/ruscord/servers', {
     method: 'POST',
     body: JSON.stringify({ name }),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export type RuscordServerMember = {
+  user_id: string;
+  email: string;
+  name: string | null;
+  nickname: string | null;
+  joined_at: string;
+  is_online?: boolean;
+};
+
+export async function ruscordListServerMembers(serverId: string): Promise<RuscordServerMember[]> {
+  const res = await authFetch(`/ruscord/servers/${serverId}/members`);
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function ruscordListInvites(serverId: string): Promise<RuscordInvite[]> {
+  const res = await authFetch(`/ruscord/servers/${serverId}/invites`);
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function ruscordRevokeInvite(serverId: string, code: string): Promise<void> {
+  const res = await authFetch(`/ruscord/servers/${serverId}/invites/${encodeURIComponent(code)}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+export async function ruscordCreateGuildChannel(
+  serverId: string,
+  body: { name: string; channel_type: 'text' | 'voice' | 'category'; parent_id?: string | null }
+): Promise<RuscordGuildChannel> {
+  const res = await authFetch(`/ruscord/servers/${serverId}/channels-full`, {
+    method: 'POST',
+    body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(await parseApiError(res));
   return res.json();
@@ -535,6 +598,71 @@ export async function ruscordPatchVoiceState(channelId: string, patch: VoiceStat
   if (!res.ok) throw new Error(await parseApiError(res));
 }
 
+export function ruscordIconUrl(serverId: string, cacheKey = 0): string {
+  const qs = cacheKey > 0 ? `?v=${cacheKey}` : '';
+  return `${API_BASE}/ruscord/icons/${serverId}${qs}`;
+}
+
+export async function ruscordPatchServerIcon(serverId: string, imageBase64: string): Promise<RuscordServer> {
+  const res = await authFetch(`/ruscord/servers/${serverId}/icon`, {
+    method: 'PATCH',
+    body: JSON.stringify({ image: imageBase64 }),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function ruscordDeleteServerIcon(serverId: string): Promise<RuscordServer> {
+  const res = await authFetch(`/ruscord/servers/${serverId}/icon`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function ruscordPatchServer(
+  serverId: string,
+  body: { name?: string; icon_url?: string | null; description?: string | null },
+): Promise<RuscordServer> {
+  const res = await authFetch(`/ruscord/servers/${serverId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function ruscordPatchChannel(
+  channelId: string,
+  body: { name?: string; sort_order?: number; parent_id?: string | null; topic?: string | null },
+): Promise<RuscordGuildChannel> {
+  const res = await authFetch(`/ruscord/channels/${channelId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function ruscordDeleteChannel(channelId: string): Promise<void> {
+  const res = await authFetch(`/ruscord/channels/${channelId}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+export async function ruscordReorderChannels(
+  serverId: string,
+  order: { id: string; sort_order: number; parent_id: string | null }[],
+): Promise<void> {
+  const res = await authFetch(`/ruscord/servers/${serverId}/channels/reorder`, {
+    method: 'PATCH',
+    body: JSON.stringify({ order }),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+export async function ruscordMarkChannelRead(channelId: string): Promise<void> {
+  const res = await authFetch(`/ruscord/channels/${channelId}/read`, { method: 'POST' });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
 // --- Чатик*с ---
 
 export type ChatParticipant = {
@@ -544,12 +672,15 @@ export type ChatParticipant = {
   role: string;
   joined_at: string;
   muted_until?: string | null;
+  peer_blocked?: boolean;
+  notifications_muted_until?: string | null;
 };
 
 export type ChatTopic = {
   id: string;
   name: string;
   created_at: string;
+  unread_count?: number;
 };
 
 export type MessagePreview = {
@@ -568,6 +699,10 @@ export type Chat = {
   participants: ChatParticipant[];
   topics: ChatTopic[] | null;
   last_message: MessagePreview | null;
+  unread_count?: number;
+  main_unread_count?: number;
+  ruscord_server_id?: string | null;
+  has_avatar?: boolean;
 };
 
 export type Message = {
@@ -577,6 +712,7 @@ export type Message = {
   sender_id: string;
   sender_email: string;
   sender_name: string | null;
+  sender_message_color?: string;
   content: string;
   message_type?: string;
   payload?: FileOfferPayload | null;
@@ -645,6 +781,18 @@ export async function getChat(chatId: string): Promise<Chat> {
   return res.json();
 }
 
+export async function markChatRead(chatId: string, topicId?: string | null): Promise<void> {
+  const body =
+    topicId != null && topicId !== ''
+      ? JSON.stringify({ topic_id: topicId })
+      : undefined;
+  const res = await authFetch(`/chats/${chatId}/read`, {
+    method: 'POST',
+    body,
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
 export async function updateChat(chatId: string, data: { name?: string }): Promise<Chat> {
   const res = await authFetch(`/chats/${chatId}`, {
     method: 'PATCH',
@@ -654,8 +802,45 @@ export async function updateChat(chatId: string, data: { name?: string }): Promi
   return res.json();
 }
 
+export async function updateChatAvatar(chatId: string, imageBase64: string): Promise<void> {
+  const res = await authFetch(`/chats/${chatId}/avatar`, {
+    method: 'PATCH',
+    body: JSON.stringify({ image: imageBase64 }),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+export async function deleteChatAvatar(chatId: string): Promise<void> {
+  const res = await authFetch(`/chats/${chatId}/avatar`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
 export async function leaveChat(chatId: string): Promise<void> {
   const res = await authFetch(`/chats/${chatId}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+/** Personal chat: block the other participant (chat-only, for current user). */
+export async function markChatBlock(chatId: string): Promise<void> {
+  const res = await authFetch(`/chats/${chatId}/block`, { method: 'POST' });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+/** Personal chat: unblock the other participant. */
+export async function markChatUnblock(chatId: string): Promise<void> {
+  const res = await authFetch(`/chats/${chatId}/unblock`, { method: 'POST' });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+/** Mute chat notifications until ISO8601 datetime, or null to unmute. */
+export async function patchChatNotificationsMute(
+  chatId: string,
+  mutedUntil: string | null,
+): Promise<void> {
+  const res = await authFetch(`/chats/${chatId}/notifications-mute`, {
+    method: 'PATCH',
+    body: JSON.stringify({ muted_until: mutedUntil }),
+  });
   if (!res.ok) throw new Error(await parseApiError(res));
 }
 

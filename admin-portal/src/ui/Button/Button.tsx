@@ -3,7 +3,7 @@ import styles from './Button.module.css';
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
-  variant?: 'primary' | 'ghost';
+  variant?: 'primary' | 'ghost' | 'danger';
 };
 
 export default function Button({ children, variant = 'primary', className, onClick, type = 'button', ...rest }: Props) {
@@ -20,7 +20,7 @@ export default function Button({ children, variant = 'primary', className, onCli
 
   const cls = [
     styles.button,
-    variant === 'ghost' ? styles.ghost : styles.primary,
+    variant === 'ghost' ? styles.ghost : variant === 'danger' ? styles.danger : styles.primary,
     spring ? styles.spring : '',
     className ?? '',
   ]

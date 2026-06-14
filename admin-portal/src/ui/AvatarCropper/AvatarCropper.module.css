@@ -1,0 +1,59 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  width: min(100%, 360px);
+}
+
+.title {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.cropBox {
+  touch-action: none;
+  cursor: grab;
+  border-radius: 50%;
+  overflow: hidden;
+  width: 256px;
+  height: 256px;
+  margin: 0 auto 1rem;
+  border: 2px solid var(--accent);
+}
+
+.canvas {
+  display: block;
+  width: 256px;
+  height: 256px;
+}
+
+.hiddenImg {
+  display: none;
+}
+
+.scaleLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

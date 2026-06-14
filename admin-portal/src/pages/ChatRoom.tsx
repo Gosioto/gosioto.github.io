@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth';
 import {
   getChat,
@@ -16,7 +16,11 @@ import {
   removeChatParticipant,
   setChatParticipantRole,
   leaveChat,
+  markChatBlock,
+  markChatUnblock,
+  patchChatNotificationsMute,
   getChatAvailableUsers,
+  markChatRead,
   type Chat,
   type Message,
   type ChatTopic,
@@ -32,15 +36,23 @@ import { CHAT_FILE_MAX_BYTES, type TransferProgress } from '../p2p/fileOfferType
 import { listHostBinds } from '../p2p/fileTransfer';
 import { isUserOnline, syncTransferStatus, userIdEq } from '../p2p/transferStatusSync';
 import { wsUrl } from '../apiConfig';
+import { notifyChatUnreadChanged } from '../context/ChatUnreadContext';
+import { formatDisplayName } from '../utils/displayName';
+import { formatMessageTime, groupMessagesByDate } from '../utils/formatMessageTimestamp';
+import { ScrollArea, IconBan, IconClock, IconBellOff, Badge, IconSend, IconPaperclip } from '../ui';
+import type { ScrollAreaHandle } from '../ui';
 import styles from './Chats.module.css';
 
 export default function ChatRoom() {
   const { chatId } = useParams<{ chatId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const topicFromUrl = searchParams.get('topic');
   const { user: me, token } = useAuth();
   const [chat, setChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [topics, setTopics] = useState<ChatTopic[]>([]);
+  const [mainUnreadCount, setMainUnreadCount] = useState(0);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(true);
@@ -57,13 +69,19 @@ export default function ChatRoom() {
   const [transferProgress, setTransferProgress] = useState<Record<string, TransferProgress>>({});
   const [transfersByMessage, setTransfersByMessage] = useState<Record<string, ChatFileTransfer[]>>({});
   const [fileSending, setFileSending] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [peerBlocked, setPeerBlocked] = useState(false);
+  const [notificationsMutedUntil, setNotificationsMutedUntil] = useState<string | null>(null);
+  const [muteMenuOpen, setMuteMenuOpen] = useState(false);
+  const muteMenuRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const scrollAreaRef = useRef<ScrollAreaHandle>(null);
   const hostFilesRef = useRef<Map<string, File>>(new Map());
   const selectedTopicIdRef = useRef<string | null>(null);
   const messagesRef = useRef<Message[]>([]);
-  selectedTopicIdRef.current = selectedTopicId;
+  const chatTypeRef = useRef<string | null>(null);
+  chatTypeRef.current = chat?.type ?? null;
   messagesRef.current = messages;
 
   const refreshPresence = useCallback(() => {
@@ -93,6 +111,7 @@ export default function ChatRoom() {
   );
 
   const isGroup = chat?.type === 'group';
+  const isPersonal = chat?.type === 'personal';
   const isAdmin = chat?.participants.find((p) => p.user_id === me?.id)?.role === 'admin';
   const myParticipant = chat?.participants.find((p) => p.user_id === me?.id);
   const imMuted = Boolean(
@@ -104,16 +123,44 @@ export default function ChatRoom() {
     getChat(chatId)
       .then((c) => {
         setChat(c);
-        if (c.type === 'group' && c.topics?.length) {
-          setTopics(c.topics);
+        if (c.type === 'group') {
+          setTopics(c.topics ?? []);
+          setMainUnreadCount(c.main_unread_count ?? 0);
         } else {
           setTopics([]);
+          setMainUnreadCount(0);
         }
-        setSelectedTopicId(null);
+        const urlTopic = topicFromUrl && c.topics?.some((t) => t.id === topicFromUrl) ? topicFromUrl : null;
+        setSelectedTopicId(urlTopic);
+        const mePart = c.participants.find((p) => p.user_id === me?.id);
+        setPeerBlocked(Boolean(mePart?.peer_blocked));
+        setNotificationsMutedUntil(mePart?.notifications_muted_until ?? null);
       })
       .catch(() => setError('Чат не найден'))
       .finally(() => setLoading(false));
-  }, [chatId]);
+  }, [chatId, me?.id, topicFromUrl]);
+
+  useEffect(() => {
+    if (!loading && chatId) {
+      inputRef.current?.focus();
+    }
+  }, [loading, chatId]);
+
+  useEffect(() => {
+    if (!chatId) return;
+    markChatRead(chatId, selectedTopicId)
+      .then(() => notifyChatUnreadChanged())
+      .catch(() => {});
+    if (isGroup) {
+      if (selectedTopicId === null) {
+        setMainUnreadCount(0);
+      } else {
+        setTopics((prev) =>
+          prev.map((t) => (t.id === selectedTopicId ? { ...t, unread_count: 0 } : t)),
+        );
+      }
+    }
+  }, [chatId, selectedTopicId, isGroup]);
 
   useEffect(() => {
     if (!chatId) return;
@@ -210,12 +257,27 @@ export default function ChatRoom() {
         const msg = raw as Message;
         const tab = selectedTopicIdRef.current;
         const msgTopic = msg.topic_id != null ? String(msg.topic_id) : null;
+        const isOwn = userIdEq(msg.sender_id, me?.id ?? '');
+        if (!isOwn) {
+          if (msgTopic === null) {
+            if (tab !== null) setMainUnreadCount((n) => n + 1);
+          } else if (msgTopic !== tab) {
+            setTopics((prev) =>
+              prev.map((t) =>
+                t.id === msgTopic ? { ...t, unread_count: (t.unread_count ?? 0) + 1 } : t,
+              ),
+            );
+          }
+        }
         if (tab === null && msgTopic !== null) return;
         if (tab !== null && msgTopic !== String(tab)) return;
         setMessages((prev) => {
           if (prev.some((m) => m.id === msg.id)) return prev;
           return [...prev, msg];
         });
+        if (chatTypeRef.current === 'personal' && !isOwn) {
+          scrollAreaRef.current?.scrollToBottom(true);
+        }
         if (msg.message_type === 'file_offer') {
           refreshTransfersForMessage(msg.id);
         }
@@ -231,10 +293,6 @@ export default function ChatRoom() {
       ws.close();
     };
   }, [chatId, token, me?.id, refreshTransfersForMessage]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   useEffect(() => {
     for (const m of messages) {
@@ -329,7 +387,7 @@ export default function ChatRoom() {
         await startHostTransferForMessage(msg.id, file, payload);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Не удалось создать предложение файла');
+      setError(formatSendMessageError(err instanceof Error ? err.message : 'Не удалось создать предложение файла'));
     } finally {
       setFileSending(false);
     }
@@ -379,6 +437,27 @@ export default function ChatRoom() {
     input.click();
   }
 
+  function formatSendMessageError(raw: string): string {
+    const lower = raw.toLowerCase();
+    if (lower.includes('forbidden') || lower === 'запрещено') {
+      if (imMuted) {
+        const until = myParticipant?.muted_until;
+        return until
+          ? `Вы не можете отправлять сообщения — вы замьючены до ${new Date(until).toLocaleString('ru')}`
+          : 'Вы не можете отправлять сообщения — действует ограничение на отправку';
+      }
+      if (peerBlocked) {
+        return 'Вы заблокировали этого пользователя. Разблокируйте, чтобы отправить сообщение.';
+      }
+      const other = chat?.participants.find((p) => p.user_id !== me?.id);
+      if (other?.peer_blocked) {
+        return 'Этот пользователь заблокировал вас — отправка сообщений недоступна.';
+      }
+      return 'Отправка сообщений недоступна из‑за блокировки или ограничения.';
+    }
+    return raw;
+  }
+
   function handleSend(e: React.FormEvent) {
     e.preventDefault();
     if (!chatId || !input.trim() || sending) return;
@@ -388,8 +467,12 @@ export default function ChatRoom() {
       .then((msg) => {
         setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
         setInput('');
+        scrollAreaRef.current?.scrollToBottom(true);
+        inputRef.current?.focus();
       })
-      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'))
+      .catch((err) =>
+        setError(formatSendMessageError(err instanceof Error ? err.message : 'Ошибка')),
+      )
       .finally(() => setSending(false));
   }
 
@@ -450,6 +533,50 @@ export default function ChatRoom() {
     if (manageOpen) getChatAvailableUsers().then(setUsers).catch(() => {});
   }, [manageOpen]);
 
+  useEffect(() => {
+    if (!muteMenuOpen) return;
+    function onDocClick(e: MouseEvent) {
+      if (muteMenuRef.current && !muteMenuRef.current.contains(e.target as Node)) {
+        setMuteMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [muteMenuOpen]);
+
+  function muteUntilHours(hours: number): string {
+    return new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+  }
+
+  const notificationsMuted = Boolean(
+    notificationsMutedUntil && new Date(notificationsMutedUntil) > new Date(),
+  );
+
+  function handleToggleBlock() {
+    if (!chatId) return;
+    const action = peerBlocked ? markChatUnblock : markChatBlock;
+    action(chatId)
+      .then(() => {
+        setPeerBlocked(!peerBlocked);
+        if (chatId) getChat(chatId).then(setChat).catch(() => {});
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
+  }
+
+  function handleNotificationsMute(mutedUntil: string | null) {
+    if (!chatId) return;
+    patchChatNotificationsMute(chatId, mutedUntil)
+      .then(() => {
+        setNotificationsMutedUntil(mutedUntil);
+        setMuteMenuOpen(false);
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
+  }
+
+  function handleToggleNotificationsMute() {
+    handleNotificationsMute(notificationsMuted ? null : muteUntilHours(24 * 365));
+  }
+
   if (loading || !chat) {
     return (
       <>
@@ -461,7 +588,13 @@ export default function ChatRoom() {
     );
   }
 
-  const chatTitle = isGroup && chat.name ? chat.name : chat.participants.find((p) => p.user_id !== me?.id)?.email ?? 'Чат';
+  const otherParticipant = chat.participants.find((p) => p.user_id !== me?.id);
+  const chatTitle = isGroup && chat.name
+    ? chat.name
+    : otherParticipant
+      ? formatDisplayName(otherParticipant.name, otherParticipant.email)
+      : 'Чат';
+  const messageGroups = groupMessagesByDate(messages);
 
   return (
     <>
@@ -469,8 +602,67 @@ export default function ChatRoom() {
         ← К списку чатов
       </Link>
       <div className={styles.roomHeader}>
-        <h2 className={styles.roomTitle}>{chatTitle}</h2>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        {isPersonal && otherParticipant ? (
+          <button
+            type="button"
+            className={styles.roomTitleBtn}
+            onClick={() => setUserSettingsUserId(otherParticipant.user_id)}
+            title="Настройки пользователя"
+          >
+            <h2 className={styles.roomTitle}>{chatTitle}</h2>
+          </button>
+        ) : (
+          <h2 className={styles.roomTitle}>{chatTitle}</h2>
+        )}
+        <div className={styles.roomHeaderActions}>
+          {isPersonal && (
+            <div className={styles.personalToolbar}>
+              <button
+                type="button"
+                className={`${styles.iconToolBtn} ${peerBlocked ? styles.iconToolBtnActive : ''}`}
+                onClick={handleToggleBlock}
+                title={peerBlocked ? 'Разблокировать' : 'Заблокировать'}
+              >
+                <IconBan size={18} />
+              </button>
+              <div className={styles.muteMenuWrap} ref={muteMenuRef}>
+                <button
+                  type="button"
+                  className={`${styles.iconToolBtn} ${notificationsMuted ? styles.iconToolBtnActive : ''}`}
+                  onClick={() => setMuteMenuOpen((v) => !v)}
+                  title="Отключить уведомления на время"
+                >
+                  <IconClock size={18} />
+                </button>
+                {muteMenuOpen && (
+                  <div className={styles.muteMenu}>
+                    <button type="button" onClick={() => handleNotificationsMute(muteUntilHours(1))}>
+                      1 час
+                    </button>
+                    <button type="button" onClick={() => handleNotificationsMute(muteUntilHours(24))}>
+                      24 часа
+                    </button>
+                    <button type="button" onClick={() => handleNotificationsMute(muteUntilHours(24 * 7))}>
+                      7 дней
+                    </button>
+                    {notificationsMuted && (
+                      <button type="button" onClick={() => handleNotificationsMute(null)}>
+                        Включить уведомления
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                className={`${styles.iconToolBtn} ${notificationsMuted ? styles.iconToolBtnActive : ''}`}
+                onClick={handleToggleNotificationsMute}
+                title={notificationsMuted ? 'Включить уведомления' : 'Отключить уведомления'}
+              >
+                <IconBellOff size={18} />
+              </button>
+            </div>
+          )}
           {isGroup && isAdmin && (
             <button
               type="button"
@@ -483,9 +675,11 @@ export default function ChatRoom() {
               Управление
             </button>
           )}
-          <button type="button" className={`${styles.button} ${styles.buttonSecondary}`} onClick={handleLeave}>
-            Выйти из чата
-          </button>
+          {isGroup && (
+            <button type="button" className={`${styles.button} ${styles.buttonSecondary}`} onClick={handleLeave}>
+              Выйти из чата
+            </button>
+          )}
         </div>
       </div>
       {error && <p className={styles.error}>{error}</p>}
@@ -497,27 +691,45 @@ export default function ChatRoom() {
             className={`${styles.topicTab} ${selectedTopicId === null ? styles.topicTabActive : ''}`}
             onClick={() => setSelectedTopicId(null)}
           >
-            Общее
+            <span>Общее</span>
+            {mainUnreadCount > 0 ? <Badge count={mainUnreadCount} className={styles.topicTabBadge} /> : null}
           </button>
-          {topics.map((t) => (
+          {topics.map((t) => {
+            const unread = t.unread_count ?? 0;
+            return (
             <button
               key={t.id}
               type="button"
               className={`${styles.topicTab} ${selectedTopicId === t.id ? styles.topicTabActive : ''}`}
               onClick={() => setSelectedTopicId(t.id)}
             >
-              {t.name}
+              <span>{t.name}</span>
+              {unread > 0 ? <Badge count={unread} className={styles.topicTabBadge} /> : null}
             </button>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      <div className={styles.messagesWrap}>
+      <ScrollArea
+        ref={scrollAreaRef}
+        className={styles.messagesWrap}
+        initialScrollToBottom
+        initialScrollKey={`${chatId}-${selectedTopicId ?? 'main'}`}
+        stickToBottom={false}
+      >
+        <div className={styles.messagesInner}>
         {messages.length === 0 && <p className={styles.muted}>Нет сообщений. Напишите первым.</p>}
-        {messages.map((msg) => {
+        {messageGroups.map((group) => (
+          <div key={group.dateKey} className={styles.messageDateGroup}>
+            <div className={styles.dateDivider}>
+              <span className={styles.dateDividerLabel}>{group.dateLabel}</span>
+            </div>
+            {group.messages.map((msg) => {
           const isOwn = userIdEq(msg.sender_id, me?.id ?? '');
           const isFileOffer = msg.message_type === 'file_offer';
           const isSelected = selectedMessageId === msg.id;
+          const senderColor = msg.sender_message_color || '#ffffff';
           return (
             <div
               key={msg.id}
@@ -561,8 +773,8 @@ export default function ChatRoom() {
                 <div className={styles.messageAvatarPlaceholder} />
               )}
               <div className={`${styles.message} ${isOwn ? styles.messageOwn : ''}`}>
-                <div className={styles.messageSender}>
-                  {msg.sender_name || msg.sender_email}
+                <div className={styles.messageSender} style={{ color: senderColor }}>
+                  {formatDisplayName(msg.sender_name, msg.sender_email)}
                 </div>
                 {msg.message_type === 'file_offer' && parseFilePayload(msg) ? (
                   <ChatFileOfferCard
@@ -587,14 +799,16 @@ export default function ChatRoom() {
                   <div className={styles.messageContent}>{msg.content}</div>
                 )}
                 <div className={styles.messageTime}>
-                  {new Date(msg.created_at).toLocaleString('ru')}
+                  {formatMessageTime(msg.created_at)}
                 </div>
               </div>
             </div>
           );
         })}
-        <div ref={messagesEndRef} />
-      </div>
+          </div>
+        ))}
+        </div>
+      </ScrollArea>
 
       {imMuted && (
         <p className={styles.error} style={{ marginTop: '0.5rem' }}>
@@ -610,14 +824,15 @@ export default function ChatRoom() {
         />
         <button
           type="button"
-          className={`${styles.button} ${styles.buttonSecondary}`}
+          className={`${styles.composerIconBtn}`}
           disabled={fileSending || imMuted || Boolean(selectedTopicId)}
-          title="Отправить файл (P2P, без хранения на сервере)"
+          title="Прикрепить файл"
           onClick={() => fileInputRef.current?.click()}
         >
-          Файл
+          <IconPaperclip size={20} />
         </button>
         <input
+          ref={inputRef}
           type="text"
           className={styles.sendInput}
           value={input}
@@ -625,8 +840,13 @@ export default function ChatRoom() {
           placeholder={imMuted ? 'Нет доступа к отправке' : 'Сообщение...'}
           disabled={sending || imMuted}
         />
-        <button type="submit" className={styles.button} disabled={sending || !input.trim() || imMuted}>
-          Отправить
+        <button
+          type="submit"
+          className={`${styles.composerIconBtn} ${styles.composerSendBtn}`}
+          disabled={sending || !input.trim() || imMuted}
+          title="Отправить"
+        >
+          <IconSend size={20} />
         </button>
       </form>
 
@@ -679,7 +899,9 @@ export default function ChatRoom() {
                             </button>
                           )}
                           <div className={styles.participantInfo}>
-                            <span className={styles.participantEmail}>{isOwn ? 'Вы' : p.email}</span>
+                            <span className={styles.participantEmail}>
+                              {isOwn ? 'Вы' : formatDisplayName(p.name, p.email)}
+                            </span>
                             <span className={styles.participantRole}> · {p.role}</span>
                             {isMuted && (
                               <span className={styles.mutedBadge} title={p.muted_until ?? ''}>
@@ -721,7 +943,7 @@ export default function ChatRoom() {
                       {users
                         .filter((u) => !chat.participants.some((p) => p.user_id === u.id))
                         .map((u) => (
-                          <option key={u.id} value={u.id}>{u.email} {u.name ? `(${u.name})` : ''}</option>
+                          <option key={u.id} value={u.id}>{formatDisplayName(u.name, u.email)}</option>
                         ))}
                     </select>
                   </div>

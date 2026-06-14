@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   getRoles,
   getPermissions,
@@ -9,8 +9,11 @@ import {
   type RoleFull,
   type PermissionGroup,
 } from '../api';
+import { Button, useToast } from '../ui';
+import { IconPlus } from '../ui/Icon/Icon';
 import styles from './Roles.module.css';
 
+const POLL_MS = 30_000;
 const SLUG_REGEX = /^[a-z0-9_-]+$/;
 
 function slugValid(s: string): boolean {
@@ -18,14 +21,15 @@ function slugValid(s: string): boolean {
 }
 
 export default function Roles() {
+  const { showToast } = useToast();
   const [roles, setRoles] = useState<RoleFull[]>([]);
   const [groups, setGroups] = useState<PermissionGroup[]>([]);
   const [loading, setLoading] = useState(true);
+  const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [newSlug, setNewSlug] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const [permissionsRoleId, setPermissionsRoleId] = useState<string | null>(null);
   const [editCodes, setEditCodes] = useState<string[]>([]);
@@ -39,21 +43,45 @@ export default function Roles() {
   const [deleteRoleId, setDeleteRoleId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    Promise.all([getRoles(), getPermissions()])
-      .then(([r, g]) => {
-        setRoles(r);
-        setGroups(g);
-      })
-      .catch(() => setError('Не удалось загрузить данные'))
-      .finally(() => setLoading(false));
+  const refreshRoles = useCallback(async () => {
+    try {
+      const r = await getRoles();
+      setRoles(r);
+    } catch {
+      // ignore background refresh errors
+    }
   }, []);
 
+  const loadInitial = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [r, g] = await Promise.all([getRoles(), getPermissions()]);
+      setRoles(r);
+      setGroups(g);
+    } catch {
+      setError('Не удалось загрузить данные');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadInitial();
+    const id = window.setInterval(() => void refreshRoles(), POLL_MS);
+    return () => window.clearInterval(id);
+  }, [loadInitial, refreshRoles]);
+
   const showSuccess = (msg: string) => {
-    setSuccess(msg);
+    showToast('Готово', msg, 'success');
     setError('');
-    setTimeout(() => setSuccess(''), 3000);
   };
+
+  function openCreate() {
+    setNewName('');
+    setNewSlug('');
+    setError('');
+    setCreateOpen(true);
+  }
 
   function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -74,11 +102,12 @@ export default function Roles() {
     }
     setCreating(true);
     createRole(name, slug)
-      .then((role) => {
-        setRoles((prev) => [...prev, role]);
+      .then(async () => {
+        setCreateOpen(false);
         setNewName('');
         setNewSlug('');
         showSuccess('Роль создана');
+        await refreshRoles();
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка создания'))
       .finally(() => setCreating(false));
@@ -121,10 +150,10 @@ export default function Roles() {
     if (!permissionsRoleId) return;
     setError('');
     updateRolePermissions(permissionsRoleId, editCodes)
-      .then((updated) => {
-        setRoles((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+      .then(async () => {
         setPermissionsRoleId(null);
         showSuccess('Права сохранены');
+        await refreshRoles();
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка сохранения'));
   }
@@ -153,10 +182,10 @@ export default function Roles() {
     setSavingEdit(true);
     setError('');
     updateRole(editRoleId, { name, slug })
-      .then((updated) => {
-        setRoles((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+      .then(async () => {
         setEditRoleId(null);
         showSuccess('Роль обновлена');
+        await refreshRoles();
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'))
       .finally(() => setSavingEdit(false));
@@ -173,13 +202,41 @@ export default function Roles() {
     setDeleting(true);
     setError('');
     deleteRole(deleteRoleId)
-      .then(() => {
-        setRoles((prev) => prev.filter((r) => r.id !== deleteRoleId));
+      .then(async () => {
         setDeleteRoleId(null);
         showSuccess('Роль удалена');
+        await refreshRoles();
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка удаления'))
       .finally(() => setDeleting(false));
+  }
+
+  function renderRoleActions(role: RoleFull) {
+    return (
+      <div className={styles.roleActions}>
+        <Button type="button" variant="primary" className={styles.buttonCompact} onClick={() => openPermissions(role)}>
+          Настроить права
+        </Button>
+        {!role.is_system && (
+          <>
+            <Button type="button" variant="ghost" className={styles.buttonCompact} onClick={() => openEdit(role)}>
+              Изменить
+            </Button>
+            <Button type="button" variant="danger" className={styles.buttonCompact} onClick={() => openDelete(role)}>
+              Удалить
+            </Button>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  function renderRoleBadge(role: RoleFull) {
+    return (
+      <span className={role.is_system ? styles.badgeSystem : styles.badgeCustom}>
+        {role.is_system ? 'системная' : 'пользовательская'}
+      </span>
+    );
   }
 
   if (loading) return <p className={styles.muted}>Загрузка…</p>;
@@ -188,89 +245,100 @@ export default function Roles() {
 
   return (
     <>
-      <h1 className={styles.pageTitle}>Роли</h1>
+      <div className={styles.pageTitleRow}>
+        <h1 className={styles.pageTitle}>Роли</h1>
+        <Button type="button" variant="primary" onClick={openCreate} title="Создать роль">
+          <IconPlus size={18} />
+        </Button>
+      </div>
       {error && <p className={styles.error}>{error}</p>}
-      {success && <p className={styles.success}>{success}</p>}
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Создать роль</h2>
-        <form onSubmit={handleCreate} className={styles.createForm}>
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>Название</span>
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder="Например: Модератор"
-              className={styles.input}
-            />
-          </div>
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>Код (slug)</span>
-            <input
-              type="text"
-              value={newSlug}
-              onChange={(e) => setNewSlug(e.target.value.toLowerCase())}
-              placeholder="moderator"
-              className={styles.input + (newSlug && !slugValid(newSlug.trim().toLowerCase()) ? ' ' + styles.inputInvalid : '')}
-            />
-          </div>
-          <button type="submit" className={styles.button} disabled={creating}>
-            Создать
-          </button>
-        </form>
-      </section>
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Список ролей</h2>
-        <div className={styles.roleList}>
+        <div className={styles.tableWrap}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Название</th>
+                <th>Код</th>
+                <th>Тип</th>
+                <th>Права</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {roles.map((role) => (
+                <tr key={role.id}>
+                  <td className={styles.roleName}>{role.name}</td>
+                  <td className={styles.roleSlug}>{role.slug}</td>
+                  <td>{renderRoleBadge(role)}</td>
+                  <td className={styles.roleMeta}>{role.permission_codes.length}</td>
+                  <td>{renderRoleActions(role)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className={styles.mobileCards}>
           {roles.map((role) => (
             <div key={role.id} className={styles.roleCard}>
               <div className={styles.roleInfo}>
                 <div className={styles.roleNameRow}>
                   <span className={styles.roleName}>{role.name}</span>
                   <span className={styles.roleSlug}>{role.slug}</span>
-                  <span className={role.is_system ? styles.badgeSystem : styles.badgeCustom}>
-                    {role.is_system ? 'системная' : 'пользовательская'}
-                  </span>
+                  {renderRoleBadge(role)}
                 </div>
-                <div className={styles.roleMeta}>
-                  Права: {role.permission_codes.length}
-                </div>
+                <div className={styles.roleMeta}>Права: {role.permission_codes.length}</div>
               </div>
-              <div className={styles.roleActions}>
-                <button
-                  type="button"
-                  className={styles.button}
-                  onClick={() => openPermissions(role)}
-                >
-                  Настроить права
-                </button>
-                {!role.is_system && (
-                  <>
-                    <button
-                      type="button"
-                      className={styles.button + ' ' + styles.buttonSecondary}
-                      onClick={() => openEdit(role)}
-                    >
-                      Изменить
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.button + ' ' + styles.buttonDanger}
-                      onClick={() => openDelete(role)}
-                    >
-                      Удалить
-                    </button>
-                  </>
-                )}
-              </div>
+              {renderRoleActions(role)}
             </div>
           ))}
         </div>
       </section>
 
-      {/* Modal: Permissions */}
+      {createOpen && (
+        <div className={styles.modalOverlay} onClick={() => setCreateOpen(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>Создать роль</h3>
+            <form onSubmit={handleCreate} className={styles.editForm}>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Название</span>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="Например: Модератор"
+                  className={styles.input}
+                  autoFocus
+                />
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Код (slug)</span>
+                <input
+                  type="text"
+                  value={newSlug}
+                  onChange={(e) => setNewSlug(e.target.value.toLowerCase())}
+                  placeholder="moderator"
+                  className={
+                    styles.input +
+                    (newSlug && !slugValid(newSlug.trim().toLowerCase()) ? ' ' + styles.inputInvalid : '')
+                  }
+                />
+              </div>
+              <div className={styles.modalActions}>
+                <Button type="submit" variant="primary" disabled={creating}>
+                  {creating ? 'Создание…' : 'Создать'}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setCreateOpen(false)} disabled={creating}>
+                  Отмена
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {permissionsRoleId && (
         <div className={styles.modalOverlay} onClick={() => setPermissionsRoleId(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
@@ -286,61 +354,56 @@ export default function Roles() {
             <div className={styles.modalBody}>
               <div className={styles.permissionList}>
                 {filteredGroups.map(([groupName, codes]) => (
-                    <div key={groupName} className={styles.permissionGroup}>
-                      <div className={styles.groupHeader}>
-                        <span className={styles.groupName}>{groupName}</span>
-                        <div className={styles.groupActions}>
-                          <button
-                            type="button"
-                            className={styles.groupAction}
-                            onClick={() => setGroupSelection(codes, true)}
-                          >
-                            Выбрать все
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.groupAction}
-                            onClick={() => setGroupSelection(codes, false)}
-                          >
-                            Снять все
-                          </button>
-                        </div>
+                  <div key={groupName} className={styles.permissionGroup}>
+                    <div className={styles.groupHeader}>
+                      <span className={styles.groupName}>{groupName}</span>
+                      <div className={styles.groupActions}>
+                        <button
+                          type="button"
+                          className={styles.groupAction}
+                          onClick={() => setGroupSelection(codes, true)}
+                        >
+                          Выбрать все
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.groupAction}
+                          onClick={() => setGroupSelection(codes, false)}
+                        >
+                          Снять все
+                        </button>
                       </div>
-                      <ul className={styles.permissionItems}>
-                        {codes.map((code) => (
-                          <li key={code} className={styles.permissionItem}>
-                            <label>
-                              <input
-                                type="checkbox"
-                                checked={editCodes.includes(code)}
-                                onChange={() => togglePermission(code)}
-                              />
-                              <span>{code}</span>
-                            </label>
-                          </li>
-                        ))}
-                      </ul>
                     </div>
+                    <ul className={styles.permissionItems}>
+                      {codes.map((code) => (
+                        <li key={code} className={styles.permissionItem}>
+                          <label>
+                            <input
+                              type="checkbox"
+                              checked={editCodes.includes(code)}
+                              onChange={() => togglePermission(code)}
+                            />
+                            <span>{code}</span>
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
               </div>
             </div>
             <div className={styles.modalActions}>
-              <button type="button" className={styles.button} onClick={savePermissions}>
+              <Button type="button" variant="primary" onClick={savePermissions}>
                 Сохранить
-              </button>
-              <button
-                type="button"
-                className={styles.button + ' ' + styles.buttonSecondary}
-                onClick={() => setPermissionsRoleId(null)}
-              >
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => setPermissionsRoleId(null)}>
                 Отмена
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal: Edit role */}
       {editRoleId && (
         <div className={styles.modalOverlay} onClick={() => setEditRoleId(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -365,23 +428,18 @@ export default function Roles() {
                 />
               </div>
               <div className={styles.modalActions}>
-                <button type="submit" className={styles.button} disabled={savingEdit}>
+                <Button type="submit" variant="primary" disabled={savingEdit}>
                   Сохранить
-                </button>
-                <button
-                  type="button"
-                  className={styles.button + ' ' + styles.buttonSecondary}
-                  onClick={() => setEditRoleId(null)}
-                >
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setEditRoleId(null)}>
                   Отмена
-                </button>
+                </Button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Modal: Delete confirm */}
       {deleteRoleId && roleToDelete && (
         <div className={styles.modalOverlay} onClick={() => setDeleteRoleId(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -392,22 +450,12 @@ export default function Roles() {
               роли пользователям будут сняты.
             </p>
             <div className={styles.modalActions}>
-              <button
-                type="button"
-                className={styles.button + ' ' + styles.buttonDanger}
-                onClick={confirmDelete}
-                disabled={deleting}
-              >
+              <Button type="button" variant="danger" onClick={confirmDelete} disabled={deleting}>
                 {deleting ? 'Удаление…' : 'Удалить'}
-              </button>
-              <button
-                type="button"
-                className={styles.button + ' ' + styles.buttonSecondary}
-                onClick={() => setDeleteRoleId(null)}
-                disabled={deleting}
-              >
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => setDeleteRoleId(null)} disabled={deleting}>
                 Отмена
-              </button>
+              </Button>
             </div>
           </div>
         </div>

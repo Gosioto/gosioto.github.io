@@ -44,13 +44,27 @@
   position: absolute;
   top: 8px;
   right: 10px;
-  background: none;
-  border: none;
-  color: var(--ui-text-faint);
-  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ui-surface-2, var(--surface2));
+  border: 1px solid var(--ui-border-hover, var(--border));
+  border-radius: 8px;
+  color: var(--ui-text-muted);
+  font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  padding: 4px;
+  padding: 0;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  border-color: var(--accent);
 }
 
 .close:hover {

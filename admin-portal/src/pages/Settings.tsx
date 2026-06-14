@@ -2,21 +2,22 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../auth';
 import { dispatchAvatarUpdated } from '../avatarEvents';
 import { updateMe, updateMyAvatar, deleteMyAvatar } from '../api';
-import { useToast } from '../ui';
+import { Button, useToast } from '../ui';
+import AvatarCropper from '../ui/AvatarCropper/AvatarCropper';
 import Avatar from '../components/Avatar';
 import styles from './Settings.module.css';
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result);
-    };
-    reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
-    reader.readAsDataURL(file);
-  });
-}
+const MESSAGE_COLOR_PRESETS = [
+  '#ffffff',
+  '#ef4444',
+  '#f97316',
+  '#eab308',
+  '#22c55e',
+  '#06b6d4',
+  '#3b82f6',
+  '#a855f7',
+  '#ec4899',
+] as const;
 
 export default function Settings() {
   const { user, refreshUser } = useAuth();
@@ -25,6 +26,8 @@ export default function Settings() {
   const [error, setError] = useState('');
   const [nameValue, setNameValue] = useState('');
   const [savingName, setSavingName] = useState(false);
+  const [savingColor, setSavingColor] = useState(false);
+  const [cropFile, setCropFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -40,22 +43,26 @@ export default function Settings() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      setError('Выберите изображение (PNG, JPG и т.д.)');
+      setError('Выберите изображение (PNG, JPG, WebP…)');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      setError('Размер файла не более 2 МБ');
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Размер файла не более 4 МБ');
       return;
     }
     setError('');
+    setCropFile(file);
+    if (inputRef.current) inputRef.current.value = '';
+  }
+
+  function uploadCropped(dataUrl: string) {
+    setCropFile(null);
     setLoading(true);
-    fileToBase64(file)
-      .then((base64) => updateMyAvatar(base64))
+    updateMyAvatar(dataUrl)
       .then(() => {
         refreshUser();
         if (user?.id) dispatchAvatarUpdated(user.id);
         showSuccess('Аватар обновлён');
-        if (inputRef.current) inputRef.current.value = '';
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка загрузки'))
       .finally(() => setLoading(false));
@@ -89,6 +96,19 @@ export default function Settings() {
       .finally(() => setSavingName(false));
   }
 
+  function handleColorSelect(color: string) {
+    if (color === (user?.message_color ?? '#ffffff')) return;
+    setError('');
+    setSavingColor(true);
+    updateMe({ message_color: color })
+      .then(() => {
+        refreshUser();
+        showSuccess('Цвет сообщений обновлён');
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'))
+      .finally(() => setSavingColor(false));
+  }
+
   if (!user) return null;
 
   return (
@@ -108,10 +128,29 @@ export default function Settings() {
             placeholder="Имя"
             disabled={savingName}
           />
-          <button type="submit" className={styles.button} disabled={savingName}>
+          <Button type="submit" variant="primary" disabled={savingName}>
             Сохранить
-          </button>
+          </Button>
         </form>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Цвет сообщений</h2>
+        <p className={styles.sectionDesc}>Цвет вашего имени в чатах</p>
+        <div className={styles.colorGrid}>
+          {MESSAGE_COLOR_PRESETS.map((color) => (
+            <button
+              key={color}
+              type="button"
+              className={`${styles.colorSwatch} ${(user.message_color ?? '#ffffff') === color ? styles.colorSwatchSelected : ''}`}
+              style={{ backgroundColor: color }}
+              title={color}
+              disabled={savingColor}
+              onClick={() => handleColorSelect(color)}
+              aria-label={`Цвет ${color}`}
+            />
+          ))}
+        </div>
       </section>
 
       <section className={styles.section}>
@@ -132,27 +171,25 @@ export default function Settings() {
               className={styles.fileInput}
               disabled={loading}
             />
-            <button
-              type="button"
-              className={styles.button}
-              onClick={() => inputRef.current?.click()}
-              disabled={loading}
-            >
+            <Button type="button" variant="primary" onClick={() => inputRef.current?.click()} disabled={loading}>
               {user.has_avatar ? 'Заменить' : 'Загрузить'}
-            </button>
+            </Button>
             {user.has_avatar && (
-              <button
-                type="button"
-                className={`${styles.button} ${styles.buttonDanger}`}
-                onClick={handleDelete}
-                disabled={loading}
-              >
+              <Button type="button" variant="danger" onClick={handleDelete} disabled={loading}>
                 Удалить
-              </button>
+              </Button>
             )}
           </div>
         </div>
       </section>
+
+      {cropFile ? (
+        <AvatarCropper
+          file={cropFile}
+          onCancel={() => setCropFile(null)}
+          onConfirm={uploadCropped}
+        />
+      ) : null}
     </>
   );
 }

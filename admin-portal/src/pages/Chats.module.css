@@ -57,6 +57,17 @@
   border-color: var(--accent);
 }
 
+.chatItemUnread {
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb, 59, 130, 246), 0.08);
+}
+
+.chatNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .chatItemAvatar {
   flex-shrink: 0;
 }
@@ -168,6 +179,119 @@
   font-size: 1.2rem;
 }
 
+.roomTitleBtn {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+}
+
+.roomTitleBtn:hover .roomTitle {
+  color: var(--accent);
+}
+
+.roomHeaderActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.personalToolbar {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.iconToolBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.iconToolBtn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.iconToolBtnActive {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.muteMenuWrap {
+  position: relative;
+}
+
+.muteMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 50;
+  min-width: 140px;
+  padding: 0.35rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.muteMenu button {
+  padding: 0.45rem 0.65rem;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.muteMenu button:hover {
+  background: var(--surface2);
+}
+
+.messageDateGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dateDivider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.25rem 0;
+}
+
+.dateDivider::before,
+.dateDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.dateDividerLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 .topicTabs {
   display: flex;
   gap: 0.35rem;
@@ -176,6 +300,9 @@
 }
 
 .topicTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   padding: 0.4rem 0.75rem;
   border-radius: 6px;
   border: 1px solid var(--border);
@@ -195,11 +322,17 @@
   color: white;
 }
 
+.topicTabBadge {
+  flex-shrink: 0;
+}
+
 .messagesWrap {
   min-height: 300px;
   max-height: 60vh;
-  overflow: auto;
   padding: 1rem 0;
+}
+
+.messagesInner {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -297,27 +430,66 @@
   display: none;
 }
 
+.chatNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.chatGroupIcon {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
 .sendForm {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0;
   margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+}
+
+.sendForm .composerIconBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.sendForm .composerIconBtn:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+.sendForm .composerIconBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sendForm .composerSendBtn {
+  color: var(--accent);
 }
 
 .sendInput {
   flex: 1;
   min-width: 0;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface);
+  border: none;
+  background: transparent;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.95rem;
   color: var(--text);
-}
-
-.sendInput:focus {
   outline: none;
-  border-color: var(--accent);
 }
 
 .backLink {

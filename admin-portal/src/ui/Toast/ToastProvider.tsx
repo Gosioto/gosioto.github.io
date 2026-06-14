@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import ToastView, { type ToastItem, type ToastKind } from './Toast';
 
 type ToastContextValue = {
-  showToast: (title: string, message?: string, kind?: ToastKind) => void;
+  showToast: (title: string, message?: string, kind?: ToastKind, onClick?: () => void) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -12,9 +12,9 @@ let toastSeq = 0;
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const showToast = useCallback((title: string, message?: string, kind: ToastKind = 'info') => {
+  const showToast = useCallback((title: string, message?: string, kind: ToastKind = 'info', onClick?: () => void) => {
     const id = ++toastSeq;
-    setToasts((prev) => [...prev, { id, title, message, kind }]);
+    setToasts((prev) => [...prev, { id, title, message, kind, onClick }]);
     window.setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 4000);

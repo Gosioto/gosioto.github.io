@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Link, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import {
   getModules,
@@ -11,9 +11,8 @@ import {
   type ModuleInfo,
   type DashboardStats,
   type PermissionGroup,
+  type User,
 } from '../api';
-import Avatar from '../components/Avatar';
-import VoiceMemberIndicators from '../components/VoiceMemberIndicators';
 import { drainPendingIce, enqueuePendingIce } from '../voice/iceQueue';
 import {
   diagnoseDisplayMediaFailure,
@@ -23,7 +22,6 @@ import { buildVoiceRtcConfiguration } from '../voice/rtcConfig';
 import { voiceLog, voiceLogEnabled } from '../voiceLog';
 import {
   RuscordVoiceProvider,
-  useRuscordVoice,
   type VoicePanelData,
   type VoicePanelUpdate,
   type VoiceHubParsedMessage,
@@ -37,41 +35,24 @@ import { isPolitePeer } from '../voice/meshNegotiation';
 import { aggregateVoiceRtcStatus } from '../voice/voiceRtcAggregate';
 import { applyOutboundRtpPolicies } from '../voice/mediaSenderPolicy';
 import { wsUrl } from '../apiConfig';
-import { SpotlightCard, DotWaveLoader } from '../ui';
+import { SpotlightCard, DotWaveLoader, useToast } from '../ui';
 import Roles from './Roles';
 import Users from './Users';
 import Chats from './Chats';
 import ChatRoom from './ChatRoom';
 import Ruscord from './Ruscord';
 import Settings from './Settings';
+import Friends from './Friends';
+import { useIsMobile } from '../hooks/useMediaQuery';
+import AppShell from '../layout/AppShell';
+import BottomNav from '../layout/BottomNav';
+import Sidebar from '../layout/Sidebar';
+import VoiceBar from '../layout/VoiceBar';
+import { ADMIN_NAV_ITEMS, BOTTOM_NAV_ITEMS } from '../layout/navConfig';
+import { ChatUnreadProvider, useChatUnread } from '../context/ChatUnreadContext';
+import { useChatNotifications, dispatchChatUnreadToast, type ChatUnreadWsPayload } from '../hooks/useChatNotifications';
+import { useRuscordNotifications, dispatchRuscordUnreadToast, type RuscordUnreadWsPayload } from '../hooks/useRuscordNotifications';
 import styles from './Dashboard.module.css';
-
-function groupPermissionsByGroup(perms: string[] | null | undefined, groups: PermissionGroup[]): [string, string[]][] {
-  if (!perms?.length) return [];
-  const codeToGroup = new Map<string, string>();
-  for (const [groupName, codes] of groups) {
-    for (const code of codes) codeToGroup.set(code, groupName);
-  }
-  const byGroup = new Map<string, string[]>();
-  for (const code of perms) {
-    const g = codeToGroup.get(code) ?? 'Прочее';
-    if (!byGroup.has(g)) byGroup.set(g, []);
-    byGroup.get(g)!.push(code);
-  }
-  return Array.from(byGroup.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-}
-
-const ADMIN_SECTIONS: { path: string; name: string; short: string; permission: string }[] = [
-  { path: '/dashboard', name: 'Сводка', short: 'С', permission: 'modules.dashboard' },
-  { path: '/dashboard/users', name: 'Пользователи', short: 'П', permission: 'users.read' },
-  { path: '/dashboard/roles', name: 'Роли', short: 'Р', permission: 'roles.read' },
-];
-
-const SERVICE_SECTIONS: { path: string; name: string; short: string }[] = [
-  { path: '/dashboard/chats', name: 'Чатик*с', short: 'Ч' },
-  { path: '/dashboard/ruscord', name: 'RUscord', short: 'R' },
-  { path: '/dashboard/settings', name: 'Настройки', short: 'Н' },
-];
 
 function canSeeSection(permission: string, userPermissions: string[] | null | undefined): boolean {
   return Boolean(userPermissions?.includes(permission));
@@ -80,9 +61,21 @@ function canSeeSection(permission: string, userPermissions: string[] | null | un
 const STORAGE_USER_VOLUMES = 'ruscord_user_volumes';
 
 export default function Dashboard() {
-  const { user, logout, token } = useAuth();
+  return (
+    <ChatUnreadProvider>
+      <DashboardContent />
+    </ChatUnreadProvider>
+  );
+}
+
+function DashboardContent() {
+  const { user, logout, token, refreshUser } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
+  const isMobile = useIsMobile();
+  const { totalUnread } = useChatUnread();
+  useChatNotifications();
+  useRuscordNotifications();
   const [loading, setLoading] = useState(true);
   const [modules, setModules] = useState<ModuleInfo[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -91,7 +84,6 @@ export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [adminOpen, setAdminOpen] = useState(true);
   const [servicesOpen, setServicesOpen] = useState(true);
-  const roleMenuRef = useRef<HTMLDivElement>(null);
 
   type VoiceState = {
     channelId: string;
@@ -359,7 +351,11 @@ export default function Dashboard() {
           setTransmissionEnabled,
         };
 
-  const adminSectionsVisible = ADMIN_SECTIONS.filter((s) => canSeeSection(s.permission, user?.permissions));
+  const adminSectionsVisible = ADMIN_NAV_ITEMS.filter((s) => canSeeSection(s.permission!, user?.permissions));
+  const bottomNavItems = BOTTOM_NAV_ITEMS.filter(
+    (item) => !item.permission || canSeeSection(item.permission, user?.permissions)
+  );
+  const chatUnreadByPath = { '/dashboard/chats': totalUnread };
 
   useEffect(() => {
     if (!user) return;
@@ -554,8 +550,6 @@ export default function Dashboard() {
     const voiceCid = voiceState?.channelId ?? '';
     const uniqueIds = [...new Set([...(voiceCid ? [voiceCid] : []), ...hubSubscriptionChannelIds])];
     const serverSid = (hubSubscriptionServerId ?? '').trim();
-    const shouldConnect = uniqueIds.length > 0 || serverSid.length > 0;
-    if (!shouldConnect) return;
 
     let cancelled = false;
     let ws: WebSocket | null = null;
@@ -581,6 +575,23 @@ export default function Dashboard() {
       ws.onmessage = (event) => {
         try {
         const data = JSON.parse(event.data) as VoiceHubParsedMessage;
+        if (data.type === 'account_blocked') {
+          showToast('Доступ ограничен', 'Ваш аккаунт заблокирован', 'error');
+          logout();
+          return;
+        }
+        if (data.type === 'permissions_changed') {
+          void refreshUser();
+          return;
+        }
+        if (data.type === 'chat_unread') {
+          dispatchChatUnreadToast(data as ChatUnreadWsPayload);
+          return;
+        }
+        if (data.type === 'ruscord_unread') {
+          dispatchRuscordUnreadToast(data as RuscordUnreadWsPayload);
+          return;
+        }
         for (const fn of voiceHubHandlersRef.current) {
           try {
             fn(data);
@@ -684,7 +695,7 @@ export default function Dashboard() {
       }
       wsRef.current = null;
     };
-  }, [voiceState?.channelId, token, hubSubscriptionKey, hubSubscriptionChannelIds, hubSubscriptionServerId]);
+  }, [voiceState?.channelId, token, hubSubscriptionKey, hubSubscriptionChannelIds, hubSubscriptionServerId, logout, refreshUser, showToast]);
 
   useEffect(() => {
     /** Закрыть peer connections и удалённые потоки. Локальный захват экрана/микрофона не трогаем — иначе при каждом обновлении списка участников mesh рвётся и getDisplayMedia гасится → «Нет сигнала». */
@@ -1124,15 +1135,6 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (!roleMenuOpen) return;
-    function close(e: MouseEvent) {
-      if (roleMenuRef.current && !roleMenuRef.current.contains(e.target as Node)) setRoleMenuOpen(false);
-    }
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
-  }, [roleMenuOpen]);
-
   function handleLogout() {
     logout();
     navigate('/', { replace: true });
@@ -1155,501 +1157,46 @@ export default function Dashboard() {
         ruscordLocalLeaveRef,
       }}
     >
-    <div className={styles.wrap}>
-      <aside className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
-        <div className={styles.sidebarHeader}>
-          <Link to="/dashboard" className={styles.logo}>
-            <span className={styles.sidebarLogoText}>GOSLOTO.XYZ</span>
-          </Link>
-          <button
-            type="button"
-            className={styles.sidebarToggle}
-            onClick={() => setSidebarCollapsed((v) => !v)}
-            title={sidebarCollapsed ? 'Развернуть меню' : 'Свернуть меню'}
-            aria-label={sidebarCollapsed ? 'Развернуть меню' : 'Свернуть меню'}
-          >
-            <span style={{ display: 'inline-block', fontSize: '1.2rem', lineHeight: 1 }}>
-              {sidebarCollapsed ? '›' : '‹'}
-            </span>
-          </button>
-        </div>
-        <div className={styles.sectionsBlock}>
-          <h2 className={styles.sectionsTitle}>Разделы</h2>
-        </div>
-        <nav className={styles.nav}>
-          {adminSectionsVisible.length > 0 && (
-            <div className={styles.navBlock}>
-              <button
-                type="button"
-                className={styles.navBlockToggle}
-                onClick={() => setAdminOpen((v) => !v)}
-                aria-expanded={adminOpen}
-              >
-                <span className={styles.navBlockToggleIcon}>{adminOpen ? '▾' : '▸'}</span>
-                <span className={styles.navBlockTitle}>Админка</span>
-              </button>
-              {adminOpen && (
-                <div className={styles.navBlockContent}>
-                  {adminSectionsVisible.map(({ path, name, short }) => (
-                    <Link
-                      key={path}
-                      to={path}
-                      title={name}
-                      className={`${styles.navItem} ${location.pathname === path || (path !== '/dashboard' && location.pathname.startsWith(path)) ? styles.navItemActive : ''}`}
-                    >
-                      <span className={styles.navItemShort}>{short}</span>
-                      <span className={styles.navItemText}>{name}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-          <div className={styles.navBlock}>
-            <button
-              type="button"
-              className={styles.navBlockToggle}
-              onClick={() => setServicesOpen((v) => !v)}
-              aria-expanded={servicesOpen}
-            >
-              <span className={styles.navBlockToggleIcon}>{servicesOpen ? '▾' : '▸'}</span>
-              <span className={styles.navBlockTitle}>Сервисы</span>
-            </button>
-            {servicesOpen && (
-              <div className={styles.navBlockContent}>
-                {SERVICE_SECTIONS.map(({ path, name, short }) => (
-                  <Link
-                    key={path}
-                    to={path}
-                    title={name}
-                    className={`${styles.navItem} ${location.pathname === path || (path !== '/dashboard' && location.pathname.startsWith(path)) ? styles.navItemActive : ''}`}
-                  >
-                    <span className={styles.navItemShort}>{short}</span>
-                    <span className={styles.navItemText}>{name}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        </nav>
-        <VoicePanelInSidebar screenShareHint={screenShareUserHint} onDismissScreenShareHint={() => setScreenShareUserHint(null)} />
-        <div className={styles.user}>
-          <div className={styles.userRow}>
-            <Avatar
-              userId={user?.id ?? ''}
-              fallbackLetter={user?.name?.[0] || user?.email?.[0]}
-              size={36}
-              className={styles.userAvatar}
+    <AppShell
+      sidebar={
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggleCollapsed={() => setSidebarCollapsed((v) => !v)}
+          adminSections={adminSectionsVisible}
+          adminOpen={adminOpen}
+          onToggleAdmin={() => setAdminOpen((v) => !v)}
+          servicesOpen={servicesOpen}
+          onToggleServices={() => setServicesOpen((v) => !v)}
+          totalUnread={totalUnread}
+          user={user}
+          permissionGroups={permissionGroups}
+          roleMenuOpen={roleMenuOpen}
+          onToggleRoleMenu={() => setRoleMenuOpen((v) => !v)}
+          onLogout={handleLogout}
+          voiceBar={
+            <VoiceBar
+              sidebarCollapsed={sidebarCollapsed}
+              screenShareHint={screenShareUserHint}
+              onDismissScreenShareHint={() => setScreenShareUserHint(null)}
             />
-            <div className={styles.roleBadgeWrap} ref={roleMenuRef}>
-              <button
-                type="button"
-                className={styles.userNameRoleBtn}
-                onClick={() => setRoleMenuOpen((v) => !v)}
-                title="Разрешённые действия"
-              >
-                <span className={styles.userNameRoleText}>
-                  {user?.name || user?.email} · {user?.role ? user.role.name : 'Без роли'}
-                </span>
-              </button>
-              {roleMenuOpen && (
-                <div className={styles.roleMenu}>
-                  <div className={styles.roleMenuTitle}>Разрешённые действия</div>
-                  {groupPermissionsByGroup(user?.permissions ?? null, permissionGroups).length === 0 ? (
-                    <div className={styles.roleMenuEmpty}>
-                      {user?.role ? 'Нет назначенных прав' : 'Роль не назначена'}
-                    </div>
-                  ) : (
-                    groupPermissionsByGroup(user?.permissions ?? null, permissionGroups).map(([groupName, codes]) => (
-                      <div key={groupName} className={styles.roleMenuGroup}>
-                        <div className={styles.roleMenuGroupName}>{groupName}</div>
-                        <ul className={styles.roleMenuList}>
-                          {codes.map((code) => (
-                            <li key={code}>{code}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-          <button type="button" onClick={handleLogout} className={styles.logout}>
-            <span className={styles.logoutText}>Выход</span>
-          </button>
-        </div>
-      </aside>
-      <main className={styles.main}>
-        <Routes>
-          <Route
-            index
-            element={
-              <DashboardHome loading={loading} stats={stats} modules={modules} />
-            }
-          />
-          <Route path="roles" element={<Roles />} />
-          <Route path="users" element={<Users />} />
-          <Route path="chats" element={<Chats />} />
-          <Route path="chats/:chatId" element={<ChatRoom />} />
-          <Route path="ruscord" element={<Ruscord />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path=":moduleId" element={<ModulePlaceholder />} />
-        </Routes>
-      </main>
-    </div>
-    </RuscordVoiceProvider>
-  );
-}
-
-type VoiceAccordionId = 'channel' | 'members' | 'devices';
-
-function VoicePanelSectionBlock({
-  sectionId,
-  title,
-  expanded,
-  onToggle,
-  children,
-}: {
-  sectionId: VoiceAccordionId;
-  title: string;
-  expanded: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-}) {
-  const sid = sectionId;
-  return (
-    <div className={styles.voicePanelSection} data-section={sectionId}>
-      <button
-        type="button"
-        className={styles.voicePanelSectionHeader}
-        onClick={onToggle}
-        aria-expanded={expanded}
-        aria-controls={`voice-ac-${sid}`}
-        id={`voice-ac-${sid}-btn`}
-      >
-        <span className={styles.voicePanelSectionChevron} aria-hidden>
-          {expanded ? '▼' : '▸'}
-        </span>
-        <span>{title}</span>
-      </button>
-      {expanded ? (
-        <div
-          id={`voice-ac-${sid}`}
-          className={styles.voicePanelSectionBody}
-          role="region"
-          aria-labelledby={`voice-ac-${sid}-btn`}
-        >
-          {children}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function voicePanelRtcRowClass(phase: VoiceRtcStatus['phase']): string {
-  switch (phase) {
-    case 'rtc_ok':
-      return styles.voiceRtcOk;
-    case 'weak':
-    case 'negotiating':
-    case 'connecting':
-      return styles.voiceRtcWarn;
-    case 'no_route':
-      return styles.voiceRtcBad;
-    case 'idle':
-    case 'solo':
-    default:
-      return styles.voiceRtcNeutral;
-  }
-}
-
-function VoicePanelInSidebar({
-  screenShareHint,
-  onDismissScreenShareHint,
-}: {
-  screenShareHint: string | null;
-  onDismissScreenShareHint: () => void;
-}) {
-  const ctx = useRuscordVoice();
-  const panel = ctx?.voicePanel;
-  const voiceRtcStatus = ctx?.voiceRtcStatus ?? null;
-  const voiceUserFacingError = ctx?.voiceUserFacingError ?? null;
-  const dismissVoiceUserFacingError = ctx?.dismissVoiceUserFacingError;
-  const streams = ctx?.streams ?? null;
-  const { user: me } = useAuth();
-  const [shareActiveNoticeDismissed, setShareActiveNoticeDismissed] = useState(false);
-  const [sectionOpen, setSectionOpen] = useState({
-    channel: true,
-    members: true,
-    devices: true,
-  });
-  useEffect(() => {
-    if (!panel?.screenShareEnabled) setShareActiveNoticeDismissed(false);
-  }, [panel?.screenShareEnabled]);
-  if (!panel) return null;
-  const hasRemoteVideo =
-    !!streams?.remoteVideoUserIds.some((uid) => String(uid) !== String(me?.id));
-  const vol = Math.min(1, Math.max(0, panel.volume));
-  const bars = [0.33, 0.66, 1].map((t) => vol >= t);
-  const otherMembers = panel.members.filter((m) => m.user_id !== me?.id);
-  return (
-    <div className={styles.voicePanel}>
-      {screenShareHint ? (
-        <div className={styles.voicePanelHint} role="alert">
-          <span>{screenShareHint}</span>
-          <button type="button" className={styles.voicePanelHintClose} onClick={onDismissScreenShareHint} aria-label="Закрыть">
-            ×
-          </button>
-        </div>
-      ) : null}
-      {panel.screenShareEnabled && !shareActiveNoticeDismissed ? (
-        <div className={styles.voicePanelShareNotice} role="status">
-          <span>
-            Экран транслируется в канал. Остановить — кнопкой «демонстрация» ниже или через системное меню браузера (индикатор записи экрана).
-          </span>
-          <button
-            type="button"
-            className={styles.voicePanelShareNoticeClose}
-            onClick={() => setShareActiveNoticeDismissed(true)}
-            aria-label="Скрыть напоминание"
-          >
-            ×
-          </button>
-        </div>
-      ) : null}
-      {voiceUserFacingError ? (
-        <div
-          className={
-            voiceUserFacingError.level === 'error'
-              ? styles.voicePanelUserError
-              : styles.voicePanelUserWarn
           }
-          role="alert"
-        >
-          <span>{voiceUserFacingError.message}</span>
-          <button
-            type="button"
-            className={styles.voicePanelHintClose}
-            onClick={() => dismissVoiceUserFacingError?.()}
-            aria-label="Закрыть"
-          >
-            ×
-          </button>
-        </div>
-      ) : null}
-      <VoicePanelSectionBlock
-        sectionId="channel"
-        title="Канал"
-        expanded={sectionOpen.channel}
-        onToggle={() => setSectionOpen((p) => ({ ...p, channel: !p.channel }))}
-      >
-        {voiceRtcStatus ? (
-          <div
-            className={`${styles.voicePanelRtcLine} ${voicePanelRtcRowClass(voiceRtcStatus.phase)}`}
-            title={voiceRtcStatus.detail}
-          >
-            {voiceRtcStatus.label}
-          </div>
-        ) : null}
-        {hasRemoteVideo ? (
-          <Link to="/dashboard/ruscord#active-channel" className={styles.voicePanelWatchStream}>
-            Смотреть трансляцию
-          </Link>
-        ) : null}
-        <div className={styles.voicePanelChannelRow}>
-          <div className={styles.voicePanelChannel} title={panel.channelName}>
-            {panel.channelName}
-          </div>
-          {panel.screenShareEnabled && (
-            <span className={styles.voicePanelLiveBadge} title="У вас включена демонстрация экрана">
-              Экран
-            </span>
-          )}
-        </div>
-        <div className={styles.voicePanelAvatars}>
-          {panel.members.slice(0, 6).map((m) => (
-            <div key={m.user_id} className={styles.voicePanelAvatarWrap} title={m.name || m.email}>
-              <Avatar userId={m.user_id} fallbackLetter={m.name?.[0] ?? m.email[0]} size={28} />
-              <span className={styles.voicePanelAvatarIndicators}>
-                <VoiceMemberIndicators member={m} compact />
-              </span>
-            </div>
-          ))}
-          {panel.members.length > 6 && (
-            <span className={styles.muted} style={{ fontSize: '0.75rem' }}>
-              +{panel.members.length - 6}
-            </span>
-          )}
-        </div>
-      </VoicePanelSectionBlock>
-
-      <VoicePanelSectionBlock
-        sectionId="members"
-        title="Участники"
-        expanded={sectionOpen.members}
-        onToggle={() => setSectionOpen((p) => ({ ...p, members: !p.members }))}
-      >
-        {otherMembers.length > 0 ? (
-          <div className={styles.voicePanelMembers}>
-            {otherMembers.map((m) => (
-              <div key={m.user_id} className={styles.voicePanelMemberRow}>
-                <Avatar userId={m.user_id} fallbackLetter={m.name?.[0] ?? m.email[0]} size={20} />
-                <VoiceMemberIndicators member={m} />
-                <span className={styles.voicePanelMemberName} title={m.name || m.email}>
-                  {m.name || m.email}
-                </span>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={panel.userVolumes[m.user_id] ?? 1}
-                  onChange={(e) => panel.setUserVolume(m.user_id, Number(e.target.value))}
-                  title={`Громкость ${m.name || m.email}`}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className={styles.voicePanelMembersEmpty}>Других участников нет</p>
-        )}
-      </VoicePanelSectionBlock>
-
-      <VoicePanelSectionBlock
-        sectionId="devices"
-        title="Устройства и трансляция"
-        expanded={sectionOpen.devices}
-        onToggle={() => setSectionOpen((p) => ({ ...p, devices: !p.devices }))}
-      >
-        <div className={styles.voicePanelControls}>
-          <button
-            type="button"
-            className={`${styles.voicePanelBtn} ${panel.muteMic ? styles.voicePanelBtnMuted : styles.voicePanelBtnActive}`}
-            onClick={() => panel.setMuteMic(!panel.muteMic)}
-            title={panel.muteMic ? 'Включить микрофон' : 'Заглушить микрофон'}
-            aria-label={panel.muteMic ? 'Включить микрофон' : 'Заглушить микрофон'}
-          >
-            <MicIcon muted={panel.muteMic} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.voicePanelBtn} ${panel.muteSounds ? styles.voicePanelBtnMuted : ''}`}
-            onClick={() => panel.setMuteSounds(!panel.muteSounds)}
-            title={panel.muteSounds ? 'Включить звуки' : 'Заглушить звуки'}
-            aria-label={panel.muteSounds ? 'Включить звуки' : 'Заглушить звуки'}
-          >
-            <SpeakerIcon muted={panel.muteSounds} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.voicePanelBtn} ${panel.videoEnabled ? styles.voicePanelBtnActive : ''}`}
-            onClick={() => panel.setVideoEnabled(!panel.videoEnabled)}
-            title={panel.videoEnabled ? 'Выключить камеру' : 'Включить камеру'}
-            aria-label={panel.videoEnabled ? 'Выключить камеру' : 'Включить камеру'}
-          >
-            <CameraIcon on={panel.videoEnabled} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.voicePanelBtn} ${panel.screenShareEnabled ? styles.voicePanelBtnActive : ''}`}
-            onClick={() => panel.setScreenShareEnabled(!panel.screenShareEnabled)}
-            title={panel.screenShareEnabled ? 'Остановить демонстрацию' : 'Демонстрация экрана'}
-            aria-label={panel.screenShareEnabled ? 'Остановить демонстрацию' : 'Демонстрация экрана'}
-          >
-            <ScreenShareIcon on={panel.screenShareEnabled} />
-          </button>
-          <div className={styles.voicePanelLevel}>
-            {bars.map((active, i) => (
-              <span key={i} className={`${styles.voicePanelLevelBar} ${active ? styles.active : ''}`} />
-            ))}
-          </div>
-        </div>
-      </VoicePanelSectionBlock>
-
-      <div className={styles.voicePanelLeaveBar}>
-        <button
-          type="button"
-          className={styles.voicePanelLeave}
-          onClick={panel.leaveChannel}
-          title="Выйти из канала"
-          aria-label="Выйти из канала"
-        >
-          <LeaveChannelIcon />
-          <span className={styles.voicePanelLeaveLabel}>Выйти из канала</span>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function MicIcon({ muted }: { muted: boolean }) {
-  if (muted)
-    return (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <line x1="1" y1="1" x2="23" y2="23" />
-        <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V5a3 3 0 0 0-5.94-.6" />
-        <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23" />
-        <line x1="12" y1="19" x2="12" y2="23" />
-        <line x1="8" y1="23" x2="16" y2="23" />
-      </svg>
-    );
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-      <line x1="12" y1="19" x2="12" y2="23" />
-      <line x1="8" y1="23" x2="16" y2="23" />
-    </svg>
-  );
-}
-
-function SpeakerIcon({ muted }: { muted: boolean }) {
-  if (muted)
-    return (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-        <line x1="23" y1="9" x2="17" y2="15" />
-        <line x1="17" y1="9" x2="23" y2="15" />
-      </svg>
-    );
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-    </svg>
-  );
-}
-
-function CameraIcon({ on }: { on: boolean }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-      <circle cx="12" cy="13" r="4" />
-      {on && <circle cx="12" cy="13" r="2" fill="currentColor" />}
-    </svg>
-  );
-}
-
-function ScreenShareIcon({ on }: { on: boolean }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="2" y="3" width="20" height="14" rx="2" />
-      <path d="M8 21h8" />
-      <path d="M12 17v4" />
-      {on && <path d="M6 8h2l2 2 2-2h2" strokeWidth="1.5" />}
-    </svg>
-  );
-}
-
-function LeaveChannelIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" y1="12" x2="9" y2="12" />
-    </svg>
+        />
+      }
+      bottomNav={isMobile ? <BottomNav items={bottomNavItems} unreadByPath={chatUnreadByPath} /> : undefined}
+    >
+      <Routes>
+        <Route index element={<DashboardHome loading={loading} stats={stats} modules={modules} user={user} />} />
+        <Route path="roles" element={<Roles />} />
+        <Route path="users" element={<Users />} />
+        <Route path="chats" element={<Chats />} />
+        <Route path="chats/:chatId" element={<ChatRoom />} />
+        <Route path="friends" element={<Friends />} />
+        <Route path="ruscord" element={<Ruscord />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path=":moduleId" element={<ModulePlaceholder />} />
+      </Routes>
+    </AppShell>
+    </RuscordVoiceProvider>
   );
 }
 
@@ -1657,12 +1204,38 @@ function DashboardHome({
   loading,
   stats,
   modules,
+  user,
 }: {
   loading: boolean;
   stats: DashboardStats | null;
   modules: ModuleInfo[];
+  user: User | null;
 }) {
   if (loading) return <DotWaveLoader label="Загрузка…" />;
+
+  const extraModules: { id: string; name: string; description: string; path: string; permission: string }[] = [];
+  if (canSeeSection('users.read', user?.permissions)) {
+    extraModules.push({
+      id: 'users',
+      name: 'Пользователи',
+      description: 'Управление учётными записями',
+      path: '/dashboard/users',
+      permission: 'users.read',
+    });
+  }
+  if (canSeeSection('roles.read', user?.permissions)) {
+    extraModules.push({
+      id: 'roles',
+      name: 'Роли',
+      description: 'Роли и права доступа',
+      path: '/dashboard/roles',
+      permission: 'roles.read',
+    });
+  }
+
+  const apiModuleIds = new Set(modules.map((m) => m.id));
+  const adminModules = extraModules.filter((m) => !apiModuleIds.has(m.id));
+
   return (
     <>
       <h1 className={styles.pageTitle}>Панель управления</h1>
@@ -1685,6 +1258,16 @@ function DashboardHome({
             <SpotlightCard
               key={m.id}
               to={`/dashboard/${m.id}`}
+              title={m.name}
+              description={m.description}
+              icon="◆"
+              className={styles.moduleCardSpotlight}
+            />
+          ))}
+          {adminModules.map((m) => (
+            <SpotlightCard
+              key={m.id}
+              to={m.path}
               title={m.name}
               description={m.description}
               icon="◆"

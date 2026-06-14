@@ -1,0 +1,459 @@
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  padding: 1.5rem 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s ease, min-width 0.2s ease;
+}
+
+.sidebarCollapsed {
+  width: 56px;
+  min-width: 56px;
+  padding: 1rem 0;
+}
+
+.sidebarCollapsed .sidebarLogoText,
+.sidebarCollapsed .sectionsTitle,
+.sidebarCollapsed .navItemText,
+.sidebarCollapsed .userEmail,
+.sidebarCollapsed .roleBadgeWrap,
+.sidebarCollapsed .logoutText {
+  display: none !important;
+}
+
+.sidebarCollapsed .sidebarHeader {
+  justify-content: center;
+  padding: 0 0.5rem;
+}
+
+.sidebarCollapsed .sidebarToggle {
+  margin-left: 0;
+}
+
+.sidebarCollapsed .navItemShort {
+  display: none;
+}
+
+.navItemShort {
+  display: none;
+}
+
+.navItemIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  color: inherit;
+}
+
+.sidebarCollapsed .navItemIcon {
+  width: 1.5rem;
+}
+
+.navItemBadge {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.sidebarCollapsed .nav {
+  align-items: center;
+  padding: 0 0.5rem;
+}
+
+.sidebarCollapsed .navItem {
+  padding: 0.6rem;
+  justify-content: center;
+  display: flex;
+}
+
+.sidebarCollapsed .user {
+  padding: 0.5rem;
+  align-items: center;
+}
+
+.sidebarCollapsed .logo {
+  padding: 0 0.5rem;
+  justify-content: center;
+}
+
+.sidebarCollapsed .navItemBadge {
+  display: none;
+}
+
+.sidebarCollapsed .navItemBadgeDot {
+  display: block;
+}
+
+.navItemBadgeDot {
+  display: none;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--surface);
+}
+
+.navItemIconWrap {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebarHeader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 0 1rem 0.75rem;
+  gap: 0.5rem;
+  min-height: 40px;
+  flex-shrink: 0;
+}
+
+.sidebarCollapsed .sidebarHeader {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  padding: 0 0.5rem 0.75rem;
+}
+
+.sidebarToggle {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--surface2) 0%, var(--surface) 100%);
+  color: var(--accent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-left: auto;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.sidebarToggle:hover {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface2) 100%);
+  border-color: var(--accent);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  color: var(--accent);
+}
+
+.sidebarToggle:active {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.sidebarToggle span {
+  display: inline-block;
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.sectionsBlock {
+  padding: 0 1rem 0.5rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sectionsTitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin: 0;
+  padding: 0.5rem 0 0;
+  line-height: 1.3;
+  display: block;
+}
+
+.sidebarCollapsed .sectionsBlock {
+  padding: 0 0.5rem 0.5rem;
+  border-bottom: none;
+}
+
+.sidebarCollapsed .sectionsTitle {
+  margin: 0;
+  padding: 0;
+}
+
+.logo {
+  padding: 0 1.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+.sidebarCollapsed .logo {
+  margin-bottom: 0.75rem;
+  padding: 0 0.5rem;
+  justify-content: center;
+}
+
+.sidebarLogoText {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+.sidebarLogoText:hover,
+.logo:hover {
+  text-decoration: none;
+  color: var(--accent-dim);
+}
+
+.nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+}
+
+.navBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.navBlockToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+}
+
+.navBlockToggle:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.navBlockToggleIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.navBlockToggleIconClosed {
+  transform: rotate(-90deg);
+}
+
+.navBlockTitle {
+  flex: 1;
+}
+
+.navBlockContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+  padding: 8px;
+  border-radius: 16px;
+  background: var(--ui-glass-bg);
+  border: 1px solid var(--ui-border);
+  backdrop-filter: var(--ui-glass-blur);
+  -webkit-backdrop-filter: var(--ui-glass-blur);
+}
+
+.sidebarCollapsed .navBlockToggle {
+  padding: 0.5rem;
+  justify-content: center;
+}
+
+.sidebarCollapsed .navBlockToggle .navBlockTitle {
+  display: none;
+}
+
+.navItem {
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.navItemActive {
+  background: var(--surface2);
+  color: var(--accent);
+}
+
+.navItemText {
+  flex: 1;
+}
+
+.navItem:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.user,
+.sidebarFooter {
+  margin-top: auto;
+  flex-shrink: 0;
+  padding: 1rem 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.userRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: nowrap;
+}
+
+.userAvatar {
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userNameRoleBtn {
+  flex: 1;
+  min-width: 0;
+  padding: 0.25rem 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userNameRoleBtn:hover {
+  color: var(--text);
+}
+
+.userNameRoleText {
+  display: inline;
+  word-break: break-all;
+}
+
+.userEmail {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.roleBadgeWrap {
+  position: relative;
+  align-self: flex-start;
+}
+
+.roleMenu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 0.5rem;
+  min-width: 220px;
+  max-width: 320px;
+  max-height: 60vh;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 0.75rem;
+  z-index: 100;
+}
+
+.roleMenuTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.roleMenuEmpty {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.roleMenuGroup {
+  margin-top: 0.5rem;
+}
+
+.roleMenuGroupName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+
+.roleMenuList {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.logout {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 0;
+  text-align: left;
+}
+
+.logoutText {
+  display: inline;
+}
+
+.logout:hover {
+  color: var(--danger);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}

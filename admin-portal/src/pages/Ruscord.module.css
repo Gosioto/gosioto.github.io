@@ -140,6 +140,9 @@
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .channelItemWrap {
@@ -156,11 +159,81 @@
   background: var(--surface2);
 }
 
+.channelItemUnread .channelNameText {
+  font-weight: 600;
+}
+
+.channelBadge {
+  margin-left: auto;
+}
+
+.channelNameText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.channelRenameInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.channelEditActions {
+  display: flex;
+  gap: 0.2rem;
+  flex-shrink: 0;
+}
+
+.channelEditBtn,
+.channelEditBtnDanger {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--textMuted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.channelEditBtn:hover {
+  background: var(--surface2);
+  color: var(--accent);
+}
+
+.channelEditBtnDanger:hover {
+  background: color-mix(in srgb, var(--danger, #e55) 15%, transparent);
+  color: var(--danger, #e55);
+}
+
+.dragHandle {
+  flex-shrink: 0;
+  color: var(--textMuted);
+  cursor: grab;
+  font-size: 0.85rem;
+  user-select: none;
+}
+
+.channelRowDragging {
+  opacity: 0.55;
+}
+
 .channelName {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.95rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .channelName::before {
@@ -732,6 +805,65 @@
   font-size: 0.9rem;
 }
 
+.friendItemClickable {
+  cursor: pointer;
+  border-radius: 6px;
+  padding-left: 0.35rem;
+  padding-right: 0.35rem;
+  margin-left: -0.35rem;
+  margin-right: -0.35rem;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.friendItemClickable:hover {
+  background: var(--surface2);
+}
+
+.membersSectionTitle {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--textMuted);
+  text-transform: uppercase;
+}
+
+.membersSectionTitle:first-child {
+  margin-top: 0;
+}
+
+.ruscordAvatar img,
+.ruscordAvatar > div {
+  border-radius: 50%;
+}
+
+.messageRow img {
+  border-radius: 50%;
+}
+
+.friendItem img,
+.friendItem > div:first-child > div {
+  border-radius: 50%;
+}
+
+.channelMemberUnder img,
+.channelMemberUnder > div:first-child > div {
+  border-radius: 50%;
+}
+
+.onlineDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.25);
+}
+
 .friendItem:last-child {
   border-bottom: none;
 }
@@ -769,27 +901,144 @@
 
 .discordShell {
   display: flex;
-  align-items: stretch;
-  gap: 0;
+  flex-direction: column;
   min-height: 60vh;
 }
 
+.serverHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  margin: -0.35rem 0 0.75rem;
+}
+
+.serverRailTop {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding: 0 0 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.serverTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  min-height: 2rem;
+}
+
+.serverTitleBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 8px;
+}
+
+.serverTitleBtn:hover {
+  color: var(--accent);
+}
+
+.serverTitleBtn:hover .serverGearBtn {
+  color: var(--accent);
+}
+
+.serverTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: left;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.serverGearBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 6px;
+  color: var(--textMuted);
+  flex-shrink: 0;
+}
+
+.editModeBadge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface2));
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.serverIconImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+}
+
+.serverTitleCentered {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text);
+}
+
+.serverHeaderActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
 .serverRail {
-  flex: 0 0 56px;
-  background: var(--surface2, #1a1d24);
-  border: 1px solid var(--border);
-  border-radius: var(--radius) 0 0 var(--radius);
-  padding: 0.5rem 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding: 0.15rem 0 0.35rem;
 }
 
 .serverRailList {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0.25rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 0.5rem;
+  width: max-content;
+  min-width: 100%;
+  justify-content: center;
+}
+
+.serverRailItem {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
 }
 
 .serverIconBtn,
@@ -1056,4 +1305,47 @@
   font-size: 0.85rem;
   word-break: break-all;
   margin-bottom: 0.75rem;
+}
+
+.modalCardWide {
+  max-width: 560px;
+}
+
+.modalSectionTitle {
+  margin: 0 0 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--textMuted);
+  text-transform: uppercase;
+}
+
+.invitesTableWrap {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.invitesTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.invitesTable th,
+.invitesTable td {
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.invitesTable th {
+  color: var(--textMuted);
+  font-weight: 600;
+}
+
+.inviteCodeInline {
+  font-size: 0.82rem;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--surface2);
 }

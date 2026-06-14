@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth';
 import {
   useRuscordVoice,
@@ -20,23 +20,37 @@ import {
   ruscordAcceptInvite,
   ruscordListChannelMessages,
   ruscordPostChannelMessage,
+  ruscordListServerMembers,
+  ruscordPatchChannel,
+  ruscordDeleteChannel,
+  ruscordReorderChannels,
+  ruscordMarkChannelRead,
+  ruscordListInvites,
   getFriends,
-  getUsers,
   type RuscordServer,
   type RuscordGuildChannel,
   type RuscordGuildMessage,
   type RuscordVoiceMember,
   type RuscordChannelWithMembers,
+  type RuscordServerMember,
   type Friend,
 } from '../api';
-import type { UserWithRole } from '../api';
 import Avatar from '../components/Avatar';
+import RuscordServerIcon from '../components/RuscordServerIcon';
+import ServerSettingsModal from '../components/ServerSettingsModal';
+import UserSettingsModal from '../components/UserSettingsModal';
+import { Badge, useToast, IconSettings } from '../ui';
+import { formatDisplayName } from '../utils/displayName';
 import VoiceMemberIndicators from '../components/VoiceMemberIndicators';
 import { ruscordLog } from '../voiceLog';
 import styles from './Ruscord.module.css';
 
 const STORAGE_MUTE_MIC = 'ruscord_mute_mic';
 const STORAGE_MUTE_SOUNDS = 'ruscord_mute_sounds';
+
+function channelStorageKey(serverId: string) {
+  return `ruscord:server:${serverId}:channel`;
+}
 
 /** Блок «Активный канал»: стримы и веб-камеры участников; театр (вкладка), полный экран монитора, PiP */
 function ActiveChannelStreams() {
@@ -520,6 +534,8 @@ function playLeaveSound() {
 
 export default function Ruscord() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user: me } = useAuth();
   const [servers, setServers] = useState<RuscordServer[]>([]);
   const [allGuildChannels, setAllGuildChannels] = useState<RuscordGuildChannel[]>([]);
@@ -531,7 +547,7 @@ export default function Ruscord() {
   const [textDraft, setTextDraft] = useState('');
   const [members, setMembers] = useState<RuscordVoiceMember[]>([]);
   const [, setFriends] = useState<Friend[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState<UserWithRole[]>([]);
+  const [serverMembers, setServerMembers] = useState<RuscordServerMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [myCurrentChannelId, setMyCurrentChannelId] = useState<string | null>(null);
@@ -545,6 +561,14 @@ export default function Ruscord() {
   const [inviteCodeResult, setInviteCodeResult] = useState<string | null>(null);
   const [acceptInviteOpen, setAcceptInviteOpen] = useState(false);
   const [acceptInviteCode, setAcceptInviteCode] = useState('');
+  const [canManageGuild, setCanManageGuild] = useState(false);
+  const [serverSettingsOpen, setServerSettingsOpen] = useState(false);
+  const [userSettingsMember, setUserSettingsMember] = useState<RuscordServerMember | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editingChannelId, setEditingChannelId] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState('');
+  const [dragChannelId, setDragChannelId] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   const voiceCtx = useRuscordVoice();
   const setVoicePanel = voiceCtx?.setVoicePanel;
@@ -586,6 +610,17 @@ export default function Ruscord() {
   selectedServerIdRef.current = selectedServerId;
 
   const voiceChannels = useMemo(() => channelsWithMembers.map((c) => c.channel), [channelsWithMembers]);
+  const voiceUserIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const cwm of channelsWithMembers) {
+      for (const m of cwm.members) ids.add(String(m.user_id));
+    }
+    return ids;
+  }, [channelsWithMembers]);
+  const categoryChannels = useMemo(
+    () => allGuildChannels.filter((c) => c.channel_type === 'category'),
+    [allGuildChannels],
+  );
   const currentChannelName = myCurrentChannelId
     ? voiceChannels.find((c) => c.id === myCurrentChannelId)?.name ?? allGuildChannels.find((c) => c.id === myCurrentChannelId)?.name ?? 'Канал'
     : '';
@@ -615,7 +650,14 @@ export default function Ruscord() {
     Promise.all([ruscordListServers(), ruscordMe()])
       .then(([serverList, meData]) => {
         setServers(serverList);
-        if (serverList.length > 0 && !selectedServerId) setSelectedServerId(serverList[0].id);
+        const urlServer = searchParams.get('server');
+        const urlChannel = searchParams.get('channel');
+        if (urlServer && serverList.some((s) => s.id === urlServer)) {
+          setSelectedServerId(urlServer);
+          if (urlChannel) setSelectedChannelId(urlChannel);
+        } else if (serverList.length > 0 && !selectedServerId) {
+          setSelectedServerId(serverList[0].id);
+        }
         if (meData.channel_id) setMyCurrentChannelId(meData.channel_id);
       })
       .catch(() => setError('Не удалось загрузить серверы'))
@@ -624,22 +666,38 @@ export default function Ruscord() {
 
   useEffect(() => {
     if (!selectedServerId) return;
-    setSelectedChannelId(null);
     setTextMessages([]);
     setServerChannelIds([]);
     fetchServerData(selectedServerId);
   }, [selectedServerId, fetchServerData]);
 
   useEffect(() => {
+    if (!selectedServerId || allGuildChannels.length === 0) return;
+    const urlChannel = searchParams.get('channel');
+    if (urlChannel && allGuildChannels.some((c) => c.id === urlChannel)) {
+      if (selectedChannelId !== urlChannel) setSelectedChannelId(urlChannel);
+      return;
+    }
+    const stored = sessionStorage.getItem(channelStorageKey(selectedServerId));
+    if (stored && allGuildChannels.some((c) => c.id === stored)) {
+      if (selectedChannelId !== stored) setSelectedChannelId(stored);
+      return;
+    }
+    const inThisServer = channelsWithMembers.some((c) => c.channel.id === myCurrentChannelId);
+    if (inThisServer && myCurrentChannelId && !selectedChannelId) setSelectedChannelId(myCurrentChannelId);
+  }, [
+    selectedServerId,
+    allGuildChannels,
+    channelsWithMembers,
+    myCurrentChannelId,
+    selectedChannelId,
+    searchParams,
+  ]);
+
+  useEffect(() => {
     setHubSubscriptionServerId?.(selectedServerId);
     return () => setHubSubscriptionServerId?.(null);
   }, [selectedServerId, setHubSubscriptionServerId]);
-
-  useEffect(() => {
-    if (!selectedServerId || channelsWithMembers.length === 0) return;
-    const inThisServer = channelsWithMembers.some((c) => c.channel.id === myCurrentChannelId);
-    if (inThisServer && myCurrentChannelId && !selectedChannelId) setSelectedChannelId(myCurrentChannelId);
-  }, [selectedServerId, myCurrentChannelId, channelsWithMembers, selectedChannelId]);
 
   useEffect(() => {
     if (!selectedChannelId) {
@@ -652,6 +710,13 @@ export default function Ruscord() {
       ruscordListChannelMessages(selectedChannelId)
         .then(setTextMessages)
         .catch(() => setTextMessages([]));
+      ruscordMarkChannelRead(selectedChannelId)
+        .then(() => {
+          setAllGuildChannels((prev) =>
+            prev.map((c) => (c.id === selectedChannelId ? { ...c, unread_count: 0 } : c)),
+          );
+        })
+        .catch(() => {});
       setMembers([]);
       return;
     }
@@ -673,10 +738,29 @@ export default function Ruscord() {
   }, []);
 
   useEffect(() => {
-    getUsers()
-      .then(setOnlineUsers)
-      .catch(() => setOnlineUsers([]));
-  }, []);
+    if (!selectedServerId) {
+      setServerMembers([]);
+      return;
+    }
+    ruscordListServerMembers(selectedServerId)
+      .then(setServerMembers)
+      .catch(() => setServerMembers([]));
+  }, [selectedServerId]);
+
+  useEffect(() => {
+    if (!selectedServerId) {
+      setCanManageGuild(false);
+      return;
+    }
+    const server = servers.find((s) => s.id === selectedServerId);
+    if (server?.owner_id && me?.id && server.owner_id === me.id) {
+      setCanManageGuild(true);
+      return;
+    }
+    ruscordListInvites(selectedServerId)
+      .then(() => setCanManageGuild(true))
+      .catch(() => setCanManageGuild(false));
+  }, [selectedServerId, servers, me?.id]);
 
   const rootChannels = useMemo(() => {
     return [...allGuildChannels]
@@ -698,10 +782,23 @@ export default function Ruscord() {
     return map;
   }, [allGuildChannels]);
 
+  const onlineMembers = useMemo(
+    () => serverMembers.filter((m) => m.is_online),
+    [serverMembers],
+  );
+
   const muteSoundsRef = useRef(muteSounds);
   muteSoundsRef.current = muteSounds;
   const meIdRef = useRef(me?.id);
   meIdRef.current = me?.id;
+  const myCurrentChannelIdRef = useRef(myCurrentChannelId);
+  myCurrentChannelIdRef.current = myCurrentChannelId;
+  const allGuildChannelsRef = useRef(allGuildChannels);
+  allGuildChannelsRef.current = allGuildChannels;
+  const channelsWithMembersRef = useRef(channelsWithMembers);
+  channelsWithMembersRef.current = channelsWithMembers;
+  const showToastRef = useRef(showToast);
+  showToastRef.current = showToast;
 
   useEffect(() => {
     if (!setHubSubscriptionChannelIds) return;
@@ -720,6 +817,14 @@ export default function Ruscord() {
             const mid = data.channel_id != null ? String(data.channel_id) : '';
             if (mid && mid === selectedChannelIdRef.current) {
               ruscordListChannelMessages(mid).then(setTextMessages).catch(() => {});
+            } else if (mid) {
+              setAllGuildChannels((prev) =>
+                prev.map((c) =>
+                  c.id === mid && c.channel_type === 'text'
+                    ? { ...c, unread_count: (c.unread_count ?? 0) + 1 }
+                    : c,
+                ),
+              );
             }
           } else {
             const sid = selectedServerIdRef.current;
@@ -742,6 +847,18 @@ export default function Ruscord() {
             video_enabled: false,
             screen_share_enabled: false,
           };
+          const myChannel = myCurrentChannelIdRef.current;
+          const imInVoiceOnServer =
+            !!myChannel &&
+            channelsWithMembersRef.current.some((c) => String(c.channel.id).toLowerCase() === String(myChannel).toLowerCase());
+          if (uid !== String(meIdRef.current) && !imInVoiceOnServer) {
+            const userLabel = formatDisplayName(member.name, member.email);
+            const chName =
+              allGuildChannelsRef.current.find((c) => String(c.id).toLowerCase() === cid)?.name ??
+              channelsWithMembersRef.current.find((c) => String(c.channel.id).toLowerCase() === cid)?.channel.name ??
+              'канал';
+            showToastRef.current(`${userLabel} присоединился к ${chName}`);
+          }
           if (cid === sel && !muteSoundsRef.current) playJoinSound();
           setChannelsWithMembers((prev) =>
             prev.map((p) => {
@@ -858,33 +975,174 @@ export default function Ruscord() {
     setCollapsedCategories((prev) => ({ ...prev, [catId]: !prev[catId] }));
   }
 
+  function selectChannel(channelId: string) {
+    setSelectedChannelId(channelId);
+    if (selectedServerId) {
+      sessionStorage.setItem(channelStorageKey(selectedServerId), channelId);
+      navigate(`/dashboard/ruscord?server=${selectedServerId}&channel=${channelId}`, { replace: true });
+    }
+  }
+
+  function buildReorderPayload(channels: RuscordGuildChannel[]) {
+    const byParent = new Map<string | null, RuscordGuildChannel[]>();
+    for (const c of channels) {
+      const key = c.parent_id;
+      if (!byParent.has(key)) byParent.set(key, []);
+      byParent.get(key)!.push(c);
+    }
+    const order: { id: string; sort_order: number; parent_id: string | null }[] = [];
+    for (const [parentId, group] of byParent) {
+      group
+        .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name))
+        .forEach((c, index) => {
+          order.push({ id: c.id, sort_order: index, parent_id: parentId });
+        });
+    }
+    return order;
+  }
+
+  async function applyChannelReorder(nextChannels: RuscordGuildChannel[]) {
+    if (!selectedServerId) return;
+    setAllGuildChannels(nextChannels);
+    try {
+      await ruscordReorderChannels(selectedServerId, buildReorderPayload(nextChannels));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Не удалось изменить порядок');
+      fetchServerData(selectedServerId);
+    }
+  }
+
+  function handleChannelDrop(targetId: string) {
+    if (!dragChannelId || dragChannelId === targetId || !editMode || !canManageGuild) return;
+    const dragged = allGuildChannels.find((c) => c.id === dragChannelId);
+    const target = allGuildChannels.find((c) => c.id === targetId);
+    if (!dragged || !target) return;
+    const parentId = target.parent_id;
+    const siblings = allGuildChannels
+      .filter((c) => c.parent_id === parentId && c.id !== dragged.id)
+      .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name));
+    const targetIdx = siblings.findIndex((c) => c.id === targetId);
+    const insertAt = targetIdx < 0 ? siblings.length : targetIdx;
+    siblings.splice(insertAt, 0, { ...dragged, parent_id: parentId });
+    const others = allGuildChannels.filter((c) => c.parent_id !== parentId && c.id !== dragged.id);
+    const next = [...others, ...siblings.map((c, i) => ({ ...c, sort_order: i, parent_id: parentId }))];
+    setDragChannelId(null);
+    void applyChannelReorder(next);
+  }
+
+  async function commitChannelRename(channelId: string) {
+    const name = renameDraft.trim();
+    setEditingChannelId(null);
+    if (!name) return;
+    const prev = allGuildChannels.find((c) => c.id === channelId);
+    if (!prev || prev.name === name) return;
+    setError('');
+    try {
+      await ruscordPatchChannel(channelId, { name });
+      setAllGuildChannels((channels) => channels.map((c) => (c.id === channelId ? { ...c, name } : c)));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Не удалось переименовать');
+    }
+  }
+
+  async function handleDeleteChannel(channelId: string) {
+    if (!window.confirm('Удалить канал?')) return;
+    setError('');
+    try {
+      await ruscordDeleteChannel(channelId);
+      if (selectedChannelId === channelId) setSelectedChannelId(null);
+      if (selectedServerId) fetchServerData(selectedServerId);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Не удалось удалить канал');
+    }
+  }
+
   function renderChannelRow(ch: RuscordGuildChannel, depth: number) {
     const isSelected = selectedChannelId === ch.id;
     const imInThisChannel = myCurrentChannelId === ch.id;
     const isVoice = ch.channel_type === 'voice';
     const isText = ch.channel_type === 'text';
+    const unread = isText ? (ch.unread_count ?? 0) : 0;
     const chMembers = channelsWithMembers.find((x) => x.channel.id === ch.id)?.members ?? [];
     const pad = { paddingLeft: `${8 + depth * 12}px` };
+    const isEditing = editingChannelId === ch.id;
+    const draggable = editMode && canManageGuild;
     return (
-      <li key={ch.id} className={styles.channelRow}>
-        <div className={`${styles.channelItem} ${isSelected ? styles.channelItemActive : ''}`} style={pad}>
-          <button
-            type="button"
-            className={styles.channelName}
-            onClick={() => setSelectedChannelId(ch.id)}
-            style={{ flex: 1, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', font: 'inherit' }}
-          >
-            {isText ? <span className={styles.chanGlyph}>#</span> : null}
-            {isVoice ? <span className={styles.chanGlyph}>🔊</span> : null}
-            {ch.name}
-          </button>
+      <li
+        key={ch.id}
+        className={`${styles.channelRow} ${dragChannelId === ch.id ? styles.channelRowDragging : ''}`}
+        draggable={draggable}
+        onDragStart={() => draggable && setDragChannelId(ch.id)}
+        onDragEnd={() => setDragChannelId(null)}
+        onDragOver={(e) => {
+          if (draggable && dragChannelId) e.preventDefault();
+        }}
+        onDrop={() => handleChannelDrop(ch.id)}
+      >
+        <div
+          className={`${styles.channelItem} ${isSelected ? styles.channelItemActive : ''} ${unread > 0 ? styles.channelItemUnread : ''}`}
+          style={pad}
+          role="button"
+          tabIndex={isEditing ? -1 : 0}
+          onClick={() => {
+            if (!isEditing) selectChannel(ch.id);
+          }}
+          onKeyDown={(e) => {
+            if (isEditing) return;
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              selectChannel(ch.id);
+            }
+          }}
+        >
+          {draggable ? <span className={styles.dragHandle} aria-hidden>⠿</span> : null}
+          {isEditing ? (
+            <input
+              className={styles.channelRenameInput}
+              value={renameDraft}
+              autoFocus
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => setRenameDraft(e.target.value)}
+              onBlur={() => void commitChannelRename(ch.id)}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.key === 'Enter') void commitChannelRename(ch.id);
+                if (e.key === 'Escape') setEditingChannelId(null);
+              }}
+            />
+          ) : (
+            <span className={styles.channelName}>
+              {isText ? <span className={styles.chanGlyph}>#</span> : null}
+              {isVoice ? <span className={styles.chanGlyph}>🔊</span> : null}
+              <span className={styles.channelNameText}>{ch.name}</span>
+              {unread > 0 ? <Badge count={unread} className={styles.channelBadge} /> : null}
+            </span>
+          )}
+          {editMode && canManageGuild && !isEditing ? (
+            <div className={styles.channelEditActions} onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                className={styles.channelEditBtn}
+                title="Переименовать"
+                onClick={() => {
+                  setEditingChannelId(ch.id);
+                  setRenameDraft(ch.name);
+                }}
+              >
+                ✎
+              </button>
+              <button type="button" className={styles.channelEditBtnDanger} title="Удалить" onClick={() => void handleDeleteChannel(ch.id)}>
+                ×
+              </button>
+            </div>
+          ) : null}
           {isVoice ? (
             imInThisChannel ? (
-              <button type="button" className={styles.channelBtn} onClick={() => handleLeave(ch.id)}>
+              <button type="button" className={styles.channelBtn} onClick={(e) => { e.stopPropagation(); handleLeave(ch.id); }}>
                 Выйти
               </button>
             ) : (
-              <button type="button" className={`${styles.channelBtn} ${styles.channelBtnJoin}`} onClick={() => handleJoin(ch.id)}>
+              <button type="button" className={`${styles.channelBtn} ${styles.channelBtnJoin}`} onClick={(e) => { e.stopPropagation(); handleJoin(ch.id); }}>
                 Войти
               </button>
             )
@@ -894,7 +1152,7 @@ export default function Ruscord() {
           <ul className={styles.channelMembersUnder}>
             {chMembers.map((m) => (
               <li key={m.user_id} className={styles.channelMemberUnder}>
-                <Avatar userId={m.user_id} fallbackLetter={m.name?.[0] ?? m.email[0]} size={24} />
+                <Avatar userId={m.user_id} className={styles.ruscordAvatar} fallbackLetter={m.name?.[0] ?? m.email[0]} size={24} />
                 <VoiceMemberIndicators member={m} compact />
                 <span>{m.name || m.email}</span>
               </li>
@@ -1061,7 +1319,6 @@ export default function Ruscord() {
 
   return (
     <>
-      <h1 className={styles.pageTitle}>RUscord</h1>
       {error && <p className={styles.error}>{error}</p>}
       {notSecureContext ? (
         <p className={styles.micHint} role="status">
@@ -1163,46 +1420,84 @@ export default function Ruscord() {
         </div>
       ) : null}
 
-      <div className={styles.discordShell}>
-        <aside className={styles.serverRail} aria-label="Серверы">
-          <ul className={styles.serverRailList}>
-            {servers.map((s) => (
-              <li key={s.id}>
-                <button
-                  type="button"
-                  className={`${styles.serverIconBtn} ${selectedServerId === s.id ? styles.serverIconBtnActive : ''}`}
-                  title={s.name}
-                  onClick={() => setSelectedServerId(s.id)}
-                >
-                  {(s.name || '?')[0].toUpperCase()}
-                </button>
-              </li>
-            ))}
-            <li>
-              <button type="button" className={styles.serverIconBtnAdd} title="Создать сервер" onClick={() => setCreateServerOpen(true)}>
-                +
-              </button>
-            </li>
-            <li>
-              <button type="button" className={styles.serverIconBtnAdd} title="Вступить по приглашению" onClick={() => setAcceptInviteOpen(true)}>
-                ↵
-              </button>
-            </li>
-          </ul>
-        </aside>
+      {serverSettingsOpen && currentServer ? (
+        <ServerSettingsModal
+          server={currentServer}
+          canManage={canManageGuild}
+          editMode={editMode}
+          categoryChannels={categoryChannels}
+          onClose={() => setServerSettingsOpen(false)}
+          onServerUpdated={(s) => setServers((prev) => prev.map((x) => (x.id === s.id ? s : x)))}
+          onEditModeChange={setEditMode}
+          onChannelCreated={() => selectedServerId && fetchServerData(selectedServerId)}
+        />
+      ) : null}
 
+      {userSettingsMember ? (
+        <UserSettingsModal
+          userId={userSettingsMember.user_id}
+          userName={userSettingsMember.name}
+          userEmail={userSettingsMember.email}
+          chatId={currentServer?.chat_id ?? null}
+          onClose={() => setUserSettingsMember(null)}
+        />
+      ) : null}
+
+      <nav className={styles.serverRailTop} aria-label="Серверы">
+        <ul className={styles.serverRailList}>
+          {servers.map((s) => (
+            <li key={s.id} className={styles.serverRailItem}>
+              <button
+                type="button"
+                className={`${styles.serverIconBtn} ${selectedServerId === s.id ? styles.serverIconBtnActive : ''}`}
+                title={s.name}
+                onClick={() => setSelectedServerId(s.id)}
+              >
+                <RuscordServerIcon
+                  serverId={s.id}
+                  hasIcon={s.has_icon}
+                  fallbackLetter={(s.name || '?')[0]}
+                  className={styles.serverIconImg}
+                />
+              </button>
+            </li>
+          ))}
+          <li className={styles.serverRailItem}>
+            <button type="button" className={styles.serverIconBtnAdd} title="Создать сервер" onClick={() => setCreateServerOpen(true)}>
+              +
+            </button>
+          </li>
+          <li className={styles.serverRailItem}>
+            <button type="button" className={styles.serverIconBtnAdd} title="Вступить по приглашению" onClick={() => setAcceptInviteOpen(true)}>
+              ↵
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <header className={styles.serverTitleRow}>
+        {currentServer ? (
+          <button
+            type="button"
+            className={styles.serverTitleBtn}
+            title="Настройки сервера"
+            aria-label="Настройки сервера"
+            onClick={() => setServerSettingsOpen(true)}
+          >
+            <h2 className={styles.serverTitle}>{currentServer.name}</h2>
+            <span className={styles.serverGearBtn} aria-hidden>
+              <IconSettings size={18} />
+            </span>
+          </button>
+        ) : (
+          <h2 className={styles.serverTitle}>Сервер</h2>
+        )}
+        {editMode ? <span className={styles.editModeBadge}>Режим редактирования</span> : null}
+      </header>
+
+      <div className={styles.discordShell}>
         <div className={styles.layout}>
           <section className={styles.serversBlock}>
-            <div className={styles.serverBlockHead}>
-              <h2 className={styles.serversTitle}>{currentServer?.name ?? 'Сервер'}</h2>
-              {currentServer ? (
-                <div className={styles.serverHeadActions}>
-                  <button type="button" className={styles.headLinkBtn} onClick={() => { setInviteModalOpen(true); setInviteCodeResult(null); }}>
-                    Инвайт
-                  </button>
-                </div>
-              ) : null}
-            </div>
             <ul className={styles.channelList}>
               {rootChannels.map((ch) => {
                 if (ch.channel_type === 'category') return renderCategoryBlock(ch);
@@ -1219,18 +1514,26 @@ export default function Ruscord() {
                   <span>{selectedMeta?.name ?? 'канал'}</span>
                 </header>
                 <div className={styles.messageList}>
-                  {textMessages.map((m) => (
-                    <div key={m.id} className={styles.messageRow}>
-                      <Avatar userId={m.author_id} fallbackLetter={m.author_name?.[0] ?? m.author_email[0]} size={36} />
-                      <div>
-                        <div className={styles.messageMeta}>
-                          <strong>{m.author_name || m.author_email}</strong>
-                          <span className={styles.messageTime}>{new Date(m.created_at).toLocaleString()}</span>
+                  {textMessages.map((m) => {
+                    const authorColor = m.author_message_color || '#ffffff';
+                    return (
+                      <div key={m.id} className={styles.messageRow}>
+                        <Avatar
+                          userId={m.author_id}
+                          className={styles.ruscordAvatar}
+                          fallbackLetter={m.author_name?.[0] ?? m.author_email[0]}
+                          size={36}
+                        />
+                        <div>
+                          <div className={styles.messageMeta}>
+                            <strong style={{ color: authorColor }}>{m.author_name || m.author_email}</strong>
+                            <span className={styles.messageTime}>{new Date(m.created_at).toLocaleString()}</span>
+                          </div>
+                          <div className={styles.messageBody}>{m.content}</div>
                         </div>
-                        <div className={styles.messageBody}>{m.content}</div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className={styles.messageComposer}>
                   <input
@@ -1256,16 +1559,57 @@ export default function Ruscord() {
           </section>
 
           <section className={styles.onlineBlock}>
-            <h2 className={styles.friendsTitle}>Онлайн</h2>
-            {onlineUsers.length === 0 && <p className={styles.emptyHint}>Нет данных или нет доступа</p>}
-            <ul className={styles.friendList}>
-              {onlineUsers.map((u) => (
-                <li key={u.id} className={styles.friendItem}>
-                  <Avatar userId={u.id} fallbackLetter={u.name?.[0] ?? u.email[0]} size={32} />
-                  <span>{u.name || u.email}</span>
-                </li>
-              ))}
-            </ul>
+            <h2 className={styles.friendsTitle}>Участники</h2>
+            {!selectedServerId && <p className={styles.emptyHint}>Выберите сервер</p>}
+            {selectedServerId && serverMembers.length === 0 && <p className={styles.emptyHint}>Нет участников</p>}
+            {selectedServerId && serverMembers.length > 0 ? (
+              <>
+                <h3 className={styles.membersSectionTitle}>Online — {onlineMembers.length}</h3>
+                <ul className={styles.friendList}>
+                  {onlineMembers.length === 0 ? (
+                    <li className={styles.emptyHint}>Никого нет в сети</li>
+                  ) : (
+                    onlineMembers.map((m) => {
+                      const label = m.nickname ?? formatDisplayName(m.name, m.email);
+                      const inVoice = voiceUserIds.has(String(m.user_id));
+                      return (
+                        <li key={`online-${m.user_id}`}>
+                          <button
+                            type="button"
+                            className={`${styles.friendItem} ${styles.friendItemClickable}`}
+                            onClick={() => setUserSettingsMember(m)}
+                          >
+                            <Avatar userId={m.user_id} className={styles.ruscordAvatar} fallbackLetter={label[0]} size={32} />
+                            {inVoice ? <span className={styles.onlineDot} title="В голосовом канале" aria-hidden /> : null}
+                            <span>{label}</span>
+                          </button>
+                        </li>
+                      );
+                    })
+                  )}
+                </ul>
+                <h3 className={styles.membersSectionTitle}>All — {serverMembers.length}</h3>
+                <ul className={styles.friendList}>
+                  {serverMembers.map((m) => {
+                    const label = m.nickname ?? formatDisplayName(m.name, m.email);
+                    const inVoice = voiceUserIds.has(String(m.user_id));
+                    return (
+                      <li key={m.user_id}>
+                        <button
+                          type="button"
+                          className={`${styles.friendItem} ${styles.friendItemClickable}`}
+                          onClick={() => setUserSettingsMember(m)}
+                        >
+                          <Avatar userId={m.user_id} className={styles.ruscordAvatar} fallbackLetter={label[0]} size={32} />
+                          {inVoice ? <span className={styles.onlineDot} title="В голосовом канале" aria-hidden /> : null}
+                          <span>{label}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            ) : null}
           </section>
         </div>
       </div>
