@@ -1,0 +1,36 @@
+================================================================================
+  07. Главная страница (page.tsx) — краткий обзор
+================================================================================
+
+  Подробная документация модуля: 09-glavnaya-lending.txt
+  Pixel Ecosystem: 17-pixel-ecosystem.txt
+  Оболочка (Header, Footer, NewsTab): 08-obolochka-ui.txt
+
+Файл главной
+------------
+  src/app/page.tsx
+  Директива 'use client' — вся страница клиентская.
+
+Состав разметки (сверху вниз)
+-----------------------------
+  1. Header
+  2. main:
+     • HeroSection
+     • AboutSection
+     • SkillsPreview
+     • LatestProjectSection
+     • CasesSection
+     • PixelEcosystemWrapper → dynamic(PixelEcosystem, { ssr: false })
+  3. Footer
+  4. NewsTab
+  5. ScrollToTop
+
+Связь с остальным приложением
+------------------------------
+  Полные версии контента: /about/, /skills/, /projects/, /hobbies/.
+  CTA на главной ведут на эти маршруты; Hero также ссылается на /freelance/.
+
+Статика и пути
+--------------
+  public/ — /Logo.png, /img/*, favicon, manifest.
+  Учитывайте basePath при деплое не с корня домена (см. 05).

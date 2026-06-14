@@ -1,0 +1,68 @@
+================================================================================
+  13. Модуль хобби (/hobbies/)
+================================================================================
+
+Назначение
+----------
+  Сетка увлечений (игры, книги, электроника, микробиология, кибербез,
+  геймдев) с карточками и переходами на детальные разделы.
+
+Точки входа
+-----------
+  src/app/hobbies/page.tsx — серверный page (без 'use client')
+  DynamicHobbiesSection + DynamicHobbiesComponents
+
+Компоненты
+----------
+  DynamicHobbiesSection.tsx
+    • next/dynamic → HobbiesPageSection (skeleton при загрузке)
+    • Отложенная загрузка тяжёлого UI
+
+  HobbiesPageSection.tsx
+    • Сетка HobbyCard, заголовки, цитата
+    • Данные: hobbiesData.ts
+
+  DynamicHobbiesComponents.tsx
+    • Доп. клиентские виджеты (модалки, анимации) для страницы
+
+  HobbyCard.tsx (hobbies/)
+    • hobbyStyles.ts — общие стили/утилиты
+    • HobbyCard.module.css
+
+  EnhancedHobbiesPageSection.tsx — расширенный вариант (если подключён)
+  HobbiesGamesSection.tsx, HobbyGameCard.tsx — связь с игровым разделом
+  GamesHeader.tsx (hobbies/) — шапка для игровой ветки
+
+  src/components/HobbyCard.tsx (корень) — отдельная копия для /about/
+
+Данные
+------
+  src/data/hobbiesData.ts — export hobbiesData: Hobby[]
+  src/types/hobby.ts
+
+Стили
+-----
+  @/styles/hobbies.css
+  @/styles/enhanced-hobbies.css (при использовании enhanced)
+  @/styles/hobby-game-card.css
+
+Фичи
+----
+  • Lazy load секции через dynamic()
+  • Skeleton placeholder (6 карточек)
+  • Ссылка на /hobbies/games/ для блока «Игры»
+
+Способ реализации
+-----------------
+  • Разделение server page + dynamic client chunk
+  • Статические данные из TS-файла
+
+Зависимости
+-----------
+  08 (Header, Footer только), 14 (игры), 18
+
+Ограничения
+-----------
+  • Нет NewsTab / ScrollToTop на /hobbies/
+  • Дубли HobbyCard: components/ vs components/hobbies/
+  • Отдельных страниц для книг/электроники нет — только карточки-заглушки

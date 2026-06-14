@@ -1,0 +1,66 @@
+================================================================================
+  11. Модуль навыков (/skills/)
+================================================================================
+
+Назначение
+----------
+  Полный каталог технических и soft-навыков с прогрессом, группировкой
+  и якорной навигацией по категориям.
+
+Точки входа
+-----------
+  src/app/skills/page.tsx — 'use client'
+  Импорт: SkillsSection, @/styles/skills.css
+
+Компоненты
+----------
+  SkillsSection.tsx
+    • useMemo — сортировка категорий по order / CATEGORY_ORDER
+    • intro-skills: кнопки-якоря #frontend, #backend, #tools, …
+    • SkillCategoryComponent (SkillCategory.tsx) для каждой категории
+
+  SkillCategory.tsx
+    • id категории для якорей
+    • Подкатегории (subcategories), если есть в данных
+    • Рендер SkillCard для каждого навыка
+
+  SkillCard.tsx
+    • name, level (%), description (tooltip/hover)
+    • Визуал прогресс-бара
+
+  SkillsPreview.tsx — только на главной (09), не на /skills/
+
+Данные
+------
+  src/data/skillsData.ts
+    export skillsData: SkillCategory[]
+  src/types/skills.ts
+    Skill, SkillCategory, Subcategory и др.
+
+  Категории (порядок): frontend, backend, tools, testing, devops,
+  additional, soft — каждая с skills[] (id, name, level, description).
+
+Стили
+-----
+  @/styles/skills.css
+
+Фичи
+----
+  • Якорная навигация из intro в секции
+  • Сортировка категорий по полю order
+  • Hover-описания на карточках навыков
+
+Способ реализации
+-----------------
+  • Декларативный рендер из единого JSON-подобного TS-файла
+  • useMemo для стабильного порядка без лишних пересортировок
+  • Обновление уровней — правка skillsData.ts вручную
+
+Зависимости
+-----------
+  08, 18 (skillsData, types/skills)
+
+Ограничения
+-----------
+  • Проценты — самооценка, не автоматические метрики
+  • Нет i18n

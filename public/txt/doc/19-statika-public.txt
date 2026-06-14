@@ -1,0 +1,78 @@
+================================================================================
+  19. Статика public/ (демо, ассеты, legacy HTML)
+================================================================================
+
+Назначение
+----------
+  Файлы, отдаваемые с корня сайта как /path/file. Включает медиа,
+  демо-кейсы без React и вспомогательные JSON.
+
+Документация
+------------
+  public/txt/doc/ — эта серия файлов 01–20
+
+Иконки и PWA
+------------
+  favicon-32x32.png, favicon-16x16.png, apple-touch-icon.png
+  site.webmanifest
+
+Медиа и ассеты
+--------------
+  img/           — скриншоты, иконки кейсов, game.png, coding.svg
+  Logo.png       — аватар на Hero и About
+  assets/        — g.json и прочие файлы
+  Web-game/      — скрины ruinxxi (chat.png, Profile.png, …)
+
+Legacy HTML-демо (связь с projectsData)
+--------------------------------------
+
+  SKYT/
+    index.html, dashboard.html, history.html, settings.html, features.html
+    css/styles.css, home.css, dashboard.css
+    demoUrl: /SKYT/index.html
+
+  sentinelguard/
+    index.html, features.html, security.html, solutions.html,
+    pricing.html, contact.html, style.css
+    подпапка #1/ — альтернативный прототип
+    demoUrl: /sentinelguard/index.html
+
+  ACHERON/
+    index.html, style.css, script.js
+    images/backgrounds/, images/logos/ (PLACEHOLDER.md)
+
+  static-site-gen/
+    index.html — MarkForge демо
+    assets/marked.min.js, sample.md, styles.css
+    demoUrl: /static-site-gen/index.html
+
+  game-vote/
+    index.html, style.css, script.js
+    games.json — данные для голосования
+
+  case/
+    user-installer.html, remote-admin.html
+    demoUrl remote-installer: /case/remote-admin.html
+
+Прочее
+------
+  txt/doc/     — документация проекта
+  public/assets/g.json — вспомогательные данные (если используется скриптами)
+
+Как открываются демо
+--------------------
+  • Из /projects/ — кнопка demo на ProjectAccordionCard (target _blank или same)
+  • Из CasesSection — ссылка /SKYT или якорь на игру
+  • Не проходят через Next routing — прямой статический HTML
+
+Способ реализации legacy
+------------------------
+  • Чистый HTML/CSS/JS, без сборки Webpack в CI
+  • Обновление демо = правка файлов в public/ напрямую
+  • Пути к ресурсам относительные внутри папки демо
+
+Ограничения
+-----------
+  • Стили демо не связаны с Tailwind главного приложения
+  • Смешанный контент http/https при неправильном деплое
+  • PLACEHOLDER в ACHERON — картинки могут отсутствовать

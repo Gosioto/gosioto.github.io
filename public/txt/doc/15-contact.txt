@@ -1,0 +1,61 @@
+================================================================================
+  15. Модуль контактов (/contact/)
+================================================================================
+
+Назначение
+----------
+  Контактная информация и форма обратной связи с отправкой через EmailJS.
+
+Точки входа
+-----------
+  src/app/contact/page.tsx — 'use client'
+
+Компоненты
+----------
+  Вся логика в page.tsx (монолит):
+    • contact-info: email, телефон, Telegram, GitHub
+    • contact-form: controlled inputs
+    • NewsTab, ScrollToTop, Header, Footer
+
+  ContactSection.tsx — отдельный компонент существует, но страница
+  contact реализована inline в page (проверить при рефакторинге).
+
+Данные
+------
+  Inline: FormData interface, начальное state пустых полей
+  EmailJS (внешний):
+    Public key init: "WQbftsAP5U1VYjWO-"
+    serviceID: "service_4gqo5nl"
+    templateID: "template_rlc7wya"
+
+Стили
+-----
+  @/styles/contact.css
+  @/styles/news-tab.css
+  @/app/globals.css (доп. импорт)
+
+Фичи
+----
+  • Валидация длины полей (name 2-50, subject 5-100, message 10-1000)
+  • Regex email
+  • Honeypot поле website (скрытое) — боты отсекаются
+  • Фильтр паттернов SQL/XSS в combinedInput
+  • Статус отправки, спиннер на кнопке
+  • Часы активности (текст в contact-info)
+  • Соц. иконки VK/LinkedIn/Twitter (href="#" — заглушки)
+
+Способ реализации
+-----------------
+  • Динамическая загрузка email.min.js в useEffect
+  • emailjs.send() на клиенте — ключи публичные (норма для EmailJS)
+  • Без backend — совместимо со static export
+
+Зависимости
+-----------
+  08 (Header, Footer, NewsTab)
+
+Ограничения / безопасность
+--------------------------
+  • Публичные ID сервиса в клиентском коде — ротация в панели EmailJS
+  • Нет rate-limit на стороне сервера
+  • Телефон в label и href могут расходиться — проверить актуальность

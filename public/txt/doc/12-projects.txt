@@ -1,0 +1,74 @@
+================================================================================
+  12. Модуль проектов (/projects/)
+================================================================================
+
+Назначение
+----------
+  Портфолио кейсов: аккордеон карточек, скриншоты, ссылки на live-демо
+  и статические HTML-прототипы в public/.
+
+Точки входа
+-----------
+  src/app/projects/page.tsx — 'use client'
+  ProjectsPageSection + @/styles/projects.css
+
+Компоненты
+----------
+  ProjectsPageSection.tsx
+    State: modalOpen, modalImageSrc
+    • prelude-секция (UI/UX, производительность, офлайн)
+    • map projectsData → ProjectAccordionCard
+    • ProjectScreenshotModal — полноэкранный просмотр скрина
+
+  ProjectAccordionCard.tsx
+    • Раскрытие описания, features, technologies
+    • Кнопки: demoUrl, githubUrl, скриншоты
+    • badge (BEST), comingSoon, logoType
+
+  ProjectScreenshotModal.tsx / ProjectScreenshotModal (projects/)
+    • openModal(src), closeModal
+
+  ProjectCard.tsx — используется в других контекстах (лендинг)
+
+Данные
+------
+  src/data/projectsData.ts — export projectsData: Project[]
+  src/types/project.ts — Project, Feature, Technology, Screenshot
+
+  Кейсы (id):
+    ruinxxi, skyt, sentinelguard, pixel-ecosystem, static-markforge,
+    remote-installer, python-scripts, js-game, future-projects
+
+  demoUrl примеры:
+    https://ruinxxi.ru/
+    /SKYT/index.html
+    /sentinelguard/index.html
+    /static-site-gen/index.html
+    /case/remote-admin.html
+
+Стили
+-----
+  @/styles/projects.css
+
+Фичи
+----
+  • Аккордеон без перезагрузки страницы
+  • Модалка увеличения скриншота
+  • Внешние и внутренние демо-ссылки
+  • Плашки BEST / coming soon
+
+Способ реализации
+-----------------
+  • useState для одной открытой модалки изображения
+  • Статический массив проектов — добавление кейса = правка projectsData.ts
+  • Демо в public/ не проходят через React Router
+
+Зависимости
+-----------
+  08, 18, 19 (статические демо SKYT, SentinelGuard, …)
+
+Ограничения
+-----------
+  • pixel-ecosystem demoUrl: /index.html#... — legacy путь, на Next якорь
+    /#pixel-ecosystem-game корректнее
+  • Часть проектов без screenshots (пустой массив)

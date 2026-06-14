@@ -1,0 +1,98 @@
+================================================================================
+  14. Модуль игр Steam (/hobbies/games/, /hobbies/games-enhanced/)
+================================================================================
+
+Назначение
+----------
+  Демонстрация игровой коллекции Steam: топ-игры, текущие, полная библиотека,
+  статистика, скриншоты, достижения, модальные окна.
+
+Две реализации (сравнение)
+--------------------------
+  ВАРИАНТ A — /hobbies/games/  (рекомендуется как основной для навигации)
+    • Компонентная архитектура, CSS «Midjourney»
+    • src/app/hobbies/games/page.tsx
+    • Сборка: GamesPageMidjourney → Top/Current/Steam *Midjourney
+    • Подгрузка рядов библиотеки: IntersectionObserver (SteamGamesMidjourney)
+    • Header + Footer + NewsTab + ScrollToTop
+    • mounted-gate: спиннер до useEffect (избежание hydration mismatch)
+
+  ВАРИАНТ B — /hobbies/games-enhanced/
+    • Монолит ~750 строк в одном page.tsx
+    • Framer Motion: hero, particles, карточки, FAB-dropdown, модалки
+    • Без общего Header/Footer — полноэкранный landing
+    • Те же данные gamesData.ts, достижения частично inline в модалке
+    • Экспериментальный / витринный UI
+
+Точки входа
+-----------
+  src/app/hobbies/games/page.tsx
+  src/app/hobbies/games-enhanced/page.tsx
+
+Компоненты (вариант A)
+----------------------
+  GamesPageMidjourney.tsx      — layout-обёртка страницы
+  TopGamesMidjourney.tsx       — топ-5, горизонтальный скролл
+  CurrentGamesMidjourney.tsx   — «сейчас играю», progress bar
+  SteamGamesMidjourney.tsx     — сетка 3 в ряд, lazy rows (visibleRows)
+  GamesSidebarMidjourney.tsx   — боковая панель (если активна)
+  GamesHideBar.tsx             — скрытие/показ панелей
+
+  GamesPage.tsx, TopGamesSection.tsx, … — альтернативный набор (legacy naming)
+
+  Модалки и галереи:
+    GameDetailsModal.tsx
+    GameScreenshotsModal.tsx
+    ScreenshotsModal.tsx
+    ScreenshotsGallery.tsx
+    AchievementsModal.tsx
+    GamePreferencesModal.tsx
+    GameModalButtons.tsx
+    GameStatsSection.tsx / GameStatsMidjourney.tsx
+    GamesHeader.tsx
+
+Данные
+------
+  src/data/gamesData.ts
+    gamesData: Game[]       — полная библиотека
+    topGames: TopGame[]     — rank, hours, achievements
+    currentGames: CurrentGame[] — progress %
+    gameStats               — агрегаты для UI
+
+  src/data/achievementsData.ts — achievementsData, getGameIconColor, getGameInitials
+  src/data/screenshotsData.ts — screenshotsData[], filterScreenshots, getUniqueGames
+
+  src/types/game.ts, src/types/index.ts (Game, Achievement)
+
+Стили (вариант A)
+-----------------
+  games-midjourney.css
+  games-midjourney-enhanced.css
+  games-dropdown-menu.css
+  games-modals.css
+  games.css, hobbies-games.css, games-enhanced.css
+
+Фичи
+----
+  • Топ-5: стрелки скролла, клик → детали
+  • Steam grid: +1 ряд при пересечении triggerRef (observer)
+  • Модалки: инфо, скриншоты, достижения
+  • FAB-dropdown (enhanced): hover-меню в углу экрана
+  • Клавиатура: Enter/Space на карточках (SteamGamesMidjourney)
+
+Способ реализации
+-----------------
+  A: разделение на компоненты + CSS modules классов + observer pagination
+  B: framer-motion AnimatePresence, inline state (selectedGame, activeModal, …)
+  • Нет реального Steam API — все данные статические в TS
+  • react-window не используется (длинные списки — порционный рендер рядов)
+
+Зависимости
+-----------
+  18 (gamesData, achievements, screenshots), 08 (на games/), 13 (ссылка с hobbies)
+
+Ограничения
+-----------
+  • Два URL для одного контента — поддерживать оба или выбрать один canonical
+  • About page ссылается на /hobby-games — битая ссылка
+  • Скриншоты в enhanced-модалке — захардкоженные 3 пути

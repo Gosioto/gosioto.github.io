@@ -1,0 +1,77 @@
+================================================================================
+  09. Модуль главной страницы (лендинг /)
+================================================================================
+
+Назначение
+----------
+  Одностраничный вход на сайт: представление, краткие навыки, кейсы,
+  актуальный проект, интерактивная мини-игра Pixel Ecosystem.
+
+Точки входа
+-----------
+  src/app/page.tsx — 'use client'
+
+Компоненты
+----------
+  HeroSection.tsx
+    • next/image (Logo.png), next/link на /about/, /contact/, /freelance/
+    • Кнопка Freelance в стиле страницы freelance
+    • Классы: hero, hero-container, hero-freelance-btn
+
+  AboutSection.tsx
+    • Краткий блок «обо мне» на главной (не путать с /about/)
+    • AboutSection.module.css + @/styles/AboutSection.css, about-fix.css
+
+  SkillsPreview.tsx
+    • Подмножество навыков из skillsData (js, ts, react, vue, git, docker…)
+    • Интерактив «подарок»: пошаговое появление Git/Docker
+    • SkillCard, ссылка на /skills/
+    • @/styles/skills-preview.css
+
+  LatestProjectSection.tsx
+    • Акцент на последнем/главном проекте (ruinxxi и др.)
+    • Данные часто из projectsData или inline
+
+  CasesSection.tsx
+    • Карусель/слайды кейсов (SKYT, Pixel Ecosystem, SentinelGuard…)
+    • State: slideStates по индексу кейса
+    • next/image, ссылки на /SKYT, /#pixel-ecosystem-game
+
+  PixelEcosystemWrapper.tsx
+    • dynamic(() => import('./PixelEcosystem'), { ssr: false })
+    • id="pixel-ecosystem-game" для якорных ссылок
+    • Подробно: 17-pixel-ecosystem.txt
+
+  + оболочка: Header, Footer, NewsTab, ScrollToTop (08)
+
+Данные
+------
+  skillsData.ts — SkillsPreview
+  projectsData.ts — LatestProjectSection / Cases (частично inline в CasesSection)
+  Остальное — inline массивы в компонентах
+
+Стили
+-----
+  globals.css (layout), секционные классы в компонентах и src/styles/
+
+Фичи
+----
+  • Hero CTA и переход на Freelance
+  • SkillsPreview — геймифицированное раскрытие навыков
+  • Cases — переключение слайдов скриншотов
+  • Pixel Ecosystem — canvas-симуляция внизу страницы (lazy, без SSR)
+
+Способ реализации
+-----------------
+  • Целиком клиентская страница — скролл-анимации и игра без гидратации SSR
+  • dynamic import для тяжёлого PixelEcosystem (~1500 строк)
+  • Смешение next/link и якорей #pixel-ecosystem-game
+
+Зависимости
+-----------
+  08 (оболочка), 18 (skillsData, projectsData), 17 (игра)
+
+Ограничения
+-----------
+  • README и Cases могут ссылаться на /SKYT без index.html — проверить на Pages
+  • Дублирование контента с полными страницами /about/, /projects/

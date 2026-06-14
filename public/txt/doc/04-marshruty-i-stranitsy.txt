@@ -1,0 +1,48 @@
+================================================================================
+  04. Маршруты и страницы (App Router)
+================================================================================
+
+Базовые правила URL
+-------------------
+  next.config.ts: trailingSlash: true
+  Итоговые URL на хостинге: /, /about/, /contact/, /hobbies/games/ и т.д.
+
+  Навигация в Header использует <a href="..."> (не только next/link) —
+  совместимость со static export и прямыми переходами.
+
+Таблица маршрутов
+-----------------
+  Маршрут                    Файл                              Документ
+  -------------------------------------------------------------------------
+  /                          src/app/page.tsx                  07, 09
+  /about/                    src/app/about/page.tsx            10
+  /skills/                   src/app/skills/page.tsx           11
+  /projects/                 src/app/projects/page.tsx           12
+  /hobbies/                  src/app/hobbies/page.tsx            13
+  /hobbies/games/            src/app/hobbies/games/page.tsx      14
+  /hobbies/games-enhanced/   src/app/hobbies/games-enhanced/     14
+                             page.tsx
+  /contact/                  src/app/contact/page.tsx            15
+  /freelance/                src/app/freelance/page.tsx          16
+
+  Статика без React-страницы (public/):
+  /SKYT/index.html, /sentinelguard/index.html, /ACHERON/index.html,
+  /static-site-gen/index.html, /game-vote/index.html, /case/*.html
+  — см. документ 19
+
+Общая оболочка страниц
+----------------------
+  Большинство маршрутов: Header + main + Footer + NewsTab + ScrollToTop.
+  Исключения:
+    • /freelance/ — свой FreelanceHeader/Footer, без общего Header
+    • /hobbies/ — без NewsTab и ScrollToTop в текущей реализации
+    • /hobbies/games-enhanced/ — без Header/Footer (полноэкранный UI)
+
+Метаданные
+----------
+  layout.tsx: title «Визитка Gosloto», description для всего сайта.
+  Отдельные page.tsx не экспортируют metadata (клиентские страницы).
+
+Связь с документацией модулей
+-----------------------------
+  Детали компонентов, данных и реализации — в файлах 08–20.

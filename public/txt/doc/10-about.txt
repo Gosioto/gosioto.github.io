@@ -1,0 +1,72 @@
+================================================================================
+  10. Модуль «Обо мне» (/about/)
+================================================================================
+
+Назначение
+----------
+  Развёрнутый профиль: биография, опыт работы, горизонтальный таймлайн
+  профессионального роста, образование, сетка увлечений.
+
+Точки входа
+-----------
+  src/app/about/page.tsx — 'use client'
+
+Компоненты
+----------
+  Inline-секция about-modern
+    Фото /Logo.png, факты, кнопки /contact/, CV /assets/cv.pdf
+
+  ExperienceSection.tsx
+    Props: experiences (массив ExperienceItem)
+    Данные: @/data/experience.ts
+
+  professional-growth (секция в page)
+    HorizontalScrollContainer — горизонтальный скролл карточек
+    FutureWorkBlock — блок «2025-2026+»
+    TimelineCard — карточки этапов (year, title, skills, details)
+    timelineData[] — inline в page.tsx (2025, 2024-25, 2022-24, 2021-23)
+
+  EducationSection.tsx
+    Сертификаты и образование (контент в компоненте)
+
+  hobbies-section на странице About
+    HobbyCard (src/components/HobbyCard.tsx) — 6 карточек
+    hobbies[] inline — ссылки на /hobby-games, /hobby-books и т.д.
+
+  Timeline.tsx — может использоваться в других контекстах (импорт есть)
+
+  Оболочка: Header, Footer, NewsTab, ScrollToTop
+
+Данные
+------
+  experience.ts — export experienceData, interface ExperienceItem
+  hobbies на About — inline (не hobbiesData.ts)
+
+Стили
+-----
+  @/styles/experience-section.css
+  @/styles/professional-growth.css
+  Классы about-modern, hobbies-grid, hobbies-quote
+
+Фичи
+----
+  • Горизонтальный скролл таймлайна (scrollSpeed={3})
+  • Раскрываемые details у TimelineCard (challenges, achievements)
+  • Escape закрывает модалку новостей
+  • Скачивание CV
+
+Способ реализации
+-----------------
+  • Клиентская страница, без fetch
+  • Смешение data/experience и больших inline-массивов в page
+  • Font Awesome для иконок фактов и цитаты
+
+Зависимости
+-----------
+  08, 18 (experience.ts), HobbyCard
+
+Ограничения / техдолг
+---------------------
+  • Ссылки хобби устарели: /hobby-games вместо /hobbies/games/
+  • /hobby-books, /hobby-electronics и др. — отдельных Next-страниц нет
+  • timelineData на About дублирует логику Timeline, не синхронизирован с experience.ts

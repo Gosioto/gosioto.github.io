@@ -1,0 +1,85 @@
+================================================================================
+  18. Слой данных, типы и хуки
+================================================================================
+
+Назначение
+----------
+  Централизованные статические данные и TypeScript-контракты для UI-модулей.
+  Без API и БД — правка контента через редактирование .ts файлов.
+
+src/data/
+---------
+
+  projectsData.ts
+    export projectsData: Project[]
+    Используют: ProjectsPageSection, LatestProjectSection (частично)
+
+  skillsData.ts
+    export skillsData: SkillCategory[]
+    Используют: SkillsSection, SkillsPreview
+
+  gamesData.ts
+    export gamesData, topGames, currentGames, gameStats
+    Используют: /hobbies/games/*, games-enhanced page
+
+  hobbiesData.ts
+    export hobbiesData: Hobby[]
+    Используют: HobbiesPageSection
+
+  experience.ts
+    export interface ExperienceItem
+    export experienceData: ExperienceItem[]
+    Используют: ExperienceSection (/about/)
+
+  achievementsData.ts
+    export achievementsData: Achievement[]
+    export getGameIconColor(), getGameInitials()
+    Используют: AchievementsModal, игровые карточки
+
+  screenshotsData.ts
+    export interface Screenshot
+    export screenshotsData: Screenshot[]
+    export getUniqueGames(), filterScreenshots()
+    Используют: ScreenshotsGallery, модалки скриншотов
+
+src/types/
+----------
+
+  project.ts    — Project, Feature, Technology, Screenshot, badge, comingSoon
+  skills.ts     — Skill, SkillCategory, Subcategory
+  game.ts       — Game, TopGame, CurrentGame (расширения)
+  hobby.ts      — Hobby
+  index.ts      — Game, Achievement (общие экспорты)
+
+src/hooks/
+----------
+
+  useGradientAnimation.ts
+    • Возвращает { buttonRef } для NewsTab
+    • Синхронизация CSS animation-direction при hover
+    • Не зависит от React state анимации
+
+Поток данных (схема)
+--------------------
+
+  [ *.ts в src/data ] → import в компонент/page → props / map → DOM
+
+  Исключения (данные не в src/data):
+    • NewsTab — newsData inline
+    • About timelineData, hobbies[] inline
+    • Contact — форма в state
+    • PixelEcosystem — entities в refs
+    • Freelance — inline в компонентах
+
+Практика обновления контента
+----------------------------
+  1. Найти модуль в doc 09–16
+  2. Открыть соответствующий data/*.ts
+  3. Соблюдать типы из src/types/
+  4. npm run build — проверить сборку static export
+
+Ограничения
+-----------
+  • Нет валидации runtime (только TypeScript compile-time)
+  • Дублирование чисел/текстов между gamesData и achievementsData
+  • secrets не хранить в data/ (EmailJS keys в contact page)

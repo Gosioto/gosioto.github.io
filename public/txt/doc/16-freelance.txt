@@ -1,0 +1,61 @@
+================================================================================
+  16. Модуль Freelance (/freelance/)
+================================================================================
+
+Назначение
+----------
+  Отдельный промо-лендинг услуг фриланс-разработки: визуально изолирован
+  от основного сайта (частицы, кастомный курсор, тёмная тема).
+
+Точки входа
+-----------
+  src/app/freelance/page.tsx — 'use client'
+  @/styles/freelance.css
+
+Компоненты
+----------
+  FreelanceParticles.tsx   — фоновые частицы (canvas): ~25 desktop / ~14
+                             mobile; зона hero ~7/5 частиц; пауза при hidden
+                             tab, prefers-reduced-motion, без glow на mobile
+  FreelanceCursor.tsx      — кастомный курсор, следование за мышью
+  FreelanceHeader.tsx      — навигация freelance-страницы
+  FreelanceHero.tsx        — первый экран, CTA
+  FreelanceServices.tsx    — список услуг
+  FreelanceSkills.tsx      — навыки в контексте заказа
+  FreelanceProjects.tsx    — примеры работ
+  FreelanceContacts.tsx    — контакты / форма
+  FreelanceFooter.tsx      — подвал freelance
+  LiveCodeSection.tsx      — демо «живого кода» (если включено)
+
+  State на page: isLoaded → класс freelance-page loaded (анимация входа)
+
+Данные
+------
+  Контент преимущественно inline в компонентах freelance/* (не src/data)
+
+Стили
+-----
+  @/styles/freelance.css — единый файл темы freelance-page
+
+Фичи
+----
+  • Секция услуг: mobile @768px и @480px — overflow hidden, упрощённая 3D-
+    карусель, горизонтальный скролл nav (freelance.css)
+  • Отдельная визуальная система без общего Header/Footer сайта
+  • Связь с главной: HeroSection ссылка /freelance/ (hero-freelance-btn)
+  • NewsTab в changelog упоминает двусторонние ссылки main ↔ freelance
+  • Particles + custom cursor — только на этой странице
+
+Способ реализации
+-----------------
+  • Клиентская страница, useEffect для isLoaded
+  • Не использует projectsData/skillsData напрямую (дублирование контента возможно)
+
+Зависимости
+-----------
+  09 (ссылка с главной), минимум общих модулей с 08
+
+Ограничения
+-----------
+  • Два параллельных «бренда» UI — правки стилей в двух местах
+  • Нет общей формы EmailJS — контакты могут дублировать /contact/

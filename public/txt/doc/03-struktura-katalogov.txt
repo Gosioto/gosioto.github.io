@@ -1,0 +1,68 @@
+================================================================================
+  03. Структура каталогов репозитория
+================================================================================
+
+Корень проекта
+--------------
+  package.json          — зависимости, скрипты, repository, homepage
+  next.config.ts        — static export, trailingSlash, images
+  tsconfig.json         — TypeScript, paths @/*
+  tailwind.config.ts    — content: src/**/*
+  tailwind.config.js    — дубликат/legacy (проверить актуальный при правках)
+  postcss.config.js     — PostCSS
+  README.md             — краткое описание + ссылка на doc/
+  next-env.d.ts
+
+src/app/  (App Router)
+----------------------
+  layout.tsx            — HTML-оболочка, metadata, favicon, CDN-шрифты
+  globals.css           — глобальные стили приложения
+  page.tsx              — главная (/)
+  about/page.tsx
+  contact/page.tsx
+  freelance/page.tsx
+  projects/page.tsx
+  skills/page.tsx
+  hobbies/page.tsx
+  hobbies/games/page.tsx
+  hobbies/games-enhanced/page.tsx
+
+src/components/
+---------------
+  Корень: Header, Footer, HeroSection, AboutSection, SkillsPreview,
+          LatestProjectSection, CasesSection, PixelEcosystem(+Wrapper),
+          NewsTab, ScrollToTop, SkillsSection, ExperienceSection, …
+
+  games/        — Steam-галерея, модалки, Midjourney-вариант (~20 файлов)
+  hobbies/      — страница хобби, карточки, dynamic-обёртки
+  projects/     — ProjectsPageSection, аккордеон, модалка скриншотов
+  freelance/    — отдельный лендинг (Header, Hero, Particles, …)
+  ui/           — button.tsx (базовый UI)
+
+src/data/
+---------
+  projectsData.ts, skillsData.ts, gamesData.ts, hobbiesData.ts,
+  experience.ts, achievementsData.ts, screenshotsData.ts
+
+src/types/
+----------
+  index.ts, project.ts, skills.ts, game.ts, hobby.ts
+
+src/hooks/
+----------
+  useGradientAnimation.ts — анимация градиента для NewsTab
+
+src/styles/
+-----------
+  23 CSS-файла по доменам (header, skills, games-midjourney, freelance, …)
+  см. документ 20
+
+public/
+-------
+  favicon, site.webmanifest, img/, assets/, Web-game/, txt/doc/
+  Legacy HTML-демо: SKYT/, sentinelguard/, ACHERON/, static-site-gen/,
+                    game-vote/, case/
+
+out/  (после npm run build)
+----------------------------
+  Статический сайт для деплоя на GitHub Pages или другой CDN.

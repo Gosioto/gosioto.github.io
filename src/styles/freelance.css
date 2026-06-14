@@ -2162,51 +2162,136 @@
   }
   
   /* Адаптивность для новой 3D карусели */
+  .freelance-services {
+    overflow-x: hidden;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .freelance-services-content {
+    padding-left: 0;
+    padding-right: 0;
+    overflow-x: hidden;
+  }
+
+  .freelance-services .section-header {
+    margin-bottom: 3rem;
+  }
+
+  .freelance-services .section-title {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    letter-spacing: 1px;
+  }
+
+  .freelance-services .section-subtitle {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+  }
+
   .services-container {
     flex-direction: column;
     gap: 2rem;
+    max-width: 100%;
+    overflow-x: hidden;
   }
   
   .services-carousel-container {
-    height: 400px;
     order: 2;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 360px;
+    overflow: hidden;
+    perspective: 800px;
+  }
+
+  .services-carousel {
+    overflow: hidden;
+    width: 100%;
   }
   
   .services-navigation {
     width: 100%;
     position: static;
     order: 1;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 1.25rem;
   }
   
   .navigation-list-container {
     height: auto;
-    overflow: visible;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
   }
   
   .navigation-list {
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.5rem;
     transform: none !important;
+    width: max-content;
+    min-width: 100%;
+    padding-bottom: 0.25rem;
   }
   
   .nav-item {
-    flex: 1;
-    min-width: 120px;
-    padding: 0.75rem;
+    flex: 0 0 auto;
+    min-width: max(140px, 42vw);
+    padding: 0.75rem 1rem;
   }
   
   .nav-title {
     font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .service-card {
-    width: 300px;
-    padding: 2rem;
+    width: min(100%, 320px);
+    max-width: calc(100vw - 2.5rem);
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .service-card.prev {
+    opacity: 0.5;
+    transform: translateX(-70px) translateZ(-80px) rotateY(12deg) scale(0.82);
+    pointer-events: none;
+  }
+
+  .service-card.next {
+    opacity: 0.5;
+    transform: translateX(70px) translateZ(-80px) rotateY(-12deg) scale(0.82);
+    pointer-events: none;
+  }
+
+  .service-card.active {
+    left: 50%;
+    margin-left: 0;
+    transform: translateX(-50%) translateZ(0) rotateY(0deg) scale(1);
+  }
+
+  .service-card.active:hover {
+    transform: translateX(-50%) translateZ(10px) rotateY(0deg) scale(1.02);
+  }
+
+  .service-features {
+    gap: 0.5rem;
+  }
+
+  .service-feature {
+    font-size: 0.9rem;
   }
   
   .carousel-controls {
     display: none;
+  }
+
+  .freelance-particles {
+    opacity: 0.45;
   }
   
   .skills-container {
@@ -2284,6 +2369,55 @@
 
   .stat-label {
     font-size: 0.65rem;
+  }
+
+  /* Услуги — очень узкие экраны */
+  .freelance-services .section-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .services-carousel-container {
+    min-height: 320px;
+    perspective: none;
+  }
+
+  .service-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 1.25rem;
+  }
+
+  .service-card.prev,
+  .service-card.next {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .service-card.active {
+    transform: translateX(-50%) translateZ(0) rotateY(0deg) scale(1);
+  }
+
+  .services-navigation .navigation-title {
+    font-size: 1.15rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .nav-item {
+    min-width: 130px;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .nav-title {
+    font-size: 0.75rem;
+  }
+
+  .service-title {
+    font-size: 1.15rem;
+  }
+
+  .service-description {
+    font-size: 0.9rem;
   }
 }
 

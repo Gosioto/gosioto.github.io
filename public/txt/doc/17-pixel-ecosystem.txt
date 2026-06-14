@@ -1,0 +1,65 @@
+================================================================================
+  17. Модуль Pixel Ecosystem (мини-игра)
+================================================================================
+
+Назначение
+----------
+  Интерактивная canvas-симуляция «экосистемы» на главной странице:
+  сущности взаимодействуют (охота, убежище, размножение, контейнеры).
+
+Точки входа
+-----------
+  src/components/PixelEcosystemWrapper.tsx
+    → dynamic(PixelEcosystem, { ssr: false, loading: ... })
+  Якорь: id="pixel-ecosystem-game"
+  Ссылки: CasesSection, projectsData (pixel-ecosystem)
+
+Компоненты
+----------
+  PixelEcosystemWrapper.tsx — только dynamic-обёртка
+  PixelEcosystem.tsx       — ~1500 строк, 'use client'
+
+Типы сущностей (интерфейсы в файле)
+------------------------------------
+  pixel     — цвет, size, evolved, panicMode, targetContainer
+  button    — buttonType, powerLevel, copyEffect, mergeEffect
+  basket    — hunting, capacity, collected, level, huntingGroup
+  container — убежище, вместимость, защита сущностей
+  Particle, Trail — визуальные эффекты
+
+Данные
+------
+  Состояние в useRef/useState внутри компонента (entities[], stats).
+  Опционально localStorage для сохранения (если включено в коде).
+  Нет src/data — вся логика в одном файле.
+
+Стили
+-----
+  Inline-стили и классы в JSX; блок статистики под canvas.
+
+Фичи
+----
+  • Canvas 2D + requestAnimationFrame game loop
+  • AI-поведение: panic, avoidance, interception, охота корзинами
+  • Статистика в реальном времени (счётчики сущностей)
+  • Управление:
+      ЛКМ (button 0) — добавить случайную сущность
+      ПКМ (button 2) — удалить сущность под курсором
+      contextmenu заблокирован на canvas
+  • Collisions, evolution, energy, age
+
+Способ реализации
+-----------------
+  • Классы/функции сущностей в одном TSX (миграция с React-версии 3000+ строк)
+  • ssr: false обязателен — window, canvas, listeners
+  • useEffect для mount canvas, cleanup listeners
+
+Зависимости
+-----------
+  09 (главная), 12 (кейс в projectsData)
+
+Ограничения
+-----------
+  • Тяжёлый бандл для главной — смягчено dynamic import
+  • demoUrl в projects указывает на legacy /index.html#...
+  • Производительность на слабых мобильных — много сущностей = нагрузка на CPU

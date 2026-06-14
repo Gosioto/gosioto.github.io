@@ -1,0 +1,72 @@
+================================================================================
+  02. Технологический стек и зависимости
+================================================================================
+
+Среда выполнения и язык
+-----------------------
+  • Node.js (разработка и сборка)
+  • TypeScript (strict: true в tsconfig.json)
+  • Алиас путей: "@/*" → "./src/*"
+
+Фреймворк и UI
+--------------
+  • Next.js 15.x — App Router (src/app), output: 'export'
+  • React 18
+  • Tailwind CSS 3.x (tailwind.config.ts, postcss, autoprefixer)
+  • Framer Motion ^12 — анимации (games-enhanced, часть UI)
+  • CSS-модули — точечно (AboutSection.module.css, HobbyCard.module.css)
+
+Зависимости и фактическое использование
+---------------------------------------
+  package.json dependencies:
+    next, react, react-dom     — ядро приложения
+    framer-motion              — /hobbies/games-enhanced/, motion-эффекты
+    react-window ^1.8.11       — указан в package.json и optimizePackageImports
+                                 в next.config.ts, но в src/ импортов НЕТ
+                                 (зарезервировано / legacy; виртуализация не
+                                 подключена)
+
+  devDependencies:
+    typescript, @types/*
+    eslint, eslint-config-next (версия 14 — при обновлении Next выровнять)
+    tailwindcss, postcss, autoprefixer
+    critters — в devDependencies (optimizeCss в next отключён)
+
+Сборка Next (next.config.ts)
+----------------------------
+  • output: 'export' — статический HTML/JS/CSS в out/
+  • trailingSlash: true — URL вида /about/
+  • images.unoptimized: true — Next/Image без серверной оптимизации
+  • compress: true, poweredByHeader: false
+  • experimental.optimizePackageImports: ['react-window']
+
+Скрипты npm
+-----------
+  npm run dev      — next dev
+  npm run build    — next build → out/
+  npm run start    — next start (для static export на Pages не используется)
+  npm run lint     — next lint
+  npm run export   — дублирует next build
+
+Внешние CDN (не в package.json)
+-------------------------------
+  src/app/layout.tsx:
+    • Font Awesome 6 (cdnjs)
+    • Google Fonts: Nunito (layout также подключает next/font Inter для body)
+
+  src/app/contact/page.tsx (клиент):
+    • EmailJS — скрипт https://cdn.emailjs.com/dist/email.min.js
+
+  public/static-site-gen/:
+    • marked.min.js — рендер Markdown в демо-генераторе
+
+Паттерны рендеринга
+-------------------
+  • 'use client' — на интерактивных страницах и большинстве секций
+  • next/dynamic + ssr: false — PixelEcosystem, HobbiesPageSection
+  • next/link, next/image — HeroSection и отдельные места (static export OK)
+
+Инструменты разработки
+----------------------
+  Git, ESLint, Lighthouse (метрики в старом README не перепроверялись после
+  миграции на Next — при необходимости запустить заново).

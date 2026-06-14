@@ -1,0 +1,81 @@
+================================================================================
+  20. Стили, темизация и UI-kit
+================================================================================
+
+Назначение
+----------
+  Описание CSS-слоя и минимального UI-kit. Стили в основном глобальные
+  (импорт в page или компонент), Tailwind — точечно (Footer, часть games).
+
+Глобальные
+----------
+  src/app/globals.css     — база, переменные, общие утилиты
+  src/app/layout.tsx      — Inter (next/font), без импорта всех модульных CSS
+
+CSS-модули
+----------
+  AboutSection.module.css
+  HobbyCard.module.css (hobbies/)
+
+src/styles/ — карта файлов
+--------------------------
+  header.css              — Header, меню, active link
+  scroll-to-top.css       — ScrollToTop
+  news-tab.css            — NewsTab, градиентная кнопка
+  skills.css              — /skills/
+  skills-preview.css      — SkillsPreview на главной
+  AboutSection.css        — AboutSection
+  about-fix.css           — правки вёрстки about-блоков
+  experience-section.css  — ExperienceSection
+  professional-growth.css — горизонтальный таймлайн /about/
+  projects.css            — /projects/
+  hobbies.css             — /hobbies/
+  enhanced-hobbies.css
+  hobby-game-card.css
+  hobbies-games.css
+  contact.css             — /contact/
+  freelance.css           — вся /freelance/
+  games.css
+  games-midjourney.css
+  games-midjourney-enhanced.css
+  games-dropdown-menu.css
+  games-modals.css
+  games-enhanced.css
+  games-modal-buttons.css
+
+Подключение
+-----------
+  Паттерн: import '@/styles/xxx.css' в page.tsx или 'use client' компоненте.
+  Tailwind: className в JSX (Footer, games-enhanced page, loader spinner).
+
+UI-kit
+------
+  src/components/ui/button.tsx — базовая кнопка (shadcn-подобный минимум)
+  Кнопки сайта чаще: .btn .btn-primary .btn-secondary в глобальных/секционных CSS
+
+Внешние стили
+-------------
+  Font Awesome 6 (CDN) — иконки по всему сайту
+  Google Fonts Nunito (CDN) + Inter через next/font
+
+Схема: страница → стили
+-----------------------
+  /              → globals, skills-preview, AboutSection.*, header (via Header)
+  /about/        → experience-section, professional-growth, header
+  /skills/       → skills.css
+  /projects/     → projects.css
+  /hobbies/      → hobbies.css
+  /hobbies/games/→ games-midjourney*.css, games-modals, dropdown
+  /contact/      → contact.css, news-tab.css
+  /freelance/    → freelance.css (изолированная тема)
+
+Рекомендации при доработке
+--------------------------
+  • Новая страница — отдельный файл в src/styles/, импорт только на page
+  • Избегать дублирования .btn — переиспользовать globals или ui/button
+  • Freelance не наследует header.css — осознанная изоляция
+
+Ограничения
+-----------
+  • Два tailwind.config (ts + js) — при правках уточнять активный
+  • Нет единой design tokens файла — цвета разбросаны по CSS
