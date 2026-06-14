@@ -25,11 +25,25 @@ admin_branch (SPA) → deploy-admin.yml  → Gosioto/gosloto-admin → admin.gos
 
 ## Шаг 1. Репозиторий для admin (один раз)
 
-1. GitHub → **New repository**: `Gosioto/gosloto-admin` (пустой, без README).
-2. **Settings → Pages**:
-   - Source: **Deploy from a branch**
-   - Branch: **main** / **/(root)**
-3. Пока **не** включайте custom domain — добавим после первого деплоя.
+Локально уже подготовлен: **`C:\Rabo4aya\GIT\gosloto-admin`** (commit на `main`, статика + `CNAME`).
+
+**Вариант A — скрипт (после `gh auth login`):**
+
+```powershell
+cd C:\Rabo4aya\GIT\gosloto-admin
+.\scripts\create-github-repo.ps1
+```
+
+**Вариант B — вручную на GitHub:**
+
+1. **New repository** → `Gosioto/gosloto-admin` (пустой, без README).
+2. Локально:
+   ```powershell
+   cd C:\Rabo4aya\GIT\gosloto-admin
+   git remote add origin https://github.com/Gosioto/gosloto-admin.git
+   git push -u origin main
+   ```
+3. **Settings → Pages** → Source: **main** / **/(root)**
 
 ## Шаг 2. Секреты и переменные в `gosioto.github.io`
 
