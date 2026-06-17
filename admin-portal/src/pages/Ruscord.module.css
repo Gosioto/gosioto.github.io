@@ -7,9 +7,10 @@
   display: grid;
   grid-template-columns: 280px 1fr 260px;
   gap: 1.5rem;
-  min-height: 60vh;
   flex: 1;
+  min-height: 0;
   min-width: 0;
+  overflow: hidden;
 }
 
 @media (max-width: 900px) {
@@ -902,7 +903,18 @@
 .discordShell {
   display: flex;
   flex-direction: column;
-  min-height: 60vh;
+  flex: 1;
+  min-height: 0;
+  height: calc(100vh - 4rem);
+  max-height: calc(100vh - 4rem);
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .discordShell {
+    height: calc(100vh - 4rem - 72px);
+    max-height: calc(100vh - 4rem - 72px);
+  }
 }
 
 .serverHeader {
@@ -1103,7 +1115,10 @@
 }
 
 .mainColumn {
-  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -1114,8 +1129,10 @@
 .textChannelPanel {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   height: 100%;
-  min-height: 360px;
+  overflow: hidden;
 }
 
 .textChannelHead {
@@ -1125,6 +1142,18 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
+}
+
+.messagesWrap {
+  flex: 1;
+  min-height: 0;
+}
+
+.messagesInner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
 }
 
 .messageList {
@@ -1161,12 +1190,55 @@
   word-break: break-word;
 }
 
+.messageEdited {
+  color: var(--textMuted);
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+
+.messageEditBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 1rem 0.35rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.messageEditBarHint {
+  flex: 1;
+  color: var(--textMuted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .messageComposer {
   display: flex;
+  align-items: flex-end;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   border-top: 1px solid var(--border);
   background: var(--surface2);
+  flex-shrink: 0;
+}
+
+.messageTextarea {
+  flex: 1;
+  min-height: 2.5rem;
+  max-height: 12rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+  line-height: 1.4;
 }
 
 .messageInput {

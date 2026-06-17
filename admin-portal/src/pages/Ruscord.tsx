@@ -20,6 +20,8 @@ import {
   ruscordAcceptInvite,
   ruscordListChannelMessages,
   ruscordPostChannelMessage,
+  ruscordEditChannelMessage,
+  ruscordDeleteChannelMessage,
   ruscordListServerMembers,
   ruscordPatchChannel,
   ruscordDeleteChannel,
@@ -39,7 +41,8 @@ import Avatar from '../components/Avatar';
 import RuscordServerIcon from '../components/RuscordServerIcon';
 import ServerSettingsModal from '../components/ServerSettingsModal';
 import UserSettingsModal from '../components/UserSettingsModal';
-import { Badge, useToast, IconSettings } from '../ui';
+import { Badge, useToast, IconSettings, ScrollArea, ContextMenu, Button } from '../ui';
+import type { ContextMenuItem, ScrollAreaHandle } from '../ui';
 import { formatDisplayName } from '../utils/displayName';
 import VoiceMemberIndicators from '../components/VoiceMemberIndicators';
 import { ruscordLog } from '../voiceLog';
@@ -47,6 +50,8 @@ import styles from './Ruscord.module.css';
 
 const STORAGE_MUTE_MIC = 'ruscord_mute_mic';
 const STORAGE_MUTE_SOUNDS = 'ruscord_mute_sounds';
+const STORAGE_LAST_SERVER = 'ruscord:lastServerId';
+const STORAGE_LAST_CHANNEL = 'ruscord:lastChannelId';
 
 function channelStorageKey(serverId: string) {
   return `ruscord:server:${serverId}:channel`;
@@ -545,6 +550,8 @@ export default function Ruscord() {
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
   const [textMessages, setTextMessages] = useState<RuscordGuildMessage[]>([]);
   const [textDraft, setTextDraft] = useState('');
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; message: RuscordGuildMessage } | null>(null);
   const [members, setMembers] = useState<RuscordVoiceMember[]>([]);
   const [, setFriends] = useState<Friend[]>([]);
   const [serverMembers, setServerMembers] = useState<RuscordServerMember[]>([]);
@@ -605,6 +612,8 @@ export default function Ruscord() {
   const animationRef = useRef<number>(0);
   const selectedChannelIdRef = useRef<string | null>(null);
   const selectedServerIdRef = useRef<string | null>(null);
+  const scrollAreaRef = useRef<ScrollAreaHandle>(null);
+  const textInputRef = useRef<HTMLTextAreaElement>(null);
   const fetchServerDataRef = useRef<(serverId: string) => void>(() => {});
   selectedChannelIdRef.current = selectedChannelId;
   selectedServerIdRef.current = selectedServerId;
@@ -627,6 +636,10 @@ export default function Ruscord() {
   const currentChannelMembers = myCurrentChannelId
     ? (channelsWithMembers.find((c) => c.channel.id === myCurrentChannelId)?.members ?? members)
     : [];
+  const currentChannelMemberIdsKey = useMemo(
+    () => currentChannelMembers.map((m) => m.user_id).sort().join(','),
+    [currentChannelMembers],
+  );
 
   const fetchServerData = useCallback((serverId: string) => {
     Promise.all([ruscordListServerChannelsFull(serverId), ruscordChannelsWithMembers(serverId)])
@@ -655,8 +668,15 @@ export default function Ruscord() {
         if (urlServer && serverList.some((s) => s.id === urlServer)) {
           setSelectedServerId(urlServer);
           if (urlChannel) setSelectedChannelId(urlChannel);
-        } else if (serverList.length > 0 && !selectedServerId) {
-          setSelectedServerId(serverList[0].id);
+        } else {
+          const storedServer = localStorage.getItem(STORAGE_LAST_SERVER);
+          if (storedServer && serverList.some((s) => s.id === storedServer)) {
+            setSelectedServerId(storedServer);
+            const storedChannel = localStorage.getItem(STORAGE_LAST_CHANNEL);
+            if (storedChannel) setSelectedChannelId(storedChannel);
+          } else if (serverList.length > 0 && !selectedServerId) {
+            setSelectedServerId(serverList[0].id);
+          }
         }
         if (meData.channel_id) setMyCurrentChannelId(meData.channel_id);
       })
@@ -683,6 +703,11 @@ export default function Ruscord() {
       if (selectedChannelId !== stored) setSelectedChannelId(stored);
       return;
     }
+    const globalStored = localStorage.getItem(STORAGE_LAST_CHANNEL);
+    if (globalStored && allGuildChannels.some((c) => c.id === globalStored)) {
+      if (selectedChannelId !== globalStored) setSelectedChannelId(globalStored);
+      return;
+    }
     const inThisServer = channelsWithMembers.some((c) => c.channel.id === myCurrentChannelId);
     if (inThisServer && myCurrentChannelId && !selectedChannelId) setSelectedChannelId(myCurrentChannelId);
   }, [
@@ -703,6 +728,8 @@ export default function Ruscord() {
     if (!selectedChannelId) {
       setMembers([]);
       setTextMessages([]);
+      setEditingMessageId(null);
+      setContextMenu(null);
       return;
     }
     const meta = allGuildChannels.find((c) => c.id === selectedChannelId);
@@ -732,10 +759,31 @@ export default function Ruscord() {
   }, [selectedChannelId, channelsWithMembers, allGuildChannels, me?.id]);
 
   useEffect(() => {
+    scrollAreaRef.current?.scrollToBottom(true);
+  }, [textMessages.length, selectedChannelId]);
+
+  useEffect(() => {
+    if (!editingMessageId) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setEditingMessageId(null);
+        setTextDraft('');
+      }
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [editingMessageId]);
+
+  useEffect(() => {
     getFriends()
       .then(setFriends)
       .catch(() => setFriends([]));
   }, []);
+
+  useEffect(() => {
+    if (!selectedServerId) return;
+    localStorage.setItem(STORAGE_LAST_SERVER, selectedServerId);
+  }, [selectedServerId]);
 
   useEffect(() => {
     if (!selectedServerId) {
@@ -745,6 +793,12 @@ export default function Ruscord() {
     ruscordListServerMembers(selectedServerId)
       .then(setServerMembers)
       .catch(() => setServerMembers([]));
+    const intervalId = window.setInterval(() => {
+      ruscordListServerMembers(selectedServerId)
+        .then(setServerMembers)
+        .catch(() => {});
+    }, 60_000);
+    return () => window.clearInterval(intervalId);
   }, [selectedServerId]);
 
   useEffect(() => {
@@ -787,6 +841,11 @@ export default function Ruscord() {
     [serverMembers],
   );
 
+  const offlineMembers = useMemo(
+    () => serverMembers.filter((m) => !m.is_online),
+    [serverMembers],
+  );
+
   const muteSoundsRef = useRef(muteSounds);
   muteSoundsRef.current = muteSounds;
   const meIdRef = useRef(me?.id);
@@ -812,6 +871,16 @@ export default function Ruscord() {
       try {
         const event = data.event;
         const gid = data.server_id != null ? String(data.server_id) : '';
+        if (event === 'guild_presence' && gid && gid === selectedServerIdRef.current) {
+          const uid = data.user_id != null ? String(data.user_id) : '';
+          if (uid && typeof data.is_online === 'boolean') {
+            setServerMembers((prev) =>
+              prev.map((m) =>
+                String(m.user_id) === uid ? { ...m, is_online: Boolean(data.is_online) } : m,
+              ),
+            );
+          }
+        }
         if (gid && gid === selectedServerIdRef.current && typeof event === 'string' && event.startsWith('guild_')) {
           if (event === 'guild_message_created') {
             const mid = data.channel_id != null ? String(data.channel_id) : '';
@@ -825,6 +894,30 @@ export default function Ruscord() {
                     : c,
                 ),
               );
+            }
+          } else if (event === 'guild_message_updated') {
+            const mid = data.channel_id != null ? String(data.channel_id) : '';
+            const msgId = data.message_id != null ? String(data.message_id) : '';
+            if (mid && mid === selectedChannelIdRef.current && msgId) {
+              setTextMessages((prev) =>
+                prev.map((m) =>
+                  m.id === msgId
+                    ? {
+                        ...m,
+                        content: String(data.content ?? m.content),
+                        edited_at: (data.edited_at as string | undefined) ?? m.edited_at ?? null,
+                        original_content:
+                          (data.original_content as string | undefined) ?? m.original_content ?? null,
+                      }
+                    : m,
+                ),
+              );
+            }
+          } else if (event === 'guild_message_deleted') {
+            const mid = data.channel_id != null ? String(data.channel_id) : '';
+            const msgId = data.message_id != null ? String(data.message_id) : '';
+            if (mid && mid === selectedChannelIdRef.current && msgId) {
+              setTextMessages((prev) => prev.filter((m) => m.id !== msgId));
             }
           } else {
             const sid = selectedServerIdRef.current;
@@ -979,6 +1072,7 @@ export default function Ruscord() {
     setSelectedChannelId(channelId);
     if (selectedServerId) {
       sessionStorage.setItem(channelStorageKey(selectedServerId), channelId);
+      localStorage.setItem(STORAGE_LAST_CHANNEL, channelId);
       navigate(`/dashboard/ruscord?server=${selectedServerId}&channel=${channelId}`, { replace: true });
     }
   }
@@ -1085,13 +1179,22 @@ export default function Ruscord() {
           role="button"
           tabIndex={isEditing ? -1 : 0}
           onClick={() => {
-            if (!isEditing) selectChannel(ch.id);
+            if (isEditing) return;
+            if (isVoice && !editMode) {
+              handleJoin(ch.id);
+            } else {
+              selectChannel(ch.id);
+            }
           }}
           onKeyDown={(e) => {
             if (isEditing) return;
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
-              selectChannel(ch.id);
+              if (isVoice && !editMode) {
+                handleJoin(ch.id);
+              } else {
+                selectChannel(ch.id);
+              }
             }
           }}
         >
@@ -1141,11 +1244,7 @@ export default function Ruscord() {
               <button type="button" className={styles.channelBtn} onClick={(e) => { e.stopPropagation(); handleLeave(ch.id); }}>
                 Выйти
               </button>
-            ) : (
-              <button type="button" className={`${styles.channelBtn} ${styles.channelBtnJoin}`} onClick={(e) => { e.stopPropagation(); handleJoin(ch.id); }}>
-                Войти
-              </button>
-            )
+            ) : null
           ) : null}
         </div>
         {isVoice && chMembers.length > 0 ? (
@@ -1221,14 +1320,67 @@ export default function Ruscord() {
     }
   }
 
+  function cancelEditingMessage() {
+    setEditingMessageId(null);
+    setTextDraft('');
+  }
+
+  function startEditingMessage(msg: RuscordGuildMessage) {
+    setEditingMessageId(msg.id);
+    setTextDraft(msg.content);
+    setContextMenu(null);
+    textInputRef.current?.focus();
+  }
+
+  function buildTextContextMenuItems(msg: RuscordGuildMessage): ContextMenuItem[] {
+    const items: ContextMenuItem[] = [];
+    const isOwn = me?.id != null && String(msg.author_id).toLowerCase() === String(me.id).toLowerCase();
+    if (isOwn) {
+      items.push({
+        id: 'edit',
+        label: 'Редактировать',
+        onClick: () => startEditingMessage(msg),
+      });
+    }
+    if (isOwn || canManageGuild) {
+      items.push({
+        id: 'delete',
+        label: 'Удалить',
+        danger: true,
+        onClick: () => void handleDeleteTextMessage(msg.id),
+      });
+    }
+    return items;
+  }
+
+  function handleDeleteTextMessage(messageId: string) {
+    if (!selectedChannelId) return;
+    if (!window.confirm('Удалить сообщение?')) return;
+    setContextMenu(null);
+    setError('');
+    ruscordDeleteChannelMessage(selectedChannelId, messageId)
+      .then(() => {
+        setTextMessages((prev) => prev.filter((m) => m.id !== messageId));
+        if (editingMessageId === messageId) cancelEditingMessage();
+      })
+      .catch((e) => setError(e instanceof Error ? e.message : 'Не удалось удалить'));
+  }
+
   async function submitTextMessage() {
     const t = textDraft.trim();
     if (!selectedChannelId || !t) return;
     setError('');
     try {
-      const msg = await ruscordPostChannelMessage(selectedChannelId, t);
-      setTextDraft('');
-      setTextMessages((prev) => [...prev, msg]);
+      if (editingMessageId) {
+        const msg = await ruscordEditChannelMessage(selectedChannelId, editingMessageId, t);
+        setTextMessages((prev) => prev.map((m) => (m.id === msg.id ? msg : m)));
+        cancelEditingMessage();
+      } else {
+        const msg = await ruscordPostChannelMessage(selectedChannelId, t);
+        setTextDraft('');
+        setTextMessages((prev) => [...prev, msg]);
+      }
+      scrollAreaRef.current?.scrollToBottom(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Не отправить сообщение');
     }
@@ -1300,7 +1452,7 @@ export default function Ruscord() {
       members: currentChannelMembers,
       volume: micVolume,
     });
-  }, [setVoicePanel, myCurrentChannelId, currentChannelName, currentChannelMembers, micVolume]);
+  }, [setVoicePanel, myCurrentChannelId, currentChannelName, micVolume, currentChannelMemberIdsKey]);
 
   if (loading) return <p className={styles.loading}>Загрузка…</p>;
 
@@ -1513,33 +1665,65 @@ export default function Ruscord() {
                   <span className={styles.chanGlyph}>#</span>
                   <span>{selectedMeta?.name ?? 'канал'}</span>
                 </header>
-                <div className={styles.messageList}>
-                  {textMessages.map((m) => {
-                    const authorColor = m.author_message_color || '#ffffff';
-                    return (
-                      <div key={m.id} className={styles.messageRow}>
-                        <Avatar
-                          userId={m.author_id}
-                          className={styles.ruscordAvatar}
-                          fallbackLetter={m.author_name?.[0] ?? m.author_email[0]}
-                          size={36}
-                        />
-                        <div>
-                          <div className={styles.messageMeta}>
-                            <strong style={{ color: authorColor }}>{m.author_name || m.author_email}</strong>
-                            <span className={styles.messageTime}>{new Date(m.created_at).toLocaleString()}</span>
+                <ScrollArea
+                  ref={scrollAreaRef}
+                  className={styles.messagesWrap}
+                  initialScrollToBottom
+                  initialScrollKey={selectedChannelId ?? 'none'}
+                  stickToBottom
+                >
+                  <div className={styles.messagesInner}>
+                    {textMessages.length === 0 ? (
+                      <p className={styles.emptyHint}>Нет сообщений. Напишите первым.</p>
+                    ) : null}
+                    {textMessages.map((m) => {
+                      const authorColor = m.author_message_color || '#ffffff';
+                      const isEdited = Boolean(m.edited_at);
+                      return (
+                        <div
+                          key={m.id}
+                          className={styles.messageRow}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            const items = buildTextContextMenuItems(m);
+                            if (items.length === 0) return;
+                            setContextMenu({ x: e.clientX, y: e.clientY, message: m });
+                          }}
+                        >
+                          <Avatar
+                            userId={m.author_id}
+                            className={styles.ruscordAvatar}
+                            fallbackLetter={m.author_name?.[0] ?? m.author_email[0]}
+                            size={36}
+                          />
+                          <div>
+                            <div className={styles.messageMeta}>
+                              <strong style={{ color: authorColor }}>{m.author_name || m.author_email}</strong>
+                              <span className={styles.messageTime}>{new Date(m.created_at).toLocaleString()}</span>
+                              {isEdited ? <span className={styles.messageEdited}>(изменено)</span> : null}
+                            </div>
+                            <div className={styles.messageBody}>{m.content}</div>
                           </div>
-                          <div className={styles.messageBody}>{m.content}</div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+                {editingMessageId ? (
+                  <div className={styles.messageEditBar}>
+                    <span className={styles.messageEditBarHint}>Редактирование сообщения</span>
+                    <Button type="button" variant="ghost" onClick={cancelEditingMessage}>
+                      Отмена
+                    </Button>
+                  </div>
+                ) : null}
                 <div className={styles.messageComposer}>
-                  <input
-                    className={styles.messageInput}
+                  <textarea
+                    ref={textInputRef}
+                    className={styles.messageTextarea}
                     placeholder={`Написать в #${selectedMeta?.name ?? 'канал'}`}
                     value={textDraft}
+                    rows={1}
                     onChange={(e) => setTextDraft(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
@@ -1549,7 +1733,7 @@ export default function Ruscord() {
                     }}
                   />
                   <button type="button" className={styles.modalBtnPrimary} onClick={() => void submitTextMessage()}>
-                    Отправить
+                    {editingMessageId ? 'Сохранить' : 'Отправить'}
                   </button>
                 </div>
               </div>
@@ -1588,9 +1772,12 @@ export default function Ruscord() {
                     })
                   )}
                 </ul>
-                <h3 className={styles.membersSectionTitle}>All — {serverMembers.length}</h3>
+                <h3 className={styles.membersSectionTitle}>All — {offlineMembers.length}</h3>
                 <ul className={styles.friendList}>
-                  {serverMembers.map((m) => {
+                  {offlineMembers.length === 0 ? (
+                    <li className={styles.emptyHint}>Все участники в сети</li>
+                  ) : (
+                    offlineMembers.map((m) => {
                     const label = m.nickname ?? formatDisplayName(m.name, m.email);
                     const inVoice = voiceUserIds.has(String(m.user_id));
                     return (
@@ -1606,13 +1793,23 @@ export default function Ruscord() {
                         </button>
                       </li>
                     );
-                  })}
+                  })
+                  )}
                 </ul>
               </>
             ) : null}
           </section>
         </div>
       </div>
+      {contextMenu ? (
+        <ContextMenu
+          open
+          x={contextMenu.x}
+          y={contextMenu.y}
+          items={buildTextContextMenuItems(contextMenu.message)}
+          onClose={() => setContextMenu(null)}
+        />
+      ) : null}
     </>
   );
 }

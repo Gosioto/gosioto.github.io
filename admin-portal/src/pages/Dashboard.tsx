@@ -394,6 +394,7 @@ function DashboardContent() {
   const wsRef = useRef<WebSocket | null>(null);
   const signalHandlerRef = useRef<((fromUserId: string, payload: unknown) => void) | null>(null);
   const sendSignalRef = useRef<(toUserId: string, payload: object) => void>(() => {});
+  const wirePeerConnectionRef = useRef<(pc: RTCPeerConnection, uid: string) => void>(() => {});
   const peerConnectionsRef = useRef<Record<string, RTCPeerConnection>>({});
   /** Не чаще одного iceRestart на пира за интервал (мс). */
   const lastIceRestartAtRef = useRef<Record<string, number>>({});
@@ -407,6 +408,14 @@ function DashboardContent() {
   const [remoteVideoUserIds, setRemoteVideoUserIds] = useState<string[]>([]);
 
   const localUidStr = user?.id != null ? String(user.id) : '';
+  const voiceMemberIdsKey = useMemo(() => {
+    if (!voiceState?.channelId) return '';
+    return voiceState.members
+      .filter((m) => String(m.user_id) !== localUidStr)
+      .map((m) => String(m.user_id))
+      .sort()
+      .join(',');
+  }, [voiceState?.channelId, voiceState?.members, localUidStr]);
   const hasLocalVideoTile =
     !!voiceState?.channelId &&
     voiceState.transmissionEnabled &&
@@ -727,7 +736,6 @@ function DashboardContent() {
     }
     const stream = micStreamRef.current;
     if (!stream) return;
-    const others = voiceState.members.filter((m) => String(m.user_id) !== String(user.id));
     const sendSignal = (toUserId: string, payload: object) => {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         const pl = payload as { type?: string };
@@ -844,30 +852,8 @@ function DashboardContent() {
         }
       };
     };
+    wirePeerConnectionRef.current = wirePeerConnection;
 
-    others.forEach((member) => {
-      const uid = member.user_id;
-      if (peerConnectionsRef.current[uid]) return;
-      const pc = new RTCPeerConnection(pcConfig);
-      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-      const screenStream = screenStreamRef.current;
-      if (screenStream) {
-        const videoTrack = screenStream.getVideoTracks()[0];
-        if (videoTrack) pc.addTrack(videoTrack, screenStream);
-      }
-      peerConnectionsRef.current[uid] = pc;
-      wirePeerConnection(pc, uid);
-      void applyOutboundRtpPolicies(pc);
-      if (!isPolitePeer(localUidStr, uid)) {
-        voiceLog('mesh initial offer (impolite)', { uid });
-        pc.createOffer().then((offer) => {
-          pc.setLocalDescription(offer);
-          sendSignal(uid, { type: 'offer', sdp: offer.sdp });
-        }).catch((e) => voiceLog('createOffer failed', { uid, e }));
-      } else {
-        voiceLog('mesh polite: ждём offer от собеседника', { uid });
-      }
-    });
     signalHandlerRef.current = (fromUserId: string, payload: unknown) => {
       const p = payload as { type?: string; sdp?: string; candidate?: RTCIceCandidateInit };
       const pc = peerConnectionsRef.current[fromUserId] || new RTCPeerConnection(pcConfig);
@@ -934,7 +920,9 @@ function DashboardContent() {
 
     // Проверка наличия звука: если через 4 с для кого-то нет трека — повторно отправить offer (переподключение между каналами)
     const retryTimer = setTimeout(() => {
-      others.forEach((member) => {
+      const retryOthers =
+        voiceStateRef.current?.members?.filter((m) => String(m.user_id) !== String(user.id)) ?? [];
+      retryOthers.forEach((member) => {
         const uid = member.user_id;
         const pc = peerConnectionsRef.current[uid];
         if (!pc || remoteAudiosRef.current[uid]) return;
@@ -987,7 +975,73 @@ function DashboardContent() {
       if (statsInterval !== undefined) clearInterval(statsInterval);
       cleanupPeersOnly();
     };
-  }, [voiceState?.channelId, voiceState?.members, voiceState?.transmissionEnabled, user?.id, micStreamReady, bumpMediaEpoch]);
+  }, [voiceState?.channelId, voiceState?.transmissionEnabled, user?.id, micStreamReady, bumpMediaEpoch, localUidStr]);
+
+  useEffect(() => {
+    if (!user?.id || !voiceState?.channelId || !voiceState.transmissionEnabled || !micStreamReady) return;
+    const stream = micStreamRef.current;
+    if (!stream || !signalHandlerRef.current) return;
+
+    const removePeer = (uid: string) => {
+      const pc = peerConnectionsRef.current[uid];
+      if (pc) {
+        pc.close();
+        delete peerConnectionsRef.current[uid];
+      }
+      delete pendingIceCandidatesRef.current[uid];
+      delete lastIceRestartAtRef.current[uid];
+      delete recoveryAttemptsRef.current[uid];
+      remoteAudiosRef.current[uid]?.remove();
+      delete remoteAudiosRef.current[uid];
+      const vs = remoteVideoStreamsRef.current[uid];
+      if (vs) {
+        vs.getTracks().forEach((t) => t.stop());
+        delete remoteVideoStreamsRef.current[uid];
+        setRemoteVideoUserIds((prev) => prev.filter((id) => id !== uid));
+      }
+    };
+
+    const others =
+      voiceStateRef.current?.members?.filter((m) => String(m.user_id) !== String(user.id)) ?? [];
+    const otherIds = new Set(others.map((m) => String(m.user_id)));
+
+    for (const uid of Object.keys(peerConnectionsRef.current)) {
+      if (!otherIds.has(uid)) {
+        voiceLog('mesh remove peer', { uid });
+        removePeer(uid);
+      }
+    }
+
+    const pcConfig = buildVoiceRtcConfiguration();
+    const sendSignal = sendSignalRef.current;
+    const wirePeer = wirePeerConnectionRef.current;
+
+    others.forEach((member) => {
+      const uid = member.user_id;
+      if (peerConnectionsRef.current[uid]) return;
+      const pc = new RTCPeerConnection(pcConfig);
+      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+      const screenStream = screenStreamRef.current;
+      if (screenStream) {
+        const videoTrack = screenStream.getVideoTracks()[0];
+        if (videoTrack) pc.addTrack(videoTrack, screenStream);
+      }
+      peerConnectionsRef.current[uid] = pc;
+      wirePeer(pc, uid);
+      void applyOutboundRtpPolicies(pc);
+      if (!isPolitePeer(localUidStr, uid)) {
+        voiceLog('mesh initial offer (impolite)', { uid });
+        pc.createOffer()
+          .then((offer) => {
+            pc.setLocalDescription(offer);
+            sendSignal(uid, { type: 'offer', sdp: offer.sdp });
+          })
+          .catch((e) => voiceLog('createOffer failed', { uid, e }));
+      } else {
+        voiceLog('mesh polite: ждём offer от собеседника', { uid });
+      }
+    });
+  }, [voiceMemberIdsKey, voiceState?.channelId, voiceState?.transmissionEnabled, user?.id, micStreamReady, localUidStr]);
 
   // Демонстрация экрана: добавление уже полученного (по клику) трека во все peer connections
   useEffect(() => {

@@ -930,6 +930,41 @@
   display: none;
 }
 
+.attachWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.attachMenu {
+  position: absolute;
+  bottom: calc(100% + 0.35rem);
+  left: 0;
+  min-width: 11rem;
+  background: var(--surface-elevated, #2b2d31);
+  border: 1px solid var(--border, #3f4147);
+  border-radius: 8px;
+  padding: 0.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 20;
+}
+
+.attachMenuItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.attachMenuItem:hover {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.06));
+}
+
 .chatNameRow {
   display: flex;
   align-items: center;

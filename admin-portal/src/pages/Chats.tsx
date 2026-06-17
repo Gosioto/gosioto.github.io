@@ -71,6 +71,14 @@ export default function Chats() {
   }, [loadChats]);
 
   useEffect(() => {
+    if (loading) return;
+    const lastChatId = localStorage.getItem('chats:lastChatId');
+    if (!lastChatId) return;
+    if (!chats.some((c) => c.id === lastChatId)) return;
+    navigate(`/dashboard/chats/${lastChatId}`, { replace: true });
+  }, [loading, chats, navigate]);
+
+  useEffect(() => {
     function onParticipantSettings(e: Event) {
       const detail = (e as CustomEvent<ChatParticipantSettingsDetail>).detail;
       if (!detail?.chatId) return;

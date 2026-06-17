@@ -529,6 +529,8 @@ export type RuscordGuildMessage = {
   author_message_color?: string;
   content: string;
   created_at: string;
+  original_content?: string | null;
+  edited_at?: string | null;
 };
 export type RuscordVoiceMember = {
   user_id: string;
@@ -668,6 +670,26 @@ export async function ruscordPostChannelMessage(channelId: string, content: stri
   });
   if (!res.ok) throw new Error(await parseApiError(res));
   return res.json();
+}
+
+export async function ruscordEditChannelMessage(
+  channelId: string,
+  messageId: string,
+  content: string,
+): Promise<RuscordGuildMessage> {
+  const res = await authFetch(`/ruscord/channels/${channelId}/messages/${messageId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ content }),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function ruscordDeleteChannelMessage(channelId: string, messageId: string): Promise<void> {
+  const res = await authFetch(`/ruscord/channels/${channelId}/messages/${messageId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
 }
 
 export async function ruscordChannelMembers(channelId: string): Promise<RuscordVoiceMember[]> {
@@ -1109,6 +1131,20 @@ export async function sendChatFileOffer(
         sha256: payload.sha256 ?? null,
       },
     }),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function uploadChatImage(chatId: string, file: File): Promise<Message> {
+  const token = getToken();
+  if (!token) throw new Error('Not authenticated');
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch(`${API_BASE}/chats/${chatId}/messages/image`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: fd,
   });
   if (!res.ok) throw new Error(await parseApiError(res));
   return res.json();

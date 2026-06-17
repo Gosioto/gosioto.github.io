@@ -6,6 +6,7 @@ import {
   getChatMessages,
   sendChatMessage,
   sendChatFileOffer,
+  uploadChatImage,
   getChatPresence,
   acceptChatFileOffer,
   listChatFileTransfers,
@@ -28,6 +29,7 @@ import AvatarLightbox from '../components/AvatarLightbox';
 import MessageStatus from '../components/MessageStatus';
 import UserSettingsModal from '../components/UserSettingsModal';
 import ChatFileOfferCard from '../components/ChatFileOfferCard';
+import ChatImageMessage from '../components/ChatImageMessage';
 import PresenceDot from '../components/PresenceDot';
 import PeerContextMenu from '../components/PeerContextMenu';
 import GroupChatModal from '../components/GroupChatModal';
@@ -83,12 +85,16 @@ export default function ChatRoom() {
   const [transferProgress, setTransferProgress] = useState<Record<string, TransferProgress>>({});
   const [transfersByMessage, setTransfersByMessage] = useState<Record<string, ChatFileTransfer[]>>({});
   const [fileSending, setFileSending] = useState(false);
+  const [imageSending, setImageSending] = useState(false);
+  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
   const [peerBlocked, setPeerBlocked] = useState(false);
   const [notificationsMutedUntil, setNotificationsMutedUntil] = useState<string | null>(null);
   const [muteMenuOpen, setMuteMenuOpen] = useState(false);
   const muteMenuRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const attachMenuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollAreaRef = useRef<ScrollAreaHandle>(null);
   const hostFilesRef = useRef<Map<string, File>>(new Map());
@@ -97,6 +103,16 @@ export default function ChatRoom() {
   const chatTypeRef = useRef<string | null>(null);
   chatTypeRef.current = chat?.type ?? null;
   messagesRef.current = messages;
+
+  useEffect(() => {
+    if (!chatId) return;
+    localStorage.setItem('chats:lastChatId', chatId);
+    if (selectedTopicId) {
+      localStorage.setItem(`chats:lastTopic:${chatId}`, selectedTopicId);
+    } else {
+      localStorage.removeItem(`chats:lastTopic:${chatId}`);
+    }
+  }, [chatId, selectedTopicId]);
 
   const refreshPresence = useCallback(() => {
     if (!chatId) return;
@@ -552,6 +568,30 @@ export default function ChatRoom() {
     }
   }
 
+  async function handleImageSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !chatId || !me?.id) return;
+    if (selectedTopicId) {
+      setError('Изображения можно отправлять только в общий поток чата');
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      setError('Можно прикрепить только изображение');
+      return;
+    }
+    setImageSending(true);
+    setError('');
+    try {
+      const msg = await uploadChatImage(chatId, file);
+      setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
+    } catch (err) {
+      setError(formatSendMessageError(err instanceof Error ? err.message : 'Не удалось отправить изображение'));
+    } finally {
+      setImageSending(false);
+    }
+  }
+
   async function handleAcceptFile(message: Message) {
     if (!chatId || !me?.id) return;
     const payload = parseFilePayload(message);
@@ -715,6 +755,17 @@ export default function ChatRoom() {
     document.addEventListener('mousedown', onDocClick);
     return () => document.removeEventListener('mousedown', onDocClick);
   }, [muteMenuOpen]);
+
+  useEffect(() => {
+    if (!attachMenuOpen) return;
+    function onDocClick(e: MouseEvent) {
+      if (attachMenuRef.current && !attachMenuRef.current.contains(e.target as Node)) {
+        setAttachMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [attachMenuOpen]);
 
   function muteUntilHours(hours: number): string {
     return new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
@@ -960,6 +1011,8 @@ export default function ChatRoom() {
             {enrichMessagesForDisplay(group.messages).map(({ msg, isGrouped, showSender }) => {
           const isOwn = userIdEq(msg.sender_id, me?.id ?? '');
           const isFileOffer = msg.message_type === 'file_offer';
+          const isImage = msg.message_type === 'image';
+          const isAttachment = isFileOffer || isImage;
           const senderColor = msg.sender_message_color || '#ffffff';
           const showMessageAvatar = !isOwn && !isGrouped;
           const editMetaVisible = showMessageEditMeta(msg);
@@ -972,7 +1025,7 @@ export default function ChatRoom() {
               key={msg.id}
               className={`${styles.messageRow} ${isOwn ? styles.messageRowOwn : ''} ${isGrouped ? styles.messageRowGrouped : ''}`}
               onContextMenu={(e) => {
-                if (isFileOffer) return;
+                if (isAttachment) return;
                 e.preventDefault();
                 const items = buildContextMenuItems(msg);
                 if (items.length === 0) return;
@@ -1023,19 +1076,29 @@ export default function ChatRoom() {
                     }}
                     onRebind={() => handleRebindHostFile(msg.id)}
                   />
+                ) : isImage && chatId ? (
+                  <ChatImageMessage
+                    chatId={chatId}
+                    messageId={msg.id}
+                    payload={
+                      msg.payload && typeof msg.payload === 'object'
+                        ? (msg.payload as { width?: number; height?: number; size?: number })
+                        : null
+                    }
+                  />
                 ) : (
                   <div className={styles.messageContent}>{displayContent}</div>
                 )}
                 <div className={`${styles.messageTime} ${styles.messageTimeMeta}`}>
                   <span>{formatMessageTime(msg.created_at)}</span>
-                  {isPersonal && isOwn && !isFileOffer ? (
+                  {isPersonal && isOwn && !isAttachment ? (
                     <MessageStatus
                       createdAt={msg.created_at}
                       peerLastReadAt={peerLastReadAt}
                       peerDeliveredAt={msg.peer_delivered_at}
                     />
                   ) : null}
-                  {isGroup && isOwn && !isFileOffer ? (
+                  {isGroup && isOwn && !isAttachment ? (
                     <MessageStatus
                       createdAt={msg.created_at}
                       status={getGroupMessageDeliveryStatus(msg.created_at, chat.participants, me?.id ?? '')}
@@ -1092,15 +1155,51 @@ export default function ChatRoom() {
           className={styles.hiddenFileInput}
           onChange={handleFileSelected}
         />
-        <button
-          type="button"
-          className={`${styles.composerIconBtn}`}
-          disabled={fileSending || imMuted || Boolean(selectedTopicId)}
-          title="Прикрепить файл"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <IconPaperclip size={20} />
-        </button>
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          className={styles.hiddenFileInput}
+          onChange={handleImageSelected}
+        />
+        <div className={styles.attachWrap} ref={attachMenuRef}>
+          <button
+            type="button"
+            className={styles.composerIconBtn}
+            disabled={fileSending || imageSending || imMuted || Boolean(selectedTopicId)}
+            title="Прикрепить"
+            aria-expanded={attachMenuOpen}
+            onClick={() => setAttachMenuOpen((v) => !v)}
+          >
+            <IconPaperclip size={20} />
+          </button>
+          {attachMenuOpen ? (
+            <div className={styles.attachMenu} role="menu">
+              <button
+                type="button"
+                className={styles.attachMenuItem}
+                role="menuitem"
+                onClick={() => {
+                  setAttachMenuOpen(false);
+                  fileInputRef.current?.click();
+                }}
+              >
+                Файл по P2P
+              </button>
+              <button
+                type="button"
+                className={styles.attachMenuItem}
+                role="menuitem"
+                onClick={() => {
+                  setAttachMenuOpen(false);
+                  imageInputRef.current?.click();
+                }}
+              >
+                Изображение в чат
+              </button>
+            </div>
+          ) : null}
+        </div>
         <textarea
           ref={inputRef}
           rows={1}
