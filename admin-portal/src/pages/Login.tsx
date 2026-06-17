@@ -42,9 +42,9 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    login(email, password)
-      .then(({ token, user }) => {
-        setAuth(token, user);
+    login(email, password, '/dashboard')
+      .then(({ token, user, session_id }) => {
+        setAuth(token, user, session_id);
         navigate('/dashboard', { replace: true });
       })
       .catch((err) => {

@@ -73,7 +73,15 @@ export default function Avatar({ userId, className, fallbackLetter, size = 40 }:
     };
   }, [userId, cacheKey]);
 
-  const style = size ? { width: size, height: size, fontSize: size * 0.45 } : undefined;
+  const style = size
+    ? {
+        width: size,
+        height: size,
+        fontSize: size * 0.45,
+        borderRadius: '50%',
+        objectFit: 'cover' as const,
+      }
+    : undefined;
   const letter = (fallbackLetter || '?').toUpperCase().slice(0, 1);
 
   if (src && !failed) {

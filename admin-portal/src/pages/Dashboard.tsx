@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
+import { usePresence } from '../hooks/usePresence';
 import {
   getModules,
   getDashboardStats,
@@ -43,6 +44,7 @@ import ChatRoom from './ChatRoom';
 import Ruscord from './Ruscord';
 import Settings from './Settings';
 import Friends from './Friends';
+import Sessions from './Sessions';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import AppShell from '../layout/AppShell';
 import BottomNav from '../layout/BottomNav';
@@ -70,6 +72,7 @@ export default function Dashboard() {
 
 function DashboardContent() {
   const { user, logout, token, refreshUser } = useAuth();
+  usePresence(token);
   const { showToast } = useToast();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -1188,6 +1191,7 @@ function DashboardContent() {
         <Route index element={<DashboardHome loading={loading} stats={stats} modules={modules} user={user} />} />
         <Route path="roles" element={<Roles />} />
         <Route path="users" element={<Users />} />
+        <Route path="sessions" element={<Sessions />} />
         <Route path="chats" element={<Chats />} />
         <Route path="chats/:chatId" element={<ChatRoom />} />
         <Route path="friends" element={<Friends />} />
@@ -1230,6 +1234,15 @@ function DashboardHome({
       description: 'Роли и права доступа',
       path: '/dashboard/roles',
       permission: 'roles.read',
+    });
+  }
+  if (canSeeSection('sessions.read', user?.permissions)) {
+    extraModules.push({
+      id: 'sessions',
+      name: 'Сессии',
+      description: 'Активные сессии и presence',
+      path: '/dashboard/sessions',
+      permission: 'sessions.read',
     });
   }
 

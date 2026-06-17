@@ -30,6 +30,20 @@
   object-fit: cover;
 }
 
+.avatarBtn {
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  display: block;
+}
+
+.avatarBtn:hover {
+  opacity: 0.9;
+}
+
 .nameLine {
   display: flex;
   flex-direction: column;

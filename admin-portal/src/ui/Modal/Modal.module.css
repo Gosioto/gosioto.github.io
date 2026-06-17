@@ -1,0 +1,31 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.card {
+  width: min(480px, 100%);
+  max-height: min(85vh, 720px);
+  overflow: auto;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.cardOverflowVisible {
+  overflow: visible;
+}
+
+.title {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}

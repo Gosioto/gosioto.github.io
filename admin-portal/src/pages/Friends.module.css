@@ -36,13 +36,23 @@
 .avatarWrap {
   position: relative;
   flex-shrink: 0;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
 }
 
-.avatarWrap .avatar {
-  width: 44px;
-  height: 44px;
+.avatarWrap .avatar,
+.avatarWrap img {
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   object-fit: cover;
+  display: block;
 }
 
 .onlineDot {
@@ -71,6 +81,42 @@
 .friendName {
   font-weight: 600;
   font-size: 1rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.friendName:hover {
+  color: var(--accent);
+}
+
+.actionBtnIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.actionBtnIcon:hover {
+  border-color: var(--accent);
+}
+
+.onlineDotAway {
+  background: #eab308;
+}
+
+.onlineDotOffline {
+  background: #6b7280;
 }
 
 .statusIcons {

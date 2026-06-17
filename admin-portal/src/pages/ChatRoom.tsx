@@ -9,37 +9,48 @@ import {
   getChatPresence,
   acceptChatFileOffer,
   listChatFileTransfers,
-  createChatTopic,
-  deleteChatTopic,
-  updateChat,
-  addChatParticipant,
-  removeChatParticipant,
-  setChatParticipantRole,
   leaveChat,
   markChatBlock,
   markChatUnblock,
   patchChatNotificationsMute,
-  getChatAvailableUsers,
   markChatRead,
+  editChatMessage,
+  deleteChatMessage,
+  markMessageDelivered,
   type Chat,
   type Message,
   type ChatTopic,
-  type ChatAvailableUser,
   type FileOfferPayload,
   type ChatFileTransfer,
 } from '../api';
 import Avatar from '../components/Avatar';
+import AvatarLightbox from '../components/AvatarLightbox';
+import MessageStatus from '../components/MessageStatus';
 import UserSettingsModal from '../components/UserSettingsModal';
 import ChatFileOfferCard from '../components/ChatFileOfferCard';
+import PresenceDot from '../components/PresenceDot';
+import PeerContextMenu from '../components/PeerContextMenu';
+import GroupChatModal from '../components/GroupChatModal';
+import FriendNicknameModal from '../components/FriendNicknameModal';
 import { chatP2pManager } from '../p2p/chatP2pManager';
 import { CHAT_FILE_MAX_BYTES, type TransferProgress } from '../p2p/fileOfferTypes';
 import { listHostBinds } from '../p2p/fileTransfer';
 import { isUserOnline, syncTransferStatus, userIdEq } from '../p2p/transferStatusSync';
 import { wsUrl } from '../apiConfig';
 import { notifyChatUnreadChanged } from '../context/ChatUnreadContext';
+import { FRIEND_PRESENCE_EVENT, type FriendPresenceDetail } from '../presenceEvents';
 import { formatDisplayName } from '../utils/displayName';
+import { formatFriendDisplayName } from '../utils/friendDisplayName';
+import { usePeerContextMenu } from '../hooks/usePeerContextMenu';
+import type { PeerMenuChatContext } from '../utils/peerMenu';
 import { formatMessageTime, groupMessagesByDate } from '../utils/formatMessageTimestamp';
-import { ScrollArea, IconBan, IconClock, IconBellOff, Badge, IconSend, IconPaperclip } from '../ui';
+import { enrichMessagesForDisplay } from '../utils/messageGrouping';
+import PeerActionsMenu from '../components/PeerActionsMenu';
+import { dispatchChatParticipantSettingsChanged } from '../utils/chatParticipantSettings';
+import { getGroupMessageDeliveryStatus } from '../utils/messageStatus';
+import { canEditPersonalMessage, canDeleteMessage, showMessageEditMeta } from '../utils/messageEdit';
+import { ScrollArea, IconBan, IconClock, IconBellOff, Badge, IconSend, IconPaperclip, Button, ContextMenu } from '../ui';
+import type { ContextMenuItem } from '../ui';
 import type { ScrollAreaHandle } from '../ui';
 import styles from './Chats.module.css';
 
@@ -58,13 +69,16 @@ export default function ChatRoom() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
-  const [manageOpen, setManageOpen] = useState(false);
-  const [users, setUsers] = useState<ChatAvailableUser[]>([]);
-  const [newTopicName, setNewTopicName] = useState('');
-  const [newGroupName, setNewGroupName] = useState('');
-  const [addUserId, setAddUserId] = useState('');
+  const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const [nicknamePeerId, setNicknamePeerId] = useState<string | null>(null);
   const [userSettingsUserId, setUserSettingsUserId] = useState<string | null>(null);
-  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [avatarLightboxUser, setAvatarLightboxUser] = useState<{
+    userId: string;
+    fallbackLetter: string;
+  } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; message: Message } | null>(null);
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [showOriginalByMessageId, setShowOriginalByMessageId] = useState<Record<string, boolean>>({});
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [transferProgress, setTransferProgress] = useState<Record<string, TransferProgress>>({});
   const [transfersByMessage, setTransfersByMessage] = useState<Record<string, ChatFileTransfer[]>>({});
@@ -75,7 +89,7 @@ export default function ChatRoom() {
   const muteMenuRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollAreaRef = useRef<ScrollAreaHandle>(null);
   const hostFilesRef = useRef<Map<string, File>>(new Map());
   const selectedTopicIdRef = useRef<string | null>(null);
@@ -117,6 +131,99 @@ export default function ChatRoom() {
   const imMuted = Boolean(
     myParticipant?.muted_until && new Date(myParticipant.muted_until) > new Date(),
   );
+
+  const peerId = chat?.participants.find((p) => p.user_id !== me?.id)?.user_id ?? null;
+
+  const openPeerProfile = useCallback((userId: string) => {
+    setUserSettingsUserId(userId);
+  }, []);
+
+  const getPeerChatContext = useCallback(
+    (userId: string): PeerMenuChatContext | null => {
+      if (!chatId || !isPersonal || userId !== peerId) return null;
+      return {
+        chatId,
+        peerBlocked,
+        notificationsMutedUntil,
+      };
+    },
+    [chatId, isPersonal, peerId, peerBlocked, notificationsMutedUntil],
+  );
+
+  const peerMenu = usePeerContextMenu({
+    meId: me?.id,
+    onOpenProfile: openPeerProfile,
+    onError: (message) => setError(message),
+    getChatContext: getPeerChatContext,
+    onBlockChange: (blocked) => {
+      setPeerBlocked(blocked);
+      if (chatId) {
+        dispatchChatParticipantSettingsChanged({ chatId, peerBlocked: blocked });
+        getChat(chatId).then(setChat).catch(() => {});
+      }
+    },
+    onMuteChange: (until) => {
+      setNotificationsMutedUntil(until);
+      if (chatId) {
+        dispatchChatParticipantSettingsChanged({ chatId, notificationsMutedUntil: until });
+      }
+    },
+    onEditNickname: (userId) => setNicknamePeerId(userId),
+    onNicknameUpdated: () => {
+      if (chatId) getChat(chatId).then(setChat).catch(() => {});
+    },
+  });
+
+  useEffect(() => {
+    if (!peerId || chat?.type !== 'personal') return;
+    function onPresence(e: Event) {
+      const detail = (e as CustomEvent<FriendPresenceDetail>).detail;
+      if (detail.user_id !== peerId) return;
+      if (detail.presence === 'online') {
+        setOnlineUserIds((prev) => (prev.includes(peerId) ? prev : [...prev, peerId]));
+      } else {
+        setOnlineUserIds((prev) => prev.filter((id) => id !== peerId));
+      }
+    }
+    window.addEventListener(FRIEND_PRESENCE_EVENT, onPresence);
+    return () => window.removeEventListener(FRIEND_PRESENCE_EVENT, onPresence);
+  }, [peerId, chat?.type]);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return;
+      if (
+        contextMenu ||
+        peerMenu.target ||
+        userSettingsUserId ||
+        groupModalOpen ||
+        nicknamePeerId ||
+        avatarLightboxUser ||
+        muteMenuOpen
+      ) {
+        return;
+      }
+      if (editingMessageId) {
+        setEditingMessageId(null);
+        setInput('');
+        return;
+      }
+      if (chatId) navigate('/dashboard/chats');
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [
+    chatId,
+    navigate,
+    contextMenu,
+    peerMenu.target,
+    userSettingsUserId,
+    groupModalOpen,
+    nicknamePeerId,
+    avatarLightboxUser,
+    muteMenuOpen,
+    editingMessageId,
+  ]);
 
   useEffect(() => {
     if (!chatId) return;
@@ -168,9 +275,18 @@ export default function ChatRoom() {
       topic_id: selectedTopicId || undefined,
       limit: 50,
     })
-      .then(setMessages)
+      .then((msgs) => {
+        setMessages(msgs);
+        if (chatTypeRef.current === 'personal' && !selectedTopicId) {
+          for (const m of msgs) {
+            if (!userIdEq(m.sender_id, me?.id ?? '')) {
+              void markMessageDelivered(chatId, m.id).catch(() => {});
+            }
+          }
+        }
+      })
       .catch(() => {});
-  }, [chatId, selectedTopicId]);
+  }, [chatId, selectedTopicId, me?.id]);
 
   useEffect(() => {
     if (!chatId || !me?.id) return;
@@ -218,6 +334,44 @@ export default function ChatRoom() {
           return;
         }
         if (typeof raw.kind === 'string') {
+          if (raw.kind === 'message_updated' && String(raw.chat_id) === chatId && raw.message) {
+            const updated = raw.message as Message;
+            const tab = selectedTopicIdRef.current;
+            const msgTopic = updated.topic_id != null ? String(updated.topic_id) : null;
+            if (tab === null && msgTopic !== null) return;
+            if (tab !== null && msgTopic !== String(tab)) return;
+            setMessages((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
+            return;
+          }
+          if (raw.kind === 'message_deleted' && String(raw.chat_id) === chatId && raw.message_id != null) {
+            const messageId = String(raw.message_id);
+            setMessages((prev) => prev.filter((m) => m.id !== messageId));
+            return;
+          }
+          if (raw.kind === 'delivery_update' && String(raw.chat_id) === chatId && raw.message_id != null) {
+            const messageId = String(raw.message_id);
+            const deliveredAt = String(raw.delivered_at ?? '');
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === messageId ? { ...m, peer_delivered_at: deliveredAt || m.peer_delivered_at } : m,
+              ),
+            );
+            return;
+          }
+          if (raw.kind === 'read_receipt' && String(raw.chat_id) === chatId && raw.user_id != null) {
+            const userId = String(raw.user_id);
+            const readAt = String(raw.read_at ?? '');
+            setChat((prev) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                participants: prev.participants.map((p) =>
+                  p.user_id === userId ? { ...p, last_read_at: readAt } : p,
+                ),
+              };
+            });
+            return;
+          }
           if (raw.kind === 'file_transfer_update' && String(raw.chat_id) === chatId && raw.transfer) {
             const tr = raw.transfer as ChatFileTransfer;
             refreshTransfersForMessage(tr.message_id);
@@ -275,8 +429,13 @@ export default function ChatRoom() {
           if (prev.some((m) => m.id === msg.id)) return prev;
           return [...prev, msg];
         });
-        if (chatTypeRef.current === 'personal' && !isOwn) {
-          scrollAreaRef.current?.scrollToBottom(true);
+        if (!isOwn) {
+          void markChatRead(chatId, tab)
+            .then(() => notifyChatUnreadChanged())
+            .catch(() => {});
+          if (chatTypeRef.current === 'personal' && msgTopic === null) {
+            void markMessageDelivered(chatId, msg.id).catch(() => {});
+          }
         }
         if (msg.message_type === 'file_offer') {
           refreshTransfersForMessage(msg.id);
@@ -463,9 +622,19 @@ export default function ChatRoom() {
     if (!chatId || !input.trim() || sending) return;
     setSending(true);
     setError('');
-    sendChatMessage(chatId, input.trim(), selectedTopicId || undefined)
+    const trimmed = input.trim();
+    const editId = editingMessageId;
+    const request = editId
+      ? editChatMessage(chatId, editId, trimmed)
+      : sendChatMessage(chatId, trimmed, selectedTopicId || undefined);
+    request
       .then((msg) => {
-        setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
+        if (editId) {
+          setMessages((prev) => prev.map((m) => (m.id === msg.id ? msg : m)));
+          setEditingMessageId(null);
+        } else {
+          setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
+        }
         setInput('');
         scrollAreaRef.current?.scrollToBottom(true);
         inputRef.current?.focus();
@@ -473,7 +642,59 @@ export default function ChatRoom() {
       .catch((err) =>
         setError(formatSendMessageError(err instanceof Error ? err.message : 'Ошибка')),
       )
-      .finally(() => setSending(false));
+      .finally(() => {
+        setSending(false);
+        requestAnimationFrame(() => inputRef.current?.focus());
+      });
+  }
+
+  function handleComposerKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend(e as unknown as React.FormEvent);
+    }
+  }
+
+  function startEditingMessage(msg: Message) {
+    setEditingMessageId(msg.id);
+    setInput(msg.content);
+    inputRef.current?.focus();
+  }
+
+  function cancelEditingMessage() {
+    setEditingMessageId(null);
+    setInput('');
+  }
+
+  function handleDeleteMessage(messageId: string) {
+    if (!chatId) return;
+    if (!confirm('Удалить сообщение?')) return;
+    deleteChatMessage(chatId, messageId)
+      .then(() => {
+        setMessages((prev) => prev.filter((m) => m.id !== messageId));
+        if (editingMessageId === messageId) cancelEditingMessage();
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
+  }
+
+  function buildContextMenuItems(msg: Message): ContextMenuItem[] {
+    const items: ContextMenuItem[] = [];
+    if (isPersonal && canEditPersonalMessage(msg, me?.id ?? '')) {
+      items.push({
+        id: 'edit',
+        label: 'Редактировать',
+        onClick: () => startEditingMessage(msg),
+      });
+    }
+    if (canDeleteMessage(msg, me?.id ?? '', isPersonal, isAdmin)) {
+      items.push({
+        id: 'delete',
+        label: 'Удалить',
+        danger: true,
+        onClick: () => handleDeleteMessage(msg.id),
+      });
+    }
+    return items;
   }
 
   function handleLeave() {
@@ -483,55 +704,6 @@ export default function ChatRoom() {
       .then(() => navigate('/dashboard/chats'))
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
   }
-
-  function handleAddTopic(e: React.FormEvent) {
-    e.preventDefault();
-    if (!chatId || !newTopicName.trim()) return;
-    createChatTopic(chatId, newTopicName.trim())
-      .then((t) => {
-        setTopics((prev) => [...prev, t]);
-        setNewTopicName('');
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
-  }
-
-  function handleAddParticipant(e: React.FormEvent) {
-    e.preventDefault();
-    if (!chatId || !addUserId) return;
-    addChatParticipant(chatId, addUserId)
-      .then(() => getChat(chatId).then(setChat))
-      .then(() => setAddUserId(''))
-      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
-  }
-
-  function handleRemoveParticipant(uid: string) {
-    if (!chatId) return;
-    removeChatParticipant(chatId, uid)
-      .then(() => getChat(chatId).then(setChat))
-      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
-  }
-
-  function handleSetRole(uid: string, role: string) {
-    if (!chatId) return;
-    setChatParticipantRole(chatId, uid, role)
-      .then(() => getChat(chatId).then(setChat))
-      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
-  }
-
-  function handleUpdateGroupName(e: React.FormEvent) {
-    e.preventDefault();
-    if (!chatId || !newGroupName.trim()) return;
-    updateChat(chatId, { name: newGroupName.trim() })
-      .then((c) => {
-        setChat(c);
-        setNewGroupName('');
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
-  }
-
-  useEffect(() => {
-    if (manageOpen) getChatAvailableUsers().then(setUsers).catch(() => {});
-  }, [manageOpen]);
 
   useEffect(() => {
     if (!muteMenuOpen) return;
@@ -557,8 +729,10 @@ export default function ChatRoom() {
     const action = peerBlocked ? markChatUnblock : markChatBlock;
     action(chatId)
       .then(() => {
-        setPeerBlocked(!peerBlocked);
-        if (chatId) getChat(chatId).then(setChat).catch(() => {});
+        const next = !peerBlocked;
+        setPeerBlocked(next);
+        dispatchChatParticipantSettingsChanged({ chatId, peerBlocked: next });
+        getChat(chatId).then(setChat).catch(() => {});
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
   }
@@ -568,6 +742,7 @@ export default function ChatRoom() {
     patchChatNotificationsMute(chatId, mutedUntil)
       .then(() => {
         setNotificationsMutedUntil(mutedUntil);
+        dispatchChatParticipantSettingsChanged({ chatId, notificationsMutedUntil: mutedUntil });
         setMuteMenuOpen(false);
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
@@ -589,25 +764,64 @@ export default function ChatRoom() {
   }
 
   const otherParticipant = chat.participants.find((p) => p.user_id !== me?.id);
+  const peerLastReadAt = otherParticipant?.last_read_at ?? null;
+  const peerOnline = otherParticipant ? isUserOnline(otherParticipant.user_id, onlineUserIds) : false;
   const chatTitle = isGroup && chat.name
     ? chat.name
     : otherParticipant
-      ? formatDisplayName(otherParticipant.name, otherParticipant.email)
+      ? formatFriendDisplayName(
+          otherParticipant.name,
+          otherParticipant.email,
+          chat.peer_nickname,
+        )
       : 'Чат';
   const messageGroups = groupMessagesByDate(messages);
 
   return (
     <>
+      <div className={styles.chatRoomPage}>
       <Link to="/dashboard/chats" className={styles.backLink}>
         ← К списку чатов
       </Link>
+      <div className={styles.chatRoomShell}>
+      <div className={styles.chatRoomBody}>
       <div className={styles.roomHeader}>
         {isPersonal && otherParticipant ? (
+          <div
+            className={`${styles.roomTitleRow} ${styles.roomTitleRowClickable}`}
+            onContextMenu={(e) => peerMenu.open(otherParticipant.user_id, e)}
+          >
+            <button
+              type="button"
+              className={styles.roomHeaderAvatarBtn}
+              onClick={() => openPeerProfile(otherParticipant.user_id)}
+              title="Профиль пользователя"
+            >
+              <span className={styles.roomHeaderAvatarWrap}>
+                <Avatar
+                  userId={otherParticipant.user_id}
+                  fallbackLetter={otherParticipant.name?.[0] || otherParticipant.email[0]}
+                  size={40}
+                />
+                <PresenceDot online={peerOnline} />
+              </span>
+            </button>
+            <button
+              type="button"
+              className={styles.roomTitleBtn}
+              onClick={() => openPeerProfile(otherParticipant.user_id)}
+              onContextMenu={(e) => peerMenu.open(otherParticipant.user_id, e)}
+              title="Профиль пользователя"
+            >
+              <h2 className={styles.roomTitle}>{chatTitle}</h2>
+            </button>
+          </div>
+        ) : isGroup ? (
           <button
             type="button"
-            className={styles.roomTitleBtn}
-            onClick={() => setUserSettingsUserId(otherParticipant.user_id)}
-            title="Настройки пользователя"
+            className={styles.roomTitleGroupBtn}
+            onClick={() => setGroupModalOpen(true)}
+            title="Информация о группе"
           >
             <h2 className={styles.roomTitle}>{chatTitle}</h2>
           </button>
@@ -661,19 +875,37 @@ export default function ChatRoom() {
               >
                 <IconBellOff size={18} />
               </button>
+              {otherParticipant ? (
+                <PeerActionsMenu
+                  peerUserId={otherParticipant.user_id}
+                  meId={me?.id}
+                  chatContext={{
+                    chatId: chatId!,
+                    peerBlocked,
+                    notificationsMutedUntil,
+                  }}
+                  onOpenProfile={openPeerProfile}
+                  onError={(message) => setError(message)}
+                  onBlockChange={(blocked) => {
+                    setPeerBlocked(blocked);
+                    if (chatId) {
+                      dispatchChatParticipantSettingsChanged({ chatId, peerBlocked: blocked });
+                      getChat(chatId).then(setChat).catch(() => {});
+                    }
+                  }}
+                  onMuteChange={(until) => {
+                    setNotificationsMutedUntil(until);
+                    if (chatId) {
+                      dispatchChatParticipantSettingsChanged({ chatId, notificationsMutedUntil: until });
+                    }
+                  }}
+                  onEditNickname={(userId) => setNicknamePeerId(userId)}
+                  onNicknameUpdated={() => {
+                    if (chatId) getChat(chatId).then(setChat).catch(() => {});
+                  }}
+                />
+              ) : null}
             </div>
-          )}
-          {isGroup && isAdmin && (
-            <button
-              type="button"
-              className={`${styles.button} ${styles.buttonSecondary}`}
-              onClick={() => {
-                setNewGroupName(chat.name || '');
-                setManageOpen(true);
-              }}
-            >
-              Управление
-            </button>
           )}
           {isGroup && (
             <button type="button" className={`${styles.button} ${styles.buttonSecondary}`} onClick={handleLeave}>
@@ -716,7 +948,7 @@ export default function ChatRoom() {
         className={styles.messagesWrap}
         initialScrollToBottom
         initialScrollKey={`${chatId}-${selectedTopicId ?? 'main'}`}
-        stickToBottom={false}
+        stickToBottom={isPersonal}
       >
         <div className={styles.messagesInner}>
         {messages.length === 0 && <p className={styles.muted}>Нет сообщений. Напишите первым.</p>}
@@ -725,42 +957,32 @@ export default function ChatRoom() {
             <div className={styles.dateDivider}>
               <span className={styles.dateDividerLabel}>{group.dateLabel}</span>
             </div>
-            {group.messages.map((msg) => {
+            {enrichMessagesForDisplay(group.messages).map(({ msg, isGrouped, showSender }) => {
           const isOwn = userIdEq(msg.sender_id, me?.id ?? '');
           const isFileOffer = msg.message_type === 'file_offer';
-          const isSelected = selectedMessageId === msg.id;
           const senderColor = msg.sender_message_color || '#ffffff';
+          const showMessageAvatar = !isOwn && !isGrouped;
+          const editMetaVisible = showMessageEditMeta(msg);
+          const displayContent =
+            editMetaVisible && showOriginalByMessageId[msg.id] && msg.original_content
+              ? msg.original_content
+              : msg.content;
           return (
             <div
               key={msg.id}
-              className={`${styles.messageRow} ${isOwn ? styles.messageRowOwn : ''} ${isSelected ? styles.messageRowSelected : ''}`}
-              onClick={
-                isFileOffer
-                  ? undefined
-                  : () => setSelectedMessageId((id) => (id === msg.id ? null : msg.id))
-              }
-              role={isFileOffer ? undefined : 'button'}
-              tabIndex={isFileOffer ? undefined : 0}
-              onKeyDown={
-                isFileOffer
-                  ? undefined
-                  : (e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setSelectedMessageId((id) => (id === msg.id ? null : msg.id));
-                      }
-                    }
-              }
+              className={`${styles.messageRow} ${isOwn ? styles.messageRowOwn : ''} ${isGrouped ? styles.messageRowGrouped : ''}`}
+              onContextMenu={(e) => {
+                if (isFileOffer) return;
+                e.preventDefault();
+                const items = buildContextMenuItems(msg);
+                if (items.length === 0) return;
+                setContextMenu({ x: e.clientX, y: e.clientY, message: msg });
+              }}
             >
-              {!isOwn ? (
-                <button
-                  type="button"
+              {showMessageAvatar ? (
+                <div
                   className={styles.messageAvatar}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setUserSettingsUserId(msg.sender_id);
-                  }}
-                  title="Настройки пользователя"
+                  onContextMenu={(e) => peerMenu.open(msg.sender_id, e)}
                 >
                   <Avatar
                     userId={msg.sender_id}
@@ -768,14 +990,20 @@ export default function ChatRoom() {
                     size={36}
                     className={styles.messageAvatarImg}
                   />
-                </button>
+                </div>
               ) : (
                 <div className={styles.messageAvatarPlaceholder} />
               )}
               <div className={`${styles.message} ${isOwn ? styles.messageOwn : ''}`}>
-                <div className={styles.messageSender} style={{ color: senderColor }}>
-                  {formatDisplayName(msg.sender_name, msg.sender_email)}
-                </div>
+                {showSender ? (
+                  <div
+                    className={styles.messageSender}
+                    style={{ color: senderColor }}
+                    onContextMenu={(e) => peerMenu.open(msg.sender_id, e)}
+                  >
+                    {formatDisplayName(msg.sender_name, msg.sender_email)}
+                  </div>
+                ) : null}
                 {msg.message_type === 'file_offer' && parseFilePayload(msg) ? (
                   <ChatFileOfferCard
                     isHost={userIdEq(msg.sender_id, me?.id ?? '')}
@@ -796,10 +1024,44 @@ export default function ChatRoom() {
                     onRebind={() => handleRebindHostFile(msg.id)}
                   />
                 ) : (
-                  <div className={styles.messageContent}>{msg.content}</div>
+                  <div className={styles.messageContent}>{displayContent}</div>
                 )}
-                <div className={styles.messageTime}>
-                  {formatMessageTime(msg.created_at)}
+                <div className={`${styles.messageTime} ${styles.messageTimeMeta}`}>
+                  <span>{formatMessageTime(msg.created_at)}</span>
+                  {isPersonal && isOwn && !isFileOffer ? (
+                    <MessageStatus
+                      createdAt={msg.created_at}
+                      peerLastReadAt={peerLastReadAt}
+                      peerDeliveredAt={msg.peer_delivered_at}
+                    />
+                  ) : null}
+                  {isGroup && isOwn && !isFileOffer ? (
+                    <MessageStatus
+                      createdAt={msg.created_at}
+                      status={getGroupMessageDeliveryStatus(msg.created_at, chat.participants, me?.id ?? '')}
+                    />
+                  ) : null}
+                  {editMetaVisible ? (
+                    <>
+                      <span aria-hidden>·</span>
+                      <span>ред. {formatMessageTime(msg.edited_at!)}</span>
+                    </>
+                  ) : null}
+                  {editMetaVisible ? (
+                    <button
+                      type="button"
+                      className={styles.messageOriginalToggle}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowOriginalByMessageId((prev) => ({
+                          ...prev,
+                          [msg.id]: !prev[msg.id],
+                        }));
+                      }}
+                    >
+                      {showOriginalByMessageId[msg.id] ? 'показать сообщение' : 'показать оригинал'}
+                    </button>
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -815,6 +1077,14 @@ export default function ChatRoom() {
           Вы замьючены до {myParticipant?.muted_until ? new Date(myParticipant.muted_until).toLocaleString('ru') : ''}
         </p>
       )}
+      {editingMessageId ? (
+        <div className={styles.messageEditBar}>
+          <span className={styles.messageEditBarHint}>Редактирование сообщения</span>
+          <Button type="button" variant="ghost" onClick={cancelEditingMessage}>
+            Отмена
+          </Button>
+        </div>
+      ) : null}
       <form onSubmit={handleSend} className={styles.sendForm}>
         <input
           ref={fileInputRef}
@@ -831,177 +1101,84 @@ export default function ChatRoom() {
         >
           <IconPaperclip size={20} />
         </button>
-        <input
+        <textarea
           ref={inputRef}
-          type="text"
+          rows={1}
           className={styles.sendInput}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={imMuted ? 'Нет доступа к отправке' : 'Сообщение...'}
+          onKeyDown={handleComposerKeyDown}
+          placeholder={
+            imMuted ? 'Нет доступа к отправке' : editingMessageId ? 'Редактирование…' : 'Сообщение...'
+          }
           disabled={sending || imMuted}
         />
         <button
           type="submit"
           className={`${styles.composerIconBtn} ${styles.composerSendBtn}`}
           disabled={sending || !input.trim() || imMuted}
-          title="Отправить"
+          title={editingMessageId ? 'Сохранить' : 'Отправить'}
         >
           <IconSend size={20} />
         </button>
       </form>
+      </div>
+      </div>
+      </div>
 
-      {manageOpen && isGroup && (
-        <div className={styles.modalOverlay} onClick={() => setManageOpen(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
-            <h3 className={styles.modalTitle}>Управление группой</h3>
+      {isGroup && chatId ? (
+        <GroupChatModal
+          open={groupModalOpen}
+          onClose={() => setGroupModalOpen(false)}
+          chat={chat}
+          chatId={chatId}
+          meId={me?.id}
+          topics={topics}
+          onTopicsChange={setTopics}
+          onChatUpdated={setChat}
+          onDeleted={() => navigate('/dashboard/chats')}
+          onError={(message) => setError(message)}
+          onOpenUserSettings={setUserSettingsUserId}
+        />
+      ) : null}
 
-            {isAdmin && (
-              <>
-                <div className={styles.manageSection}>
-                  <form onSubmit={handleUpdateGroupName}>
-                    <div className={styles.field}>
-                      <label className={styles.fieldLabel}>Название группы</label>
-                      <input
-                        type="text"
-                        className={styles.input}
-                        value={newGroupName}
-                        onChange={(e) => setNewGroupName(e.target.value)}
-                        placeholder="Название группы"
-                      />
-                    </div>
-                    <button type="submit" className={styles.button}>Сохранить</button>
-                  </form>
-                </div>
+      {nicknamePeerId ? (
+        <FriendNicknameModal
+          peerUserId={nicknamePeerId}
+          onClose={() => setNicknamePeerId(null)}
+          onSaved={() => {
+            if (chatId) getChat(chatId).then(setChat).catch(() => {});
+          }}
+          onError={(message) => setError(message)}
+        />
+      ) : null}
 
-                <div className={styles.manageSection}>
-                  <p className={styles.sectionTitle}>Участники</p>
-                  <div className={styles.participantsList}>
-                    {chat.participants.map((p) => {
-                      const isMuted = p.muted_until && new Date(p.muted_until) > new Date();
-                      const isOwn = p.user_id === me?.id;
-                      return (
-                        <div key={p.user_id} className={styles.participantRow}>
-                          {isOwn ? (
-                            <div className={styles.participantAvatarPlaceholder} aria-hidden>—</div>
-                          ) : (
-                            <button
-                              type="button"
-                              className={styles.participantAvatarBtn}
-                              onClick={() => setUserSettingsUserId(p.user_id)}
-                              title="Настройки пользователя"
-                            >
-                              <Avatar
-                                userId={p.user_id}
-                                fallbackLetter={p.name?.[0] || p.email[0]}
-                                size={36}
-                                className={styles.participantAvatar}
-                              />
-                            </button>
-                          )}
-                          <div className={styles.participantInfo}>
-                            <span className={styles.participantEmail}>
-                              {isOwn ? 'Вы' : formatDisplayName(p.name, p.email)}
-                            </span>
-                            <span className={styles.participantRole}> · {p.role}</span>
-                            {isMuted && (
-                              <span className={styles.mutedBadge} title={p.muted_until ?? ''}>
-                                замьючен до {p.muted_until ? new Date(p.muted_until).toLocaleString('ru') : ''}
-                              </span>
-                            )}
-                          </div>
-                          {isAdmin && p.user_id !== me?.id && (
-                            <div className={styles.participantActions}>
-                              <button
-                                type="button"
-                                className={styles.buttonSecondary}
-                                onClick={() => handleSetRole(p.user_id, p.role === 'admin' ? 'member' : 'admin')}
-                              >
-                                {p.role === 'admin' ? 'Снять админа' : 'Админ'}
-                              </button>
-                              <button
-                                type="button"
-                                className={styles.buttonSecondary}
-                                onClick={() => handleRemoveParticipant(p.user_id)}
-                              >
-                                Удалить
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+      {contextMenu ? (
+        <ContextMenu
+          open
+          x={contextMenu.x}
+          y={contextMenu.y}
+          items={buildContextMenuItems(contextMenu.message)}
+          onClose={() => setContextMenu(null)}
+        />
+      ) : null}
 
-                <div className={styles.manageSection}>
-                  <p className={styles.sectionTitle}>Добавить участника</p>
-                  <form onSubmit={handleAddParticipant}>
-                  <div className={styles.field}>
-                    <label className={styles.fieldLabel}>Пользователь</label>
-                    <select className={styles.input} value={addUserId} onChange={(e) => setAddUserId(e.target.value)}>
-                      <option value="">— Выберите —</option>
-                      {users
-                        .filter((u) => !chat.participants.some((p) => p.user_id === u.id))
-                        .map((u) => (
-                          <option key={u.id} value={u.id}>{formatDisplayName(u.name, u.email)}</option>
-                        ))}
-                    </select>
-                  </div>
-                  <button type="submit" className={styles.button} disabled={!addUserId}>Добавить</button>
-                </form>
-                </div>
+      {peerMenu.target ? (
+        <PeerContextMenu
+          x={peerMenu.target.x}
+          y={peerMenu.target.y}
+          items={peerMenu.items}
+          onClose={peerMenu.close}
+        />
+      ) : null}
 
-                <div className={styles.manageSection}>
-                <p className={styles.sectionTitle}>Темы</p>
-                <div className={styles.participantsList}>
-                  {topics.map((t) => (
-                    <div key={t.id} className={styles.topicRow}>
-                      <span>{t.name}</span>
-                      <button
-                        type="button"
-                        className={styles.buttonSecondary}
-                        onClick={() => {
-                          if (confirm('Удалить тему?')) {
-                            deleteChatTopic(chatId!, t.id)
-                              .then(() => {
-                                setTopics((prev) => prev.filter((x) => x.id !== t.id));
-                                if (selectedTopicId === t.id) setSelectedTopicId(null);
-                              })
-                              .catch((err) => setError(err instanceof Error ? err.message : 'Ошибка'));
-                          }
-                        }}
-                      >
-                        Удалить
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <form onSubmit={handleAddTopic}>
-                  <div className={styles.field}>
-                    <input
-                      type="text"
-                      className={styles.input}
-                      value={newTopicName}
-                      onChange={(e) => setNewTopicName(e.target.value)}
-                      placeholder="Название новой темы"
-                    />
-                  </div>
-                  <button type="submit" className={styles.button} disabled={!newTopicName.trim()}>
-                    Создать тему
-                  </button>
-                </form>
-                </div>
-              </>
-            )}
-
-            <div className={styles.modalActions} style={{ marginTop: '1rem' }}>
-              <button type="button" className={styles.buttonSecondary} onClick={() => setManageOpen(false)}>
-                Закрыть
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {avatarLightboxUser ? (
+        <AvatarLightbox
+          userId={avatarLightboxUser.userId}
+          fallbackLetter={avatarLightboxUser.fallbackLetter}
+          onClose={() => setAvatarLightboxUser(null)}
+        />
+      ) : null}
 
       {userSettingsUserId && chat && (() => {
         const p = chat.participants.find((x) => x.user_id === userSettingsUserId);
@@ -1013,15 +1190,14 @@ export default function ChatRoom() {
             userEmail={p.email}
             chatId={chatId ?? null}
             isGroupAdmin={isAdmin}
-            selectedMessageId={selectedMessageId}
             onClose={() => setUserSettingsUserId(null)}
+            onAvatarClick={() =>
+              setAvatarLightboxUser({
+                userId: p.user_id,
+                fallbackLetter: p.name?.[0] || p.email[0],
+              })
+            }
             onMuted={() => chatId && getChat(chatId).then(setChat)}
-            onMessageDeleted={() => {
-              if (chatId) {
-                getChatMessages(chatId, { topic_id: selectedTopicId || undefined, limit: 50 }).then(setMessages);
-                setSelectedMessageId(null);
-              }
-            }}
             onRoleChanged={() => chatId && getChat(chatId).then(setChat)}
           />
         );

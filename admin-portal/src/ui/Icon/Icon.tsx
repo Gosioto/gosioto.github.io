@@ -198,3 +198,33 @@ export function IconPaperclip(props: IconProps) {
     </svg>
   );
 }
+
+/** Три точки (меню «дополнительно»). */
+export function IconMoreHorizontal(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/** Одна галочка (статус отправки/доставки). */
+export function IconCheck(props: IconProps) {
+  return (
+    <svg {...base(props)} strokeWidth={2.5}>
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+/** Двойная галочка (прочитано). */
+export function IconChecks(props: IconProps) {
+  return (
+    <svg {...base(props)} strokeWidth={2.5}>
+      <polyline points="4 13 8 17 14 8" />
+      <polyline points="9 13 13 17 20 7" />
+    </svg>
+  );
+}

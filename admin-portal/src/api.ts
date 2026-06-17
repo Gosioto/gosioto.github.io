@@ -1,4 +1,5 @@
 import { API_BASE, healthUrl } from './apiConfig';
+import { getBrowserKey, getTabKey, setStoredSessionId, clearStoredSessionId, clearBrowserKey } from './sessionKeys';
 
 export { API_BASE } from './apiConfig';
 
@@ -21,6 +22,7 @@ export type User = {
 
 export type AuthResponse = {
   token: string;
+  session_id: string;
   user: User;
 };
 
@@ -40,12 +42,18 @@ function getToken(): string | null {
   return localStorage.getItem('token');
 }
 
-export async function login(email: string, password: string): Promise<AuthResponse> {
+export async function login(email: string, password: string, currentPath?: string): Promise<AuthResponse> {
   const normalizedEmail = email.trim().toLowerCase();
   const res = await fetch(`${API_BASE}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: normalizedEmail, password }),
+    body: JSON.stringify({
+      email: normalizedEmail,
+      password,
+      tab_key: getTabKey(),
+      browser_key: getBrowserKey(),
+      current_path: currentPath ?? '/dashboard',
+    }),
   });
   if (!res.ok) {
     if (res.status === 403) throw new Error('Аккаунт заблокирован');
@@ -57,7 +65,48 @@ export async function login(email: string, password: string): Promise<AuthRespon
     }
     throw new Error(err.detail || err.error || 'Неверный логин или пароль');
   }
-  return res.json();
+  const data: AuthResponse = await res.json();
+  setStoredSessionId(data.session_id);
+  return data;
+}
+
+export async function resumeSession(currentPath?: string): Promise<AuthResponse> {
+  const token = getToken();
+  if (!token) throw new MeRequestError('Not authenticated', 'unknown');
+  const res = await fetch(`${API_BASE}/auth/session/resume`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      tab_key: getTabKey(),
+      browser_key: getBrowserKey(),
+      current_path: currentPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/dashboard'),
+    }),
+  });
+  if (!res.ok) {
+    if (res.status === 401) throw new MeRequestError('Session expired', 'unauthorized', 401);
+    throw new MeRequestError('Resume failed', 'unknown', res.status);
+  }
+  const data: AuthResponse = await res.json();
+  setStoredSessionId(data.session_id);
+  return data;
+}
+
+export async function logoutApi(): Promise<void> {
+  const token = getToken();
+  if (!token) return;
+  try {
+    await fetch(`${API_BASE}/auth/logout`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    /* best effort */
+  }
+  clearStoredSessionId();
+  clearBrowserKey();
 }
 
 /** Thrown by {@link me}; use {@link MeRequestError.kind} to tell invalid session from network/server errors. */
@@ -351,11 +400,13 @@ export type Friend = {
   name: string | null;
   has_avatar: boolean;
   online: boolean;
+  presence: 'online' | 'away' | 'offline';
   personal_chat_id?: string | null;
   peer_blocked_by_me: boolean;
   peer_blocked_me: boolean;
   notifications_muted_until?: string | null;
   muted_until?: string | null;
+  nickname?: string | null;
 };
 
 export async function getFriends(): Promise<Friend[]> {
@@ -367,6 +418,73 @@ export async function getFriends(): Promise<Friend[]> {
 export async function removeFriend(userId: string): Promise<void> {
   const res = await authFetch(`/friends/${userId}`, { method: 'DELETE' });
   if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+export async function patchFriendNickname(userId: string, nickname: string | null): Promise<void> {
+  const res = await authFetch(`/friends/${userId}/nickname`, {
+    method: 'PATCH',
+    body: JSON.stringify({ nickname }),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+export type UserSessionRow = {
+  id: string;
+  user_id: string;
+  email: string;
+  name: string | null;
+  tab_key: string;
+  browser_key: string;
+  current_path: string | null;
+  status: string;
+  client_ip: string | null;
+  user_agent: string | null;
+  connected_at: string;
+  last_seen_at: string;
+};
+
+export type UserSessionSummary = {
+  user_id: string;
+  email: string;
+  name: string | null;
+  presence: string;
+  session_count: number;
+  last_seen_at: string | null;
+};
+
+export async function getSessionSummaries(): Promise<UserSessionSummary[]> {
+  const res = await authFetch('/admin/sessions/summaries');
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function getUserSessions(userId?: string, status?: string): Promise<UserSessionRow[]> {
+  const q = new URLSearchParams();
+  if (userId) q.set('user_id', userId);
+  if (status) q.set('status', status);
+  const res = await authFetch(`/admin/sessions?${q.toString()}`);
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function getSessionHistory(userId: string, day: string): Promise<unknown> {
+  const res = await authFetch(`/admin/sessions/${userId}/history?day=${encodeURIComponent(day)}`);
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+export async function revokeSession(sessionId: string): Promise<void> {
+  const res = await authFetch(`/admin/sessions/${sessionId}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+export async function purgeSessionStorage(beforeDay: string): Promise<unknown> {
+  const res = await authFetch('/admin/sessions/storage/purge', {
+    method: 'POST',
+    body: JSON.stringify({ before_day: beforeDay, confirm: true }),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
 }
 
 // --- RUscord ---
@@ -674,6 +792,7 @@ export type ChatParticipant = {
   muted_until?: string | null;
   peer_blocked?: boolean;
   notifications_muted_until?: string | null;
+  last_read_at?: string | null;
 };
 
 export type ChatTopic = {
@@ -686,9 +805,11 @@ export type ChatTopic = {
 export type MessagePreview = {
   id: string;
   content_preview: string;
+  sender_id: string;
   sender_email: string;
   sender_name: string | null;
   created_at: string;
+  peer_delivered_at?: string | null;
 };
 
 export type Chat = {
@@ -703,6 +824,8 @@ export type Chat = {
   main_unread_count?: number;
   ruscord_server_id?: string | null;
   has_avatar?: boolean;
+  peer_online?: boolean | null;
+  peer_nickname?: string | null;
 };
 
 export type Message = {
@@ -717,6 +840,10 @@ export type Message = {
   message_type?: string;
   payload?: FileOfferPayload | null;
   created_at: string;
+  original_content?: string | null;
+  edited_at?: string | null;
+  peer_delivered_at?: string | null;
+  edit_visible?: boolean;
 };
 
 export type FileOfferPayload = {
@@ -790,6 +917,11 @@ export async function markChatRead(chatId: string, topicId?: string | null): Pro
     method: 'POST',
     body,
   });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+export async function deleteGroupChat(chatId: string): Promise<void> {
+  const res = await authFetch(`/chats/${chatId}/group`, { method: 'DELETE' });
   if (!res.ok) throw new Error(await parseApiError(res));
 }
 
@@ -910,6 +1042,28 @@ export async function deleteChatTopic(chatId: string, topicId: string): Promise<
 /** Удалить сообщение в чате (только админ чата). */
 export async function deleteChatMessage(chatId: string, messageId: string): Promise<void> {
   const res = await authFetch(`/chats/${chatId}/messages/${messageId}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(await parseApiError(res));
+}
+
+/** Редактировать текстовое сообщение в личном чате. */
+export async function editChatMessage(
+  chatId: string,
+  messageId: string,
+  content: string,
+): Promise<Message> {
+  const res = await authFetch(`/chats/${chatId}/messages/${messageId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ content: content.trim() }),
+  });
+  if (!res.ok) throw new Error(await parseApiError(res));
+  return res.json();
+}
+
+/** Подтвердить доставку сообщения собеседнику (личный чат). */
+export async function markMessageDelivered(chatId: string, messageId: string): Promise<void> {
+  const res = await authFetch(`/chats/${chatId}/messages/${messageId}/delivered`, {
+    method: 'POST',
+  });
   if (!res.ok) throw new Error(await parseApiError(res));
 }
 

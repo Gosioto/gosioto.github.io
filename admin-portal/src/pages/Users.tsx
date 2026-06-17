@@ -566,8 +566,6 @@ export default function Users() {
       {avatarViewUser && (
         <AvatarLightbox
           userId={avatarViewUser.id}
-          email={avatarViewUser.email}
-          name={avatarViewUser.name}
           fallbackLetter={avatarViewUser.name?.[0] || avatarViewUser.email[0]}
           onClose={() => setAvatarViewUserId(null)}
         />

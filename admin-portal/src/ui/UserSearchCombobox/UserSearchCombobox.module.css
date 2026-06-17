@@ -1,71 +1,75 @@
-.root {
-  position: relative;
-  width: 100%;
-}
-
-.inputWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.searchIcon {
-  position: absolute;
-  left: 0.65rem;
-  color: var(--text-muted);
-  pointer-events: none;
-}
-
-.input {
-  width: 100%;
-  padding: 0.55rem 0.75rem 0.55rem 2rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 0.95rem;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.list {
-  position: absolute;
-  z-index: 20;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  margin: 0;
-  padding: 0.25rem;
-  list-style: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  max-height: 220px;
-  overflow-y: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-.option {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 0.5rem 0.65rem;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.option:hover {
-  background: var(--surface2);
-}
-
-.optionActive {
-  background: rgba(0, 212, 170, 0.12);
-  color: var(--accent);
-}
+.root {
+  position: relative;
+  width: 100%;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.65rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  padding: 0.55rem 0.75rem 0.55rem 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.listElevated {
+  z-index: 1300;
+}
+
+.option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.option:hover {
+  background: var(--surface2);
+}
+
+.optionActive {
+  background: rgba(0, 212, 170, 0.12);
+  color: var(--accent);
+}

@@ -16,6 +16,7 @@ import {
   type UserWithRole,
 } from '../api';
 import Avatar from './Avatar';
+import AvatarLightbox from './AvatarLightbox';
 import styles from './UserSettingsModal.module.css';
 
 type Props = {
@@ -30,6 +31,7 @@ type Props = {
   onMuted?: () => void;
   onMessageDeleted?: () => void;
   onRoleChanged?: () => void;
+  onAvatarClick?: () => void;
 };
 
 function muteUntilMinutes(minutes: number): string {
@@ -47,6 +49,7 @@ export default function UserSettingsModal({
   onMuted,
   onMessageDeleted,
   onRoleChanged,
+  onAvatarClick,
 }: Props) {
   const { user: me } = useAuth();
   const [muteError, setMuteError] = useState('');
@@ -56,6 +59,7 @@ export default function UserSettingsModal({
   const [targetUser, setTargetUser] = useState<UserWithRole | null>(null);
   const [roleLoading, setRoleLoading] = useState(false);
   const [deleteMsgLoading, setDeleteMsgLoading] = useState(false);
+  const [avatarLightboxOpen, setAvatarLightboxOpen] = useState(false);
 
   const isOwn = userId === me?.id;
   const canMute = Boolean(chatId && isGroupAdmin && !isOwn);
@@ -135,19 +139,32 @@ export default function UserSettingsModal({
       .finally(() => setDeleteMsgLoading(false));
   }
 
+  function handleAvatarClick() {
+    setAvatarLightboxOpen(true);
+    onAvatarClick?.();
+  }
+
   return (
+    <>
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         {/* 1. Профиль */}
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>Профиль</h3>
           <div className={styles.header}>
-            <Avatar
-              userId={userId}
-              fallbackLetter={userName?.[0] || userEmail[0]}
-              size={72}
-              className={styles.avatar}
-            />
+            <button
+              type="button"
+              className={styles.avatarBtn}
+              onClick={handleAvatarClick}
+              title="Просмотр аватара"
+            >
+              <Avatar
+                userId={userId}
+                fallbackLetter={userName?.[0] || userEmail[0]}
+                size={72}
+                className={styles.avatar}
+              />
+            </button>
             <div className={styles.nameLine}>
               {userName ? <span className={styles.displayName}>{userName}</span> : null}
               <span className={styles.email}>{userEmail}</span>
@@ -252,5 +269,13 @@ export default function UserSettingsModal({
         </div>
       </div>
     </div>
+    {avatarLightboxOpen ? (
+      <AvatarLightbox
+        userId={userId}
+        fallbackLetter={userName?.[0] || userEmail[0]}
+        onClose={() => setAvatarLightboxOpen(false)}
+      />
+    ) : null}
+    </>
   );
 }

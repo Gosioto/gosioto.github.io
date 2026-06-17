@@ -22,3 +22,4 @@ coverage/
 .vscode/
 .DS_Store
 Thumbs.db
+/admin-portal/node_modules

@@ -10,4 +10,7 @@ export type { ScrollAreaHandle } from './ScrollArea/ScrollArea';
 export { default as Badge } from './Badge/Badge';
 export { default as UserSearchCombobox } from './UserSearchCombobox/UserSearchCombobox';
 export { default as AvatarCropper } from './AvatarCropper/AvatarCropper';
+export { default as Modal } from './Modal/Modal';
+export { default as ContextMenu } from './ContextMenu/ContextMenu';
+export type { ContextMenuItem } from './ContextMenu/ContextMenu';
 export * from './Icon/Icon';

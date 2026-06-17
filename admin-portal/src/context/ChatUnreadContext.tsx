@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import { getChats, type Chat } from '../api';
+import { getChats, type Chat, type ChatParticipant } from '../api';
+import { useAuth } from '../auth';
+import { isChatNotificationsMuted } from '../utils/chatMute';
 
 const POLL_MS = 20_000;
 export const CHAT_UNREAD_EVENT = 'chat-unread';
@@ -13,11 +15,18 @@ type ChatUnreadContextValue = {
 
 const ChatUnreadContext = createContext<ChatUnreadContextValue | null>(null);
 
-function sumUnread(chats: ChatWithUnread[]): number {
-  return chats.reduce((sum, chat) => sum + (chat.unread_count ?? 0), 0);
+function sumUnread(chats: ChatWithUnread[], meId?: string): number {
+  return chats.reduce((sum, chat) => {
+    const myPart = meId
+      ? chat.participants.find((p: ChatParticipant) => p.user_id === meId)
+      : undefined;
+    if (isChatNotificationsMuted(myPart?.notifications_muted_until)) return sum;
+    return sum + (chat.unread_count ?? 0);
+  }, 0);
 }
 
 export function ChatUnreadProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [totalUnread, setTotalUnread] = useState(0);
   const loadingRef = useRef(false);
 
@@ -26,13 +35,13 @@ export function ChatUnreadProvider({ children }: { children: ReactNode }) {
     loadingRef.current = true;
     try {
       const chats = (await getChats()) as ChatWithUnread[];
-      setTotalUnread(sumUnread(chats));
+      setTotalUnread(sumUnread(chats, user?.id));
     } catch {
       // ignore polling errors
     } finally {
       loadingRef.current = false;
     }
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     void refresh();

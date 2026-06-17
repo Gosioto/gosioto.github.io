@@ -1,50 +1,58 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 300;
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  max-width: min(90vw, 420px);
+.frame {
+  position: relative;
+  max-width: min(90vw, 480px);
+  max-height: min(90vh, 480px);
 }
 
-.avatarWrap {
-  animation: avatarZoomIn 0.28s ease-out;
+.image {
+  display: block;
+  max-width: min(90vw, 480px);
+  max-height: min(90vh, 480px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius);
 }
 
-.avatar {
-  width: 256px;
-  height: 256px;
+.placeholder {
+  width: min(90vw, 280px);
+  height: min(90vw, 280px);
+  max-height: min(90vh, 280px);
   border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-}
-
-.caption {
-  margin: 0;
-  font-size: 1rem;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 5rem;
   font-weight: 600;
-  color: #fff;
-  text-align: center;
-  word-break: break-word;
 }
 
-@keyframes avatarZoomIn {
-  from {
-    opacity: 0;
-    transform: scale(0.82);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.closeBtn {
+  position: absolute;
+  top: -2.5rem;
+  right: 0;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.closeBtn:hover {
+  background: rgba(0, 0, 0, 0.65);
 }

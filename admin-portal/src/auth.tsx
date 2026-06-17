@@ -1,12 +1,13 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import { me, MeRequestError, type User } from './api';
+import { me, resumeSession, logoutApi, MeRequestError, type User } from './api';
+import { setStoredSessionId } from './sessionKeys';
 
 type AuthContextType = {
   token: string | null;
   user: User | null;
-  setAuth: (token: string, user: User) => void;
+  setAuth: (token: string, user: User, sessionId?: string) => void;
   refreshUser: () => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   loading: boolean;
 };
 
@@ -17,13 +18,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(!!token);
 
-  const setAuth = useCallback((t: string, u: User) => {
+  const setAuth = useCallback((t: string, u: User, sessionId?: string) => {
     localStorage.setItem('token', t);
+    if (sessionId) setStoredSessionId(sessionId);
     setToken(t);
     setUser(u);
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await logoutApi();
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
@@ -46,13 +49,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     function probe() {
-      return me()
-        .then((u) => {
-          if (!cancelled) setUser(u);
+      return resumeSession()
+        .then(({ token: t, user: u, session_id }) => {
+          if (cancelled) return;
+          localStorage.setItem('token', t);
+          setToken(t);
+          setStoredSessionId(session_id);
+          setUser(u);
         })
         .catch((err: unknown) => {
           if (cancelled) return;
-          if (shouldLogout(err)) logout();
+          if (shouldLogout(err)) {
+            void logout();
+            return;
+          }
+          return me()
+            .then((u) => {
+              if (!cancelled) setUser(u);
+            })
+            .catch((e: unknown) => {
+              if (!cancelled && shouldLogout(e)) void logout();
+            });
         })
         .finally(() => {
           if (!cancelled) setLoading(false);
@@ -63,19 +80,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     function onVisibility() {
       if (document.visibilityState !== 'visible' || cancelled || !localStorage.getItem('token')) return;
-      me()
-        .then((u) => {
-          if (!cancelled) setUser(u);
+      resumeSession()
+        .then(({ token: t, user: u, session_id }) => {
+          if (cancelled) return;
+          localStorage.setItem('token', t);
+          setToken(t);
+          setStoredSessionId(session_id);
+          setUser(u);
         })
         .catch((err: unknown) => {
           if (cancelled) return;
-          if (shouldLogout(err)) logout();
+          if (shouldLogout(err)) void logout();
         });
     }
+
+    function onSessionRevoked() {
+      if (!cancelled) void logout();
+    }
+
     document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('gosloto:session_revoked', onSessionRevoked);
     return () => {
       cancelled = true;
       document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('gosloto:session_revoked', onSessionRevoked);
     };
   }, [token, logout]);
 

@@ -11,11 +11,18 @@ import {
 } from '../api';
 import Avatar from '../components/Avatar';
 import UserSettingsModal from '../components/UserSettingsModal';
-import { IconBan, IconBellOff, IconClock, useToast } from '../ui';
+import { IconBan, IconBellOff, IconClock, IconMessage, IconUsers, useToast } from '../ui';
 import { formatDisplayName } from '../utils/displayName';
+import { FRIEND_PRESENCE_EVENT, type FriendPresenceDetail } from '../presenceEvents';
 import styles from './Friends.module.css';
 
 const POLL_MS = 20_000;
+
+function presenceDotClass(presence: string) {
+  if (presence === 'online') return styles.onlineDot;
+  if (presence === 'away') return `${styles.onlineDot} ${styles.onlineDotAway}`;
+  return `${styles.onlineDot} ${styles.onlineDotOffline}`;
+}
 
 function muteUntilHours(hours: number): string {
   return new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
@@ -23,6 +30,11 @@ function muteUntilHours(hours: number): string {
 
 function isActiveUntil(until: string | null | undefined): boolean {
   return Boolean(until && new Date(until) > new Date());
+}
+
+function normalizePresence(value: string): Friend['presence'] {
+  if (value === 'online' || value === 'away' || value === 'offline') return value;
+  return 'offline';
 }
 
 export default function Friends() {
@@ -51,6 +63,26 @@ export default function Friends() {
     const id = window.setInterval(() => void loadFriends(), POLL_MS);
     return () => window.clearInterval(id);
   }, [loadFriends]);
+
+  useEffect(() => {
+    function onPresence(e: Event) {
+      const detail = (e as CustomEvent<FriendPresenceDetail>).detail;
+      if (!detail?.user_id) return;
+      setFriends((prev) =>
+        prev.map((f) =>
+          f.user_id === detail.user_id
+            ? {
+                ...f,
+                presence: normalizePresence(detail.presence),
+                online: detail.presence === 'online',
+              }
+            : f,
+        ),
+      );
+    }
+    window.addEventListener(FRIEND_PRESENCE_EVENT, onPresence);
+    return () => window.removeEventListener(FRIEND_PRESENCE_EVENT, onPresence);
+  }, []);
 
   useEffect(() => {
     if (!muteMenuFor) return;
@@ -162,15 +194,32 @@ export default function Friends() {
                   <Avatar
                     userId={friend.user_id}
                     fallbackLetter={friend.name?.[0] || friend.email[0]}
-                    size={44}
+                    size={52}
                     className={styles.avatar}
                   />
-                  {friend.online ? <span className={styles.onlineDot} title="В сети" /> : null}
+                  {(friend.presence ?? (friend.online ? 'online' : 'offline')) !== 'offline' ? (
+                    <span
+                      className={presenceDotClass(friend.presence ?? (friend.online ? 'online' : 'offline'))}
+                      title={
+                        friend.presence === 'away'
+                          ? 'Не на месте'
+                          : friend.presence === 'online' || friend.online
+                            ? 'В сети'
+                            : 'Офлайн'
+                      }
+                    />
+                  ) : null}
                 </button>
 
                 <div className={styles.friendBody}>
                   <div className={styles.nameRow}>
-                    <span className={styles.friendName}>{displayName}</span>
+                    <button
+                      type="button"
+                      className={styles.friendName}
+                      onClick={() => setProfileUser(friend)}
+                    >
+                      {displayName}
+                    </button>
                     <span className={styles.statusIcons} aria-label="Статус">
                       {blocked ? (
                         <span title={friend.peer_blocked_by_me ? 'Вы заблокировали' : 'Вас заблокировали'}>
@@ -195,36 +244,40 @@ export default function Friends() {
                 <div className={styles.actions}>
                   <button
                     type="button"
-                    className={styles.actionBtn}
+                    className={styles.actionBtnIcon}
                     disabled={busy}
+                    title="Профиль"
                     onClick={() => setProfileUser(friend)}
                   >
-                    Профиль
+                    <IconUsers size={18} />
                   </button>
                   <button
                     type="button"
-                    className={styles.actionBtn}
+                    className={styles.actionBtnIcon}
                     disabled={busy}
+                    title="Сообщение"
                     onClick={() => void handleMessage(friend)}
                   >
-                    Сообщение
+                    <IconMessage size={18} />
                   </button>
                   <button
                     type="button"
-                    className={`${styles.actionBtn} ${friend.peer_blocked_by_me ? styles.actionBtnActive : ''}`}
+                    className={`${styles.actionBtnIcon} ${friend.peer_blocked_by_me ? styles.actionBtnActive : ''}`}
                     disabled={busy}
+                    title={friend.peer_blocked_by_me ? 'Разблокировать' : 'Блок'}
                     onClick={() => void handleToggleBlock(friend)}
                   >
-                    {friend.peer_blocked_by_me ? 'Разблок.' : 'Блок'}
+                    <IconBan size={18} />
                   </button>
                   <div className={styles.muteMenuWrap} ref={muteMenuFor === friend.user_id ? muteMenuRef : undefined}>
                     <button
                       type="button"
-                      className={`${styles.actionBtn} ${notificationsMuted ? styles.actionBtnActive : ''}`}
+                      className={`${styles.actionBtnIcon} ${notificationsMuted ? styles.actionBtnActive : ''}`}
                       disabled={busy}
+                      title={notificationsMuted ? 'Включить звук' : 'Без звука'}
                       onClick={() => setMuteMenuFor((id) => (id === friend.user_id ? null : friend.user_id))}
                     >
-                      {notificationsMuted ? 'Звук вкл.' : 'Без звука'}
+                      <IconBellOff size={18} />
                     </button>
                     {muteMenuFor === friend.user_id && (
                       <div className={styles.muteMenu}>
