@@ -4,95 +4,73 @@
 
 Назначение
 ----------
-  Демонстрация игровой коллекции Steam: топ-игры, текущие, полная библиотека,
-  статистика, скриншоты, достижения, модальные окна.
+  Витрина игрового профиля: кастомная шапка, топ-5, recent, скриншоты,
+  перетаскиваемая Steam-панель, модалка игры с галереей. Данные — static
+  snapshot (GitHub Pages, без live Steam API у посетителей).
 
-Две реализации (сравнение)
---------------------------
-  ВАРИАНТ A — /hobbies/games/  (рекомендуется как основной для навигации)
-    • Компонентная архитектура, CSS «Midjourney»
-    • src/app/hobbies/games/page.tsx
-    • Сборка: GamesPageMidjourney → Top/Current/Steam *Midjourney
-    • Подгрузка рядов библиотеки: IntersectionObserver (SteamGamesMidjourney)
-    • Header + Footer + NewsTab + ScrollToTop
-    • mounted-gate: спиннер до useEffect (избежание hydration mismatch)
+Канонический маршрут
+--------------------
+  /hobbies/games/
 
-  ВАРИАНТ B — /hobbies/games-enhanced/
-    • Монолит ~750 строк в одном page.tsx
-    • Framer Motion: hero, particles, карточки, FAB-dropdown, модалки
-    • Без общего Header/Footer — полноэкранный landing
-    • Те же данные gamesData.ts, достижения частично inline в модалке
-    • Экспериментальный / витринный UI
+  Точка входа: src/app/hobbies/games/page.tsx
+  Без глобального Header — своя GamesHeaderBar
+  Оболочка: GamesProfilePage + Footer + NewsTab + ScrollToTop
+  Стили: src/styles/games-profile.css
 
-Точки входа
------------
-  src/app/hobbies/games/page.tsx
-  src/app/hobbies/games-enhanced/page.tsx
+Компоненты (канон)
+------------------
+  GamesHeaderBar.tsx         — sticky шапка: якоря + CTA Steam
+  GamesHero.tsx              — full-bleed hero
+  FavoriteGames.tsx          — топ-5 (клик → модалка)
+  RecentGames.tsx            — последние 5 (клик → модалка)
+  GamesScreenshotsSection.tsx — обзорная мозаика + lightbox
+  GamesSecondary.tsx         — агрегаты + библиотека (клик → модалка)
+  SteamDock.tsx              — draggable панель (desktop) / sheet (mobile)
+  GameDetailModal.tsx        — capsule-иконка, мета, галерея по gameId
 
-Компоненты (вариант A)
+Структура страницы
+------------------
+  HeaderBar → Hero → Топ-5 → Последние 5 → Скриншоты → Библиотека
+  + SteamDock + GameDetailModal
+
+Данные (только static)
 ----------------------
-  GamesPageMidjourney.tsx      — layout-обёртка страницы
-  TopGamesMidjourney.tsx       — топ-5, горизонтальный скролл
-  CurrentGamesMidjourney.tsx   — «сейчас играю», progress bar
-  SteamGamesMidjourney.tsx     — сетка 3 в ряд, lazy rows (visibleRows)
-  GamesSidebarMidjourney.tsx   — боковая панель (если активна)
-  GamesHideBar.tsx             — скрытие/показ панелей
-
-  GamesPage.tsx, TopGamesSection.tsx, … — альтернативный набор (legacy naming)
-
-  Модалки и галереи:
-    GameDetailsModal.tsx
-    GameScreenshotsModal.tsx
-    ScreenshotsModal.tsx
-    ScreenshotsGallery.tsx
-    AchievementsModal.tsx
-    GamePreferencesModal.tsx
-    GameModalButtons.tsx
-    GameStatsSection.tsx / GameStatsMidjourney.tsx
-    GamesHeader.tsx
-
-Данные
-------
   src/data/gamesData.ts
-    gamesData: Game[]       — полная библиотека
-    topGames: TopGame[]     — rank, hours, achievements
-    currentGames: CurrentGame[] — progress %
-    gameStats               — агрегаты для UI
+    profileMeta, topGames, recentGames, gamesData, gameStats
+    У каждой игры: appId, gameId
 
-  src/data/achievementsData.ts — achievementsData, getGameIconColor, getGameInitials
-  src/data/screenshotsData.ts — screenshotsData[], filterScreenshots, getUniqueGames
+  src/data/screenshotsData.ts
+    localScreenshots + merge с generatedScreenshots
+    filterScreenshots(gameId)
 
-  src/types/game.ts, src/types/index.ts (Game, Achievement)
+  src/data/screenshotsData.generated.ts
+    Пишется скриптом steam:screenshots (может быть пустым)
 
-Стили (вариант A)
------------------
-  games-midjourney.css
-  games-midjourney-enhanced.css
-  games-dropdown-menu.css
-  games-modals.css
-  games.css, hobbies-games.css, games-enhanced.css
+Парсер скриншотов Steam (offline)
+---------------------------------
+  npm run steam:screenshots
+  → scripts/fetch-steam-screenshots.mjs
+  → public/img/screenshot/steam/{appId}/
+  → src/data/screenshotsData.generated.ts
 
-Фичи
-----
-  • Топ-5: стрелки скролла, клик → детали
-  • Steam grid: +1 ряд при пересечении triggerRef (observer)
-  • Модалки: инфо, скриншоты, достижения
-  • FAB-dropdown (enhanced): hover-меню в углу экрана
-  • Клавиатура: Enter/Space на карточках (SteamGamesMidjourney)
+  Затем: commit ассетов → npm run build → деплой out/
+  Если Steam отдаёт login wall — предыдущий снимок не затирается.
 
-Способ реализации
------------------
-  A: разделение на компоненты + CSS modules классов + observer pagination
-  B: framer-motion AnimatePresence, inline state (selectedGame, activeModal, …)
-  • Нет реального Steam API — все данные статические в TS
-  • react-window не используется (длинные списки — порционный рендер рядов)
+Правило хостинга
+----------------
+  • Нет запросов к steamcommunity в браузере посетителя для парсинга.
+  • CDN Steam для header/capsule допустим.
+  • Галерея — локальные файлы public/img/screenshot/...
+
+Экспериментальный маршрут
+-------------------------
+  /hobbies/games-enhanced/ — не канон; те же gamesData.
 
 Зависимости
 -----------
-  18 (gamesData, achievements, screenshots), 08 (на games/), 13 (ссылка с hobbies)
+  18 (данные), 13 (ссылка с hobbies)
 
 Ограничения
 -----------
-  • Два URL для одного контента — поддерживать оба или выбрать один canonical
-  • About page ссылается на /hobby-games — битая ссылка
-  • Скриншоты в enhanced-модалке — захардкоженные 3 пути
+  • Снимок устаревает, пока не обновлён вручную / скриптом.
+  • Полный список игр Steam Community часто требует логин.

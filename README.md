@@ -34,7 +34,7 @@
 | `/skills/` | Навыки по категориям |
 | `/projects/` | Кейсы и аккордеон проектов |
 | `/hobbies/` | Сетка увлечений |
-| `/hobbies/games/` | Steam-библиотека (основная версия) |
+| `/hobbies/games/` | Игровой профиль Steam: топ-5, recent, скриншоты |
 | `/hobbies/games-enhanced/` | Альтернативный UI (Framer Motion) |
 | `/contact/` | Контакты и форма (EmailJS) |
 | `/freelance/` | Лендинг услуг |
@@ -59,7 +59,7 @@ npm run lint
 ## Интерактив
 
 - **Pixel Ecosystem** — canvas-симуляция на главной (ЛКМ — добавить, ПКМ — удалить)
-- **Steam-галерея** — топ игр, текущие, библиотека, модалки скриншотов/достижений
+- **Steam-профиль** — кастомная шапка, dock, топ-5/recent, модалка с галереей; скрины через `npm run steam:screenshots`
 - **Форма контакта** — EmailJS с honeypot и валидацией
 - **NewsTab** — changelog версий сайта на страницах
 

@@ -19,8 +19,9 @@ src/data/
     Используют: SkillsSection, SkillsPreview
 
   gamesData.ts
-    export gamesData, topGames, currentGames, gameStats
-    Используют: /hobbies/games/*, games-enhanced page
+    export profileMeta, gamesData, topGames, recentGames,
+           currentGames (legacy), gameStats
+    Используют: /hobbies/games/* (Games Profile), games-enhanced
 
   hobbiesData.ts
     export hobbiesData: Hobby[]
@@ -40,14 +41,14 @@ src/data/
     export interface Screenshot
     export screenshotsData: Screenshot[]
     export getUniqueGames(), filterScreenshots()
-    Используют: ScreenshotsGallery, модалки скриншотов
+    Используют: GamesScreenshotsSection, ScreenshotsGallery, модалки
 
 src/types/
 ----------
 
   project.ts    — Project, Feature, Technology, Screenshot, badge, comingSoon
   skills.ts     — Skill, SkillCategory, Subcategory
-  game.ts       — Game, TopGame, CurrentGame (расширения)
+  game.ts       — Game, TopGame, RecentGame, SteamProfileMeta, GameStats
   hobby.ts      — Hobby
   index.ts      — Game, Achievement (общие экспорты)
 
